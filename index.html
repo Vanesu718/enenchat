@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>聊天模拟器</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>oho</title>
 <style>
 :root { 
   --main-pink: #f0b8c8; 
@@ -28,12 +28,14 @@ body {
   min-height: 100vh; 
   overflow: hidden;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .phone-case {
-  position: relative; 
-  width: clamp(320px, 95vw, 375px); 
-  height: clamp(660px, 92vh, 812px);
+  position: fixed;
+  width: 375px;
+  height: 812px;
   background: rgba(255, 255, 255, 0.3); 
   backdrop-filter: blur(20px); 
   -webkit-backdrop-filter: blur(20px);
@@ -41,6 +43,15 @@ body {
   padding: 10px; 
   border: 1px solid rgba(255,255,255,0.5);
   box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+  resize: none;
+  pointer-events: auto;
+}
+
+@media (max-width: 400px) {
+  .phone-case {
+    width: 95vw;
+    height: 92vh;
+  }
 }
 
 .screen { 
@@ -398,8 +409,8 @@ body {
 .msg-item.left .msg-bubble { background: rgba(255, 255, 255, 0.6); color: var(--text-dark); border-bottom-left-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.5); }
 .msg-item.right .msg-bubble { background: rgba(240, 184, 200, 0.85); color: #fff; border-bottom-right-radius: 6px; box-shadow: 0 4px 12px rgba(240, 184, 200, 0.2); border: 1px solid rgba(255,255,255,0.3); }
 .msg-quote { padding: 6px 10px; border-radius: 8px; font-size: 12px; margin-bottom: 6px; line-height: 1.2; background: #f8f5f0; color: var(--text-light); }
-.msg-menu { position: absolute; top: -5px; right: 10px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 99; display: none; }
-.msg-item:hover .msg-menu { display: block; }
+.msg-menu { position: absolute; top: -5px; right: 10px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 99; display: none; pointer-events: none; }
+.msg-item:active .msg-menu { display: block; pointer-events: auto; }
 .msg-menu-item { padding: 6px 12px; font-size: 12px; color: var(--text-dark); cursor: pointer; }
 .msg-menu-item:hover { background: var(--light-pink); }
 .msg-item.selected .msg-bubble { opacity: 0.7; border: 2px solid #ff6b81; }
@@ -653,6 +664,97 @@ body {
 #chat-bg-file, #chat-user-avatar-file {
   display: none;
 }
+
+/* 朋友圈样式 */
+.moment-item {
+  background: white;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #f0e8df;
+}
+.moment-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.moment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  border: 2px solid var(--light-pink);
+}
+.moment-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.moment-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+.moment-time {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+.moment-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+.moment-actions {
+  display: flex;
+  gap: 15px;
+  padding-top: 8px;
+  border-top: 1px solid #f5f5f5;
+}
+.moment-action-btn {
+  font-size: 13px;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.moment-action-btn:hover {
+  background: var(--light-pink);
+  color: var(--main-pink);
+}
+.moment-comments {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+.moment-comment-item {
+  font-size: 13px;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.comment-author {
+  color: var(--main-pink);
+  font-weight: 500;
+}
+.moment-input-area {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 10px 15px;
+  border-top: 1px solid #f0e8df;
+  display: none;
+}
+.moment-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--light-pink);
+  border-radius: 20px;
+  outline: none;
+  font-size: 14px;
+}
 </style>
 </head>
 <body>
@@ -701,7 +803,7 @@ body {
         <div class="page-title">发现</div>
       </div>
       <div class="page-body">
-        <div class="empty-tip">发现页面待开发</div>
+        <div class="menu-item" onclick="openSub('moments-page')">朋友圈</div>
       </div>
     </div>
 
@@ -901,6 +1003,20 @@ body {
           </div>
         </div>
         <button class="save-btn" onclick="saveUserAvatar()">保存头像</button>
+        
+        <div style="margin:30px 0; border-top:1px solid #f0e8df;"></div>
+        
+        <div class="form-section">
+          <div class="form-label">数据备份与恢复</div>
+          <div class="setting-desc">导出所有数据（联系人、聊天记录、设置等）为JSON文件，或从备份文件中恢复数据。</div>
+          <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="upload-btn" style="flex:1; margin:0;" onclick="exportBackup()">📤 导出备份</button>
+            <label class="upload-btn" style="flex:1; margin:0; text-align:center;">
+              📥 导入备份
+              <input type="file" id="import-backup-file" accept=".json" onchange="importBackup(this)" style="display:none;">
+            </label>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -979,6 +1095,7 @@ body {
         <div onclick="quickReRoll()" style="padding:10px 16px; min-width:140px; cursor:pointer;">快速重roll</div>
         <div onclick="batchDeleteMsg()" style="padding:10px 16px; min-width:140px; cursor:pointer;">批量删除</div>
         <div onclick="clearChatRecord()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:red;">清空记录</div>
+        <div onclick="deleteCurrentContact()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:red; border-top:1px solid #f0e8df;">删除联系人</div>
       </div>
       <div class="chat-content" id="chatContent"></div>
       <div class="batch-delete-bar" id="batchDeleteBar">
@@ -1092,6 +1209,31 @@ body {
 **Birthday:** 11月13日（天蝎座）</textarea>
         </div>
 
+        <!-- 联系人头像和名字设置 -->
+        <div class="setting-section">
+          <div class="setting-section-title">联系人头像和名字</div>
+          <div class="setting-desc">修改当前联系人的头像和显示名称。</div>
+          
+          <div style="display:flex; align-items:center; gap:15px; margin:15px 0;">
+            <div class="avatar-preview-small" id="contactAvatarPreview">
+              <img src="">
+            </div>
+            <div style="flex:1;">
+              <input type="text" class="nickname-input" id="contactNameInput" placeholder="联系人名字" style="margin:0;">
+            </div>
+          </div>
+          
+          <div class="bg-btn-group">
+            <label class="setting-btn">
+              <span>🖼️</span> 上传头像
+              <input type="file" id="contact-avatar-file" accept="image/*" onchange="previewContactAvatarFile(this)" class="hidden-file">
+            </label>
+            <button class="setting-btn secondary" onclick="uploadContactAvatarByUrl()">
+              <span>🔗</span> 链接上传
+            </button>
+          </div>
+        </div>
+
         <!-- 联系人面具设置 -->
         <div class="setting-section">
           <div class="setting-section-title">联系人面具设置</div>
@@ -1113,6 +1255,18 @@ body {
 
         <!-- 保存按钮 -->
         <button class="save-btn" onclick="saveAllChatSettings()">保存所有设置</button>
+      </div>
+    </div>
+
+    <!-- 朋友圈二级页面 -->
+    <div class="sub-page" id="moments-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('moments-page')">←</div>
+        <div class="page-title">朋友圈</div>
+        <div style="margin-left:auto; cursor:pointer; font-size:18px;" onclick="refreshMoments()">🔄</div>
+      </div>
+      <div class="page-body" id="momentsContainer" style="padding:0;">
+        <div class="empty-tip">点击右上角刷新按钮查看朋友圈</div>
       </div>
     </div>
 
@@ -1666,8 +1820,52 @@ function initChatSettingsPage() {
   document.getElementById('userMaskTextarea').value = chatSettings.userMask || '';
   document.getElementById('contactMaskTextarea').value = chatSettings.contactMask || '';
   
+  // 加载联系人头像和名字
+  loadContactAvatarAndName();
+  
   // 渲染世界书多选框列表
   renderWorldBookCheckboxList();
+}
+
+// 加载联系人头像和名字
+function loadContactAvatarAndName() {
+  if (!currentContactId) return;
+  
+  const contact = contacts.find(c => c.id === currentContactId);
+  if (!contact) return;
+  
+  // 加载联系人头像
+  const contactAvatarPreview = document.getElementById('contactAvatarPreview');
+  if (contactAvatarPreview) {
+    contactAvatarPreview.innerHTML = `<img src="${contact.avatar}">`;
+  }
+  
+  // 加载联系人名字
+  const contactNameInput = document.getElementById('contactNameInput');
+  if (contactNameInput) {
+    contactNameInput.value = contact.name;
+  }
+}
+
+// 预览联系人头像文件
+function previewContactAvatarFile(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const preview = document.getElementById('contactAvatarPreview');
+    preview.innerHTML = `<img src="${e.target.result}">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+// 通过链接上传联系人头像
+function uploadContactAvatarByUrl() {
+  const url = prompt('请输入图片链接：');
+  if (url && url.trim() !== '') {
+    const preview = document.getElementById('contactAvatarPreview');
+    preview.innerHTML = `<img src="${url}">`;
+  }
 }
 
 // 渲染世界书多选框列表
@@ -1749,6 +1947,10 @@ function previewChatBgFile(input) {
     preview.style.backgroundSize = 'cover';
     preview.style.backgroundPosition = 'center';
     chatSettings.chatBg = `url(${e.target.result})`;
+    // 立即保存到localStorage
+    if (currentContactId) {
+      localStorage.setItem(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+    }
   };
   reader.readAsDataURL(file);
 }
@@ -1846,6 +2048,28 @@ function saveAllChatSettings() {
   chatSettings.chatNickname = document.getElementById('chatNicknameInput').value.trim();
   chatSettings.userMask = document.getElementById('userMaskTextarea').value.trim();
   chatSettings.contactMask = document.getElementById('contactMaskTextarea').value.trim();
+  
+  // 保存联系人头像和名字
+  const newContactName = document.getElementById('contactNameInput').value.trim();
+  const newContactAvatar = document.querySelector('#contactAvatarPreview img')?.src;
+  
+  if (newContactName) {
+    const contact = contacts.find(c => c.id === currentContactId);
+    if (contact) {
+      contact.name = newContactName;
+      if (newContactAvatar) {
+        contact.avatar = newContactAvatar;
+      }
+      localStorage.setItem('CHAT_CONTACTS', JSON.stringify(contacts));
+      
+      // 更新聊天页面的标题和头像
+      document.getElementById('chatHeaderTitle').innerText = newContactName;
+      document.getElementById('chatHeaderAvatar').innerHTML = `<img src="${contact.avatar}">`;
+      
+      // 更新联系人列表
+      renderContactList();
+    }
+  }
   
   // 保存到本地存储
   localStorage.setItem(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
@@ -2150,6 +2374,215 @@ function uploadMeBgByUrl() {
   }
 }
 
+// ========== 导出备份功能 ==========
+function exportBackup() {
+  const backupData = {
+    version: '1.0',
+    exportTime: new Date().toISOString(),
+    contacts: contacts,
+    chatRecords: chatRecords,
+    worldBookEntries: worldBookEntries,
+    worldBook: worldBook,
+    apiConfig: JSON.parse(localStorage.getItem('AI_CHAT_CONFIG') || '{}'),
+    userAvatar: userAvatar,
+    userNickname: localStorage.getItem('USER_NICKNAME') || '',
+    userSignature: document.getElementById('userSignature')?.value || '',
+    isOfflineMode: isOfflineMode,
+    // 保存所有聊天设置
+    chatSettings: {}
+  };
+  
+  // 保存每个联系人的聊天设置
+  contacts.forEach(c => {
+    const settings = localStorage.getItem(`CHAT_SETTINGS_${c.id}`);
+    if (settings) {
+      backupData.chatSettings[c.id] = JSON.parse(settings);
+    }
+  });
+  
+  // 保存每个联系人的状态
+  backupData.contactStatus = {};
+  contacts.forEach(c => {
+    const status = localStorage.getItem(`STATUS_${c.id}`);
+    if (status) {
+      backupData.contactStatus[c.id] = JSON.parse(status);
+    }
+  });
+  
+  // 保存底部图标
+  backupData.dockIcons = {};
+  for(let i=1; i<=4; i++) {
+    const icon = localStorage.getItem(`dock${i}`);
+    if (icon) {
+      backupData.dockIcons[`dock${i}`] = icon;
+    }
+  }
+  
+  // 保存其他图片资源
+  backupData.savedImages = {};
+  ['user-bg', 'user-avatar', 'p1', 'p2'].forEach(id => {
+    const data = localStorage.getItem('SVD_'+id);
+    if (data) {
+      backupData.savedImages[id] = data;
+    }
+  });
+  
+  // 生成JSON文件并下载
+  const jsonStr = JSON.stringify(backupData, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `oho_backup_${new Date().getTime()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  alert('✅ 备份文件已导出！');
+}
+
+// ========== 导入备份功能 ==========
+function importBackup(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  
+  if (!confirm('⚠️ 导入备份将覆盖当前所有数据，确定继续吗？')) {
+    input.value = '';
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const backupData = JSON.parse(e.target.result);
+      
+      // 验证备份文件格式
+      if (!backupData.version || !backupData.contacts) {
+        alert('❌ 备份文件格式不正确！');
+        return;
+      }
+      
+      // 恢复联系人
+      contacts = backupData.contacts || [];
+      localStorage.setItem('CHAT_CONTACTS', JSON.stringify(contacts));
+      
+      // 恢复聊天记录
+      chatRecords = backupData.chatRecords || {};
+      localStorage.setItem('CHAT_RECORDS', JSON.stringify(chatRecords));
+      
+      // 恢复世界书
+      worldBookEntries = backupData.worldBookEntries || [];
+      localStorage.setItem('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+      worldBook = backupData.worldBook || '';
+      localStorage.setItem('WORLD_BOOK', worldBook);
+      
+      // 恢复API配置
+      if (backupData.apiConfig) {
+        localStorage.setItem('AI_CHAT_CONFIG', JSON.stringify(backupData.apiConfig));
+      }
+      
+      // 恢复用户头像
+      if (backupData.userAvatar) {
+        userAvatar = backupData.userAvatar;
+        localStorage.setItem('USER_AVATAR', userAvatar);
+      }
+      
+      // 恢复用户昵称
+      if (backupData.userNickname) {
+        localStorage.setItem('USER_NICKNAME', backupData.userNickname);
+      }
+      
+      // 恢复用户签名
+      if (backupData.userSignature) {
+        const sigEl = document.getElementById('userSignature');
+        if (sigEl) sigEl.value = backupData.userSignature;
+      }
+      
+      // 恢复模式设置
+      if (backupData.isOfflineMode !== undefined) {
+        isOfflineMode = backupData.isOfflineMode;
+        localStorage.setItem('isOfflineMode', isOfflineMode);
+      }
+      
+      // 恢复聊天设置
+      if (backupData.chatSettings) {
+        Object.keys(backupData.chatSettings).forEach(contactId => {
+          localStorage.setItem(`CHAT_SETTINGS_${contactId}`, JSON.stringify(backupData.chatSettings[contactId]));
+        });
+      }
+      
+      // 恢复联系人状态
+      if (backupData.contactStatus) {
+        Object.keys(backupData.contactStatus).forEach(contactId => {
+          localStorage.setItem(`STATUS_${contactId}`, JSON.stringify(backupData.contactStatus[contactId]));
+        });
+      }
+      
+      // 恢复底部图标
+      if (backupData.dockIcons) {
+        Object.keys(backupData.dockIcons).forEach(key => {
+          localStorage.setItem(key, backupData.dockIcons[key]);
+        });
+      }
+      
+      // 恢复其他图片资源
+      if (backupData.savedImages) {
+        Object.keys(backupData.savedImages).forEach(id => {
+          localStorage.setItem('SVD_'+id, backupData.savedImages[id]);
+        });
+      }
+      
+      alert('✅ 备份已成功导入！页面将刷新以应用更改。');
+      location.reload();
+    } catch (err) {
+      console.error(err);
+      alert('❌ 导入失败：' + err.message);
+    }
+    
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ========== 删除联系人功能 ==========
+function deleteCurrentContact() {
+  if (!currentContactId) {
+    alert('请先选择联系人');
+    return;
+  }
+  
+  toggleChatMenu();
+  
+  const contact = contacts.find(c => c.id === currentContactId);
+  if (!contact) return;
+  
+  if (!confirm(`确定要删除联系人"${contact.name}"吗？\n\n⚠️ 这将同时删除与TA的所有聊天记录、设置和状态信息，且无法恢复！`)) {
+    return;
+  }
+  
+  // 删除联系人
+  contacts = contacts.filter(c => c.id !== currentContactId);
+  localStorage.setItem('CHAT_CONTACTS', JSON.stringify(contacts));
+  
+  // 删除聊天记录
+  delete chatRecords[currentContactId];
+  localStorage.setItem('CHAT_RECORDS', JSON.stringify(chatRecords));
+  
+  // 删除聊天设置
+  localStorage.removeItem(`CHAT_SETTINGS_${currentContactId}`);
+  
+  // 删除状态信息
+  localStorage.removeItem(`STATUS_${currentContactId}`);
+  
+  alert('✅ 联系人已删除！');
+  
+  // 关闭聊天窗口并返回联系人列表
+  closeSub('chat-win');
+  renderContactList();
+  currentContactId = '';
+}
+
 window.onload = () => {
   updateTime();
   loadApiConfig();
@@ -2180,6 +2613,203 @@ window.onload = () => {
   
   document.getElementById('dynamic-island').classList.remove('hidden');
 };
+
+// ========== 朋友圈功能 ==========
+let moments = JSON.parse(localStorage.getItem('MOMENTS') || '[]');
+let currentMomentId = null;
+
+async function refreshMoments() {
+  if (contacts.length === 0) {
+    alert('请先添加联系人');
+    return;
+  }
+  
+  const cfg = JSON.parse(localStorage.getItem('AI_CHAT_CONFIG') || '{}');
+  if (!cfg.key || !cfg.url || !cfg.model) {
+    alert('请先配置API设置');
+    return;
+  }
+  
+  const selectedContacts = [...contacts].sort(() => Math.random() - 0.5).slice(0, 5);
+  const container = document.getElementById('momentsContainer');
+  container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-light);">正在生成朋友圈...</div>';
+  
+  const newMoments = [];
+  
+  for (const contact of selectedContacts) {
+    try {
+      const prompt = `你是${contact.name}。根据以下人设，发一条符合你性格的朋友圈动态（50字以内，要自然真实）：\n${contact.persona}\n\n只需要返回朋友圈内容，不要其他说明。`;
+      
+      const res = await fetch(`${cfg.url}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+        body: JSON.stringify({
+          model: cfg.model,
+          temperature: 0.9,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      
+      const data = await res.json();
+      const content = data.choices?.[0]?.message?.content || '今天天气不错~';
+      
+      newMoments.push({
+        id: Date.now() + Math.random(),
+        contactId: contact.id,
+        contactName: contact.name,
+        contactAvatar: contact.avatar,
+        content: content.trim(),
+        time: Date.now(),
+        comments: []
+      });
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (e) {
+      console.error('生成失败:', e);
+    }
+  }
+  
+  moments = [...newMoments, ...moments].slice(0, 50);
+  localStorage.setItem('MOMENTS', JSON.stringify(moments));
+  renderMoments();
+}
+
+function renderMoments() {
+  const container = document.getElementById('momentsContainer');
+  
+  if (moments.length === 0) {
+    container.innerHTML = '<div class="empty-tip">点击右上角刷新按钮查看朋友圈</div>';
+    return;
+  }
+  
+  container.innerHTML = '';
+  
+  moments.forEach(moment => {
+    const div = document.createElement('div');
+    div.className = 'moment-item';
+    
+    const timeStr = formatTime(moment.time);
+    
+    let commentsHtml = '';
+    if (moment.comments && moment.comments.length > 0) {
+      commentsHtml = '<div class="moment-comments">';
+      moment.comments.forEach(comment => {
+        commentsHtml += `<div class="moment-comment-item"><span class="comment-author">${comment.author}</span>: ${comment.content}</div>`;
+      });
+      commentsHtml += '</div>';
+    }
+    
+    div.innerHTML = `
+      <div class="moment-header">
+        <div class="moment-avatar"><img src="${moment.contactAvatar}"></div>
+        <div>
+          <div class="moment-name">${moment.contactName}</div>
+          <div class="moment-time">${timeStr}</div>
+        </div>
+      </div>
+      <div class="moment-content">${moment.content}</div>
+      <div class="moment-actions">
+        <div class="moment-action-btn" onclick="likeMoment('${moment.id}')">👍 赞</div>
+        <div class="moment-action-btn" onclick="commentMoment('${moment.id}')">💬 评论</div>
+      </div>
+      ${commentsHtml}
+    `;
+    
+    container.appendChild(div);
+  });
+  
+  const inputArea = document.createElement('div');
+  inputArea.className = 'moment-input-area';
+  inputArea.id = 'momentInputArea';
+  inputArea.innerHTML = `<input type="text" class="moment-input" id="momentInput" placeholder="说点什么..." onkeypress="if(event.key==='Enter')submitComment()">`;
+  container.appendChild(inputArea);
+}
+
+function formatTime(timestamp) {
+  const now = Date.now();
+  const diff = now - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  
+  if (minutes < 1) return '刚刚';
+  if (minutes < 60) return `${minutes}分钟前`;
+  if (hours < 24) return `${hours}小时前`;
+  if (days < 7) return `${days}天前`;
+  
+  const date = new Date(timestamp);
+  return `${date.getMonth() + 1}月${date.getDate()}日`;
+}
+
+function likeMoment(momentId) {
+  alert('👍 已赞');
+}
+
+function commentMoment(momentId) {
+  currentMomentId = momentId;
+  const inputArea = document.getElementById('momentInputArea');
+  const input = document.getElementById('momentInput');
+  inputArea.style.display = 'block';
+  input.focus();
+  const moment = moments.find(m => m.id == momentId);
+  input.placeholder = '回复 ' + (moment?.contactName || '') + '...';
+}
+
+async function submitComment() {
+  const input = document.getElementById('momentInput');
+  const content = input.value.trim();
+  
+  if (!content || !currentMomentId) return;
+  
+  const moment = moments.find(m => m.id == currentMomentId);
+  if (!moment) return;
+  
+  if (!moment.comments) moment.comments = [];
+  moment.comments.push({
+    author: '我',
+    content: content,
+    time: Date.now()
+  });
+  
+  localStorage.setItem('MOMENTS', JSON.stringify(moments));
+  
+  const cfg = JSON.parse(localStorage.getItem('AI_CHAT_CONFIG') || '{}');
+  if (cfg.key && cfg.url && cfg.model) {
+    try {
+      const prompt = `你是${moment.contactName}，刚发了朋友圈："${moment.content}"。用户评论："${content}"。请用简短自然的语气回复（20字以内）。只返回回复内容。`;
+      
+      const res = await fetch(`${cfg.url}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+        body: JSON.stringify({
+          model: cfg.model,
+          temperature: 0.8,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      
+      const data = await res.json();
+      const reply = data.choices?.[0]?.message?.content || '😊';
+      
+      moment.comments.push({
+        author: moment.contactName,
+        content: reply.trim(),
+        time: Date.now()
+      });
+      
+      localStorage.setItem('MOMENTS', JSON.stringify(moments));
+    } catch (e) {
+      console.error('AI回复失败:', e);
+    }
+  }
+  
+  input.value = '';
+  document.getElementById('momentInputArea').style.display = 'none';
+  currentMomentId = null;
+  
+  renderMoments();
+  setTimeout(() => refreshMoments(), 1000);
+}
 </script>
 </body>
 </html>
