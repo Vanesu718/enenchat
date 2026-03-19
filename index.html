@@ -3,7 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+* {
+  touch-action: manipulation;
+}
+</style>
 <title>oho</title>
+<!-- 引入mammoth.js库用于解析docx文档 -->
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
 :root { 
   --main-pink: #f0b8c8; 
@@ -847,6 +856,32 @@ body {
 .moment-send-btn:active {
   opacity: 0.8;
 }
+
+/* Toast提示样式 */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 12px;
+  font-size: 14px;
+  z-index: 99999;
+  animation: fadeInOut 2s ease-in-out;
+  pointer-events: none;
+  max-width: 80%;
+  text-align: center;
+  line-height: 1.5;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+  10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  90% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+}
 </style>
 </head>
 <body>
@@ -910,7 +945,7 @@ body {
         
         <div class="me-avatar-card">
           <img id="user-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><circle cx='100' cy='100' r='98' fill='%23f0b8c8'/><text x='100' y='115' text-anchor='middle' font-size='60' fill='white'>我</text></svg>" class="me-avatar-img" onclick="triggerUpload('avatar-input')">
-          <h3 id="user-nickname" ondblclick="editNickname()" style="cursor:pointer; font-size:16px; color:#444;">Lik-</h3>
+          <div id="user-nickname" ondblclick="editNickname()" style="cursor:pointer; font-size:16px; color:#444; padding:8px 20px; margin:0 auto; display:inline-block; min-width:100px; text-align:center;">Lik-</div>
           <input type="text" class="editable-signature" id="userSignature" value="🍀 日落尤其温柔，人间皆是浪漫">
         </div>
 
@@ -1217,10 +1252,10 @@ body {
           <textarea class="form-textarea" id="contactPersona" placeholder="写TA的性格、外貌、习惯..."></textarea>
           <div style="margin-top:10px;">
             <label class="upload-btn" style="display:inline-block; margin:0;">
-              📄 导入文档 (txt/doc/docx/wps, 1M以内)
-              <input type="file" id="persona-file" accept=".txt,.doc,.docx,.wps" onchange="importPersonaFile(this)" style="display:none;">
+              📄 导入文档 (支持txt/docx, 1M以内)
+              <input type="file" id="persona-file" accept=".txt,.docx" onchange="importPersonaFile(this)" style="display:none;">
             </label>
-            <span style="font-size:12px; color:var(--text-light); margin-left:10px;">支持txt/doc/docx/wps格式</span>
+            <span style="font-size:12px; color:var(--text-light); margin-left:10px;">支持txt和docx格式</span>
           </div>
 
         </div>
@@ -1499,6 +1534,18 @@ body {
 </div>
 
 <script>
+// Toast提示函数 - 替代alert
+function showToast(message, duration = 2000) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.remove();
+  }, duration);
+}
+
 // 底部图标永久保存
 function pickDock(index) {
   const input = document.createElement('input');
@@ -1569,21 +1616,37 @@ function restoreDockIconsOnLoad(){
 }
 
 // 页面正常逻辑
-let isOfflineMode = localStorage.getItem('isOfflineMode') === 'true';
-
-function updateTime() {
-    const now = new Date();
-    const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-    const el = document.getElementById('currentTime');
-    if(el) el.innerText = timeStr;
-    document.getElementById('status-time').innerText = timeStr;
-    document.getElementById('status-time2').innerText = timeStr;
-    document.getElementById('status-time3').innerText = timeStr;
-}
-setInterval(updateTime, 1000); updateTime();
-
-// 跟踪正在进行的AI请求
+let contacts = JSON.parse(localStorage.getItem('CHAT_CONTACTS') || '[]');
+let chatRecords = JSON.parse(localStorage.getItem('CHAT_RECORDS') || '{}');
+let currentContactId = '';
+let worldBook = localStorage.getItem('WORLD_BOOK') || '';
+let worldBookEntries = JSON.parse(localStorage.getItem('WORLDBOOK_ENTRIES') || '[]');
+let userAvatar = localStorage.getItem('USER_AVATAR') || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><circle cx='18' cy='18' r='17' fill='%23f0b8c8'/><text x='18' y='22' text-anchor='middle' font-size='12' fill='white'>我</text></svg>";
+let replyMsg = null;
+let isBatchDeleteMode = false;
+let selectedMsgIndices = [];
+let chatSettings = {
+    hideAvatar: false,
+    chatBg: '',
+    chatUserAvatar: '',
+    chatNickname: '',
+    userMask: '',
+    contactMask: '',
+    useWorldBook: true
+};
+let isOfflineMode = localStorage.getItem('isOfflineMode') !== 'true';
 let aiRequestInProgress = false;
+
+  const label = document.getElementById('mode-label');
+  const toggle = document.getElementById('mode-toggle');
+  if (isOfflineMode) {
+    toggle.classList.remove('active');
+    if (label) label.innerText = '线上模式';
+  } else {
+    toggle.classList.add('active');
+    if (label) label.innerText = '线上模式';
+  }
+setInterval(updateTime, 1000); updateTime();
 
 function navTo(id, el) {
     // 关闭所有sub-page
@@ -1726,27 +1789,6 @@ function compressAndSave(file, tid, type) {
     reader.readAsDataURL(file);
 }
 
-let contacts = JSON.parse(localStorage.getItem('CHAT_CONTACTS') || '[]');
-let chatRecords = JSON.parse(localStorage.getItem('CHAT_RECORDS') || '{}');
-let currentContactId = '';
-let worldBook = localStorage.getItem('WORLD_BOOK') || '';
-let worldBookEntries = JSON.parse(localStorage.getItem('WORLDBOOK_ENTRIES') || '[]');
-let userAvatar = localStorage.getItem('USER_AVATAR') || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><circle cx='18' cy='18' r='17' fill='%23f0b8c8'/><text x='18' y='22' text-anchor='middle' font-size='12' fill='white'>我</text></svg>";
-let replyMsg = null;
-let isBatchDeleteMode = false;
-let selectedMsgIndices = [];
-
-// 聊天设置相关变量
-let chatSettings = {
-    hideAvatar: false,
-    chatBg: '',
-    chatUserAvatar: '',
-    chatNickname: '',
-    userMask: '',
-    contactMask: '',
-    useWorldBook: true
-};
-
 function renderContactList() {
   const el = document.getElementById('contactList');
   if (contacts.length === 0) {
@@ -1781,7 +1823,7 @@ function uploadAvatarByUrl() {
   if (u) document.getElementById('avatarPreview').innerHTML = `<img src="${u}">`;
 }
 
-// 导入人设文档
+// 导入人设文档 - 支持txt和docx格式
 function importPersonaFile(input) {
   const file = input.files?.[0];
   if (!file) return;
@@ -1795,28 +1837,63 @@ function importPersonaFile(input) {
   
   const fileName = file.name.toLowerCase();
   
-  // 检查文件类型
+  // 处理txt文件
   if (fileName.endsWith('.txt')) {
-    // 处理txt文件
     const reader = new FileReader();
     reader.onload = e => {
       const content = e.target.result;
       const textarea = document.getElementById('contactPersona');
       textarea.value = content;
-      alert('✅ 文档内容已导入到人设框！');
+      alert('✅ 文档内容已成功导入！');
     };
     reader.onerror = () => {
       alert('❌ 文件读取失败，请重试！');
     };
     reader.readAsText(file, 'UTF-8');
-  } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx') || fileName.endsWith('.wps')) {
-    // 处理doc/docx/wps文件
-    alert('📝 检测到Word/WPS文档！\n\n由于浏览器限制，请按以下步骤操作：\n\n1. 在Word/WPS中打开该文档\n2. 全选内容（Ctrl+A）\n3. 复制（Ctrl+C）\n4. 直接粘贴到人设输入框中\n\n或者：\n将文档另存为.txt格式后重新上传');
-  } else {
-    alert('⚠️ 不支持的文件格式！\n\n支持的格式：\n• .txt（可直接导入）\n• .doc/.docx/.wps（需手动复制粘贴）');
+    input.value = '';
+    return;
   }
   
-  // 清空input，允许重复选择同一文件
+  // 处理docx文件（使用mammoth.js）
+  if (fileName.endsWith('.docx')) {
+    // 检查mammoth库是否加载
+    if (typeof mammoth === 'undefined') {
+      alert('❌ Word文档解析库未加载！请刷新页面重试。');
+      input.value = '';
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = e => {
+      const arrayBuffer = e.target.result;
+      
+      // 使用mammoth解析docx
+      mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+        .then(result => {
+          const text = result.value.trim();
+          if (text) {
+            const textarea = document.getElementById('contactPersona');
+            textarea.value = text;
+            alert('✅ Word文档内容已成功导入！');
+          } else {
+            alert('⚠️ 文档内容为空或无法解析！');
+          }
+        })
+        .catch(err => {
+          console.error('docx解析失败:', err);
+          alert('❌ Word文档解析失败！\n\n建议：\n1. 确保文件是有效的.docx格式\n2. 或将文档另存为.txt格式后重新上传');
+        });
+    };
+    reader.onerror = () => {
+      alert('❌ 文件读取失败，请重试！');
+    };
+    reader.readAsArrayBuffer(file);
+    input.value = '';
+    return;
+  }
+  
+  // 不支持的格式
+  alert('⚠️ 不支持的文件格式！\n\n支持的格式：\n• .txt（纯文本）\n• .docx（Word 2007及以上版本）\n\n注意：不支持.doc（旧版Word）和.wps格式');
   input.value = '';
 }
 
@@ -1825,12 +1902,19 @@ function saveContact() {
   const name = document.getElementById('contactName').value.trim();
   const p = document.getElementById('contactPersona').value.trim();
   const avatar = document.querySelector('#avatarPreview img').src;
-  if (!name) { alert('请输入名字'); return; }
+  if (!name) { 
+    showToast('请输入名字');
+    return; 
+  }
   contacts.push({ id: Date.now().toString(), name, persona: p, avatar });
-  localStorage.setItem('CHAT_CONTACTS', JSON.stringify(contacts));
-  renderContactList();
-  alert('✅ 联系人已永久保存！刷新不会消失！');
-  closeSub('addContact');
+  try {
+    localStorage.setItem('CHAT_CONTACTS', JSON.stringify(contacts));
+    renderContactList();
+    showToast('✅ 联系人已永久保存！');
+    closeSub('addContact');
+  } catch(e) {
+    showToast('❌ 保存失败：' + e.message);
+  }
 }
 
 
@@ -1840,6 +1924,11 @@ function openChatPage(contact) {
   document.getElementById('chatHeaderTitle').innerText = contact.name;
   cancelReply();
   exitBatchDelete();
+  
+  // 先加载聊天设置
+  loadChatSettings();
+  
+  // 再渲染聊天（这样才能应用隐藏头像设置）
   renderChat();
   openSub('chat-win');
   
@@ -1852,9 +1941,6 @@ function openChatPage(contact) {
     toggle.classList.remove('active');
     if (label) label.innerText = '线上模式';
   }
-  
-  // 加载当前联系人的聊天设置
-  loadChatSettings();
 }
 
 function toggleMode() {
@@ -1862,13 +1948,15 @@ function toggleMode() {
   localStorage.setItem('isOfflineMode', isOfflineMode);
   const toggle = document.getElementById('mode-toggle');
   const label = document.getElementById('mode-label');
+  // 灰色(关闭) = 线下模式，粉色(打开) = 线上模式
+  // 文字始终显示"线上模式"
   if (isOfflineMode) {
-    toggle.classList.add('active');
-    if (label) label.innerText = '线下模式';
+    toggle.classList.remove('active'); // 灰色 = 线下模式
   } else {
-    toggle.classList.remove('active');
-    if (label) label.innerText = '线上模式';
+    toggle.classList.add('active'); // 粉色 = 线上模式
   }
+  // 文字不变，始终显示"线上模式"
+  if (label) label.innerText = '线上模式';
 }
 
 function renderChat() {
@@ -1892,10 +1980,14 @@ function renderChat() {
     loadMore.innerText = '↑ 往上翻查看更早消息';
     el.insertBefore(loadMore, el.firstChild);
   }
-  el.scrollTop = el.scrollHeight;
   
   // 应用隐藏头像设置
   applyHideAvatarSetting();
+  
+  // 滚动到底部（延迟执行确保DOM渲染完成）
+  setTimeout(() => {
+    el.scrollTop = el.scrollHeight;
+  }, 50);
 }
 
 function addMsgToUI(content, side, avatar, quote, idx) {
@@ -2304,6 +2396,12 @@ function toggleHideAvatar() {
   const toggle = document.getElementById('hide-avatar-toggle');
   toggle.classList.toggle('active');
   chatSettings.hideAvatar = toggle.classList.contains('active');
+  
+  // 立即保存到localStorage
+  if (currentContactId) {
+    localStorage.setItem(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+  }
+  
   // 立即应用设置
   applyHideAvatarSetting();
 }
@@ -2704,12 +2802,14 @@ function saveWorldBook() {
 function editNickname() {
   const nicknameEl = document.getElementById('user-nickname');
   const currentName = nicknameEl.innerText;
-  const newName = prompt('请输入新昵称：', currentName);
+  const newName = prompt('请输入新昵称（最多10个字）：', currentName);
   if (newName && newName.trim() !== '') {
-    nicknameEl.innerText = newName.trim();
-    localStorage.setItem('USER_NICKNAME', newName.trim());
+    // 限制最多10个字
+    const trimmedName = newName.trim().slice(0, 10);
+    nicknameEl.innerText = trimmedName;
+    localStorage.setItem('USER_NICKNAME', trimmedName);
     // 同步更新播放器名字
-    updatePlayerName(newName.trim());
+    updatePlayerName(trimmedName);
   }
 }
 
