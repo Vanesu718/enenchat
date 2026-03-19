@@ -65,20 +65,7 @@ body {
   flex-direction: column; 
 }
 .island { 
-  position: absolute; 
-  top: 12px; 
-  left: 50%; 
-  transform: translateX(-50%); 
-  width: 100px; 
-  height: 26px; 
-  background: rgba(0,0,0,0.8); 
-  border-radius: 20px; 
-  z-index: 10002; 
-  transition: opacity 0.3s;
-}
-.island.hidden {
-  opacity: 0;
-  pointer-events: none;
+  display: none;
 }
 
 .dock {
@@ -122,9 +109,7 @@ body {
   justify-content: center;
 }
 .dock-btn .dock-icon svg {
-  width: 26px;
-  height: 26px;
-  color: #666;
+  display: none;
 }
 .dock-btn.active .dock-icon svg {
   color: #fff;
@@ -180,6 +165,27 @@ body {
   font-size: 20px;
   cursor: pointer;
   color: var(--text-dark);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.04);
+  transition: all 0.2s ease;
+}
+.page-back:active {
+  background: rgba(0,0,0,0.1);
+  transform: scale(0.92);
+}
+.page-back svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--text-dark);
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .page-title {
   margin-left: 15px;
@@ -237,15 +243,19 @@ body {
 .contact-avatar {
   width: 48px;
   height: 48px;
+  min-width: 48px;
+  min-height: 48px;
   border-radius: 50%;
   overflow: hidden;
   margin-right: 12px;
   border: 2px solid var(--light-pink);
+  flex-shrink: 0;
 }
 .contact-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 .contact-name {
   font-size: 16px;
@@ -401,7 +411,9 @@ body {
 .menu-item { padding: 16px; background: white; border-radius: 16px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); color: var(--text-dark); }
 
 .chat-page { background: var(--bg-cream); }
-.chat-header { height: 50px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid #f0e8df; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); }
+.chat-header { height: 50px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #f0e8df; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); }
+.chat-header .page-back { background: none; width: auto; height: auto; padding: 4px 6px; }
+.chat-header .page-back:active { background: none; }
 .chat-header-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; margin-right: 10px; border: 1px solid var(--light-pink); }
 .chat-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .chat-content { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
@@ -464,7 +476,10 @@ body {
 #user-bg { 
   width: 100%;
   height: 100%;
-  background: url('https://picsum.photos/id/101/400/800') center/cover;
+  background-color: #e8d5c8;
+  background-image: none;
+  background-size: cover;
+  background-position: center;
   cursor: pointer;
 }
 .me-blur-mask {
@@ -859,7 +874,7 @@ body {
         <span>📶 🔋</span>
       </div>
       <div class="page-header">
-        <div class="page-back" onclick="navTo('page-chat', document.querySelector('.dock-btn:nth-child(1)'))">←</div>
+        <div class="page-back" onclick="navTo('page-chat', document.querySelector('.dock-btn:nth-child(1)'))"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">通讯录</div>
       </div>
       <div class="page-body">
@@ -876,7 +891,7 @@ body {
         <span>📶 🔋</span>
       </div>
       <div class="page-header">
-        <div class="page-back" onclick="navTo('page-chat', document.querySelector('.dock-btn:nth-child(1)'))">←</div>
+        <div class="page-back" onclick="navTo('page-chat', document.querySelector('.dock-btn:nth-child(1)'))"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">发现</div>
       </div>
       <div class="page-body">
@@ -894,7 +909,7 @@ body {
         <div class="me-time" id="currentTime">00:00</div>
         
         <div class="me-avatar-card">
-          <img id="user-avatar" src="https://picsum.photos/id/64/200/200" class="me-avatar-img" onclick="triggerUpload('avatar-input')">
+          <img id="user-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><circle cx='100' cy='100' r='98' fill='%23f0b8c8'/><text x='100' y='115' text-anchor='middle' font-size='60' fill='white'>我</text></svg>" class="me-avatar-img" onclick="triggerUpload('avatar-input')">
           <h3 id="user-nickname" ondblclick="editNickname()" style="cursor:pointer; font-size:16px; color:#444;">Lik-</h3>
           <input type="text" class="editable-signature" id="userSignature" value="🍀 日落尤其温柔，人间皆是浪漫">
         </div>
@@ -928,22 +943,22 @@ body {
 
     <div class="dock">
       <div class="dock-btn active" onclick="navTo('page-chat', this)">
-      <div id="dock1" class="dock-icon"></div>
+        <div id="dock1" class="dock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
       </div>
       <div class="dock-btn" onclick="navTo('page-contacts', this)">
-      <div id="dock2" class="dock-icon"></div>
+        <div id="dock2" class="dock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
       </div>
       <div class="dock-btn" onclick="navTo('page-discover', this)">
-      <div id="dock3" class="dock-icon"></div>
+        <div id="dock3" class="dock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></div>
       </div>
       <div class="dock-btn" onclick="navTo('page-me', this)">
-      <div id="dock4" class="dock-icon"></div>
+        <div id="dock4" class="dock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
       </div>
     </div>
 
     <div class="sub-page" id="theme-setting">
       <div class="page-header">
-        <div class="page-back" onclick="closeSub('theme-setting')">←</div>
+        <div class="page-back" onclick="closeSub('theme-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">🎨 美化设置</div>
       </div>
       <div class="page-body">
@@ -966,7 +981,7 @@ body {
           <input type="color" id="customThemeColor" value="#f0b8c8" onchange="applyCustomColor(this.value)" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;">
         </div>
         <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
-        <div class="form-label">底部图标替换</div>
+        <div class="form-label">底部图标替换（仅支持1M以内图片）</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;">
           <div style="text-align:center;">
             <div id="prev1" style="width:60px;height:60px;border-radius:16px;margin:0 auto;border:2px solid var(--light-pink);background:#fff;background-size:cover;background-position:center;"></div>
@@ -987,7 +1002,7 @@ body {
         </div>
         <button class="save-btn" onclick="saveDockIcons()">保存全部图标</button>
         <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
-        <div class="form-label">"我"页面背景图片</div>
+        <div class="form-label">"我"页面背景图片（仅支持2M以内图片上传）</div>
         <div style="margin-top:10px;">
           <div style="width:100%; height:120px; border-radius:12px; border:2px solid var(--light-pink); overflow:hidden; margin-bottom:10px;" id="me-bg-preview">
             <img id="me-bg-preview-img" style="width:100%; height:100%; object-fit:cover;">
@@ -1002,7 +1017,7 @@ body {
 
     <div class="sub-page" id="api-win">
       <div class="page-header">
-        <div class="page-back" onclick="closeSub('api-win')">←</div>
+        <div class="page-back" onclick="closeSub('api-win')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">API设置</div>
       </div>
       <div class="page-body">
@@ -1044,9 +1059,15 @@ body {
 
     <div class="sub-page" id="world-win">
       <div class="page-header">
-        <div class="page-back" onclick="closeSub('world-win')">←</div>
+        <div class="page-back" onclick="closeSub('world-win')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">世界书管理</div>
         <div style="margin-left:auto; font-size:24px; color:var(--main-pink); cursor:pointer;" onclick="openSub('add-worldbook')">+</div>
+      </div>
+      <div style="display:flex; gap:8px; padding:10px 20px; border-bottom:1px solid #f0e8df; background:rgba(255,255,255,0.7);">
+        <div class="wb-tab active" onclick="filterWorldBook('all')" data-category="all" style="flex:1; text-align:center; padding:8px; border-radius:8px; cursor:pointer; font-size:13px; background:var(--main-pink); color:white;">全部</div>
+        <div class="wb-tab" onclick="filterWorldBook('记忆总结')" data-category="记忆总结" style="flex:1; text-align:center; padding:8px; border-radius:8px; cursor:pointer; font-size:13px; background:#f5f5f5; color:var(--text-dark);">记忆总结</div>
+        <div class="wb-tab" onclick="filterWorldBook('语言规范')" data-category="语言规范" style="flex:1; text-align:center; padding:8px; border-radius:8px; cursor:pointer; font-size:13px; background:#f5f5f5; color:var(--text-dark);">语言规范</div>
+        <div class="wb-tab" onclick="filterWorldBook('html')" data-category="html" style="flex:1; text-align:center; padding:8px; border-radius:8px; cursor:pointer; font-size:13px; background:#f5f5f5; color:var(--text-dark);">html</div>
       </div>
       <div class="page-body" id="worldBookList">
         <div class="empty-tip">暂无世界书条目<br>点击右上角 + 添加</div>
@@ -1055,7 +1076,7 @@ body {
 
     <div class="sub-page" id="add-worldbook">
       <div class="page-header">
-        <div class="page-back" onclick="closeSub('add-worldbook')">←</div>
+        <div class="page-back" onclick="closeSub('add-worldbook')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">新增世界书条目</div>
       </div>
       <div class="page-body">
@@ -1065,7 +1086,11 @@ body {
         </div>
         <div class="form-section">
           <div class="form-label">分类</div>
-          <input class="form-input" id="worldbook-category" placeholder="例如：角色、地点、事件等">
+          <select class="form-select" id="worldbook-category">
+            <option value="记忆总结">记忆总结</option>
+            <option value="语言规范">语言规范</option>
+            <option value="html">html</option>
+          </select>
         </div>
         <div class="form-section">
           <div class="form-label">世界观设定</div>
@@ -1077,26 +1102,80 @@ body {
 
     <div class="sub-page" id="userSetting">
       <div class="page-header">
-        <div class="page-back" onclick="closeSub('userSetting')">←</div>
+        <div class="page-back" onclick="closeSub('userSetting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">个人设置</div>
       </div>
       <div class="page-body">
-        <div class="form-section">
-          <div class="form-label">我的头像</div>
-          <div class="avatar-upload">
-            <div class="avatar-preview" id="userAvatarPreview">
-              <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><circle cx='40' cy='40' r='38' fill='%23f0b8c8'/><text x='40' y='45' text-anchor='middle' font-size='20' fill='white'>我</text></svg>">
+        <!-- 记忆总结设置 -->
+        <div class="setting-section" style="margin-bottom:20px;">
+          <div class="setting-section-title">🧠 记忆总结设置</div>
+          <div class="setting-desc">管理AI的长期记忆和短期记忆，让角色更好地记住与你的互动。</div>
+        </div>
+
+        <!-- 长期记忆 (LTM) -->
+        <div class="setting-section" style="margin-bottom:15px;">
+          <div class="setting-section-title">长期记忆 (LTM)</div>
+          <div class="switch-row">
+            <div class="switch-label">开启自动总结</div>
+            <div class="switch-toggle" id="ltm-auto-toggle" onclick="toggleLtmAuto()"></div>
+          </div>
+          <div class="setting-desc">🔄 容错机制：若总结失败，系统会保留历史对话，并在累积到下一轮对话时自动重试总结，直到成功为止。</div>
+          
+          <div style="margin-top:15px;">
+            <div class="switch-label" style="margin-bottom:8px;">自动总结触发间隔</div>
+            <div class="setting-desc" style="margin-top:4px; margin-bottom:8px;">⚠️ 注意：触发间隔绑定短期记忆条数。当短期记忆累计到10条时，自动触发长期记忆归档。世界书文字内容无上限，可持续追加更新。</div>
+          </div>
+
+          <div style="margin-top:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div class="switch-label" style="font-weight:600;">自定义总结提示词 (Prompt)</div>
+              <div onclick="resetLtmPrompt()" style="font-size:12px; color:var(--main-pink); cursor:pointer;">🔄 恢复默认</div>
             </div>
-            <div class="upload-options">
-              <label class="upload-btn">本地上传<input type="file" id="user-avatar-file" accept="image/*" onchange="previewUserAvatarFile(this)" class="hidden-file"></label>
-              <button class="upload-btn" onclick="uploadUserAvatarByUrl()">链接上传</button>
+            <textarea class="mask-textarea" id="ltm-prompt" style="min-height:120px;">【暂停剧情扮演】请根据前文内容，生成一个详细的总结集合，涵盖所有主要事件、观点或关键信息。 总结需辑清晰，按时间顺序组织，每件事以独立条目形式呈现，并在每条前标注具体时间点(例如日期、时间或事件发生的时间段)。若时间信息不明确，请根据上下文合理推测并注明。每个事件总结约100字，力求简明扼要但信息完整，突出关键细节。整个总结集合应全面覆盖前文内容，避免遗漏，确保条目间逻辑连贯。
+**格式要求:** 
+-使用条目式结构，每条以时间点开头(例如"2023年10月1日:")。 
+-每条总结约100字，描述一个事件或关键信息，包括背景、经过和影响。 
+-语言客观中立，避免添加未提及内容，保持叙事一致性。 
+-若事件较多，可分组(如按日期或主题)，并在分组前加小标题。</textarea>
+            <div class="setting-desc" style="margin-top:6px;">
+              <strong>可用变量(系统会自动替换)：</strong><br>
+              <code>{charName}</code>：角色名字<br>
+              <code>{userName}</code>：用户名字<br>
+              <code>{timeHeader}</code>：时间段标记（如【23/10/01 10:00 - 10:30】）<br>
+              <span style="color:#e67e22;">注意：请务必保留 {timeHeader} 变量在开头，否则无法记录时间。</span>
             </div>
           </div>
         </div>
-        <button class="save-btn" onclick="saveUserAvatar()">保存头像</button>
-        
-        <div style="margin:30px 0; border-top:1px solid #f0e8df;"></div>
-        
+
+        <!-- 短期记忆 (STM) -->
+        <div class="setting-section" style="margin-bottom:15px;">
+          <div class="setting-section-title">短期记忆 (STM)</div>
+          <div class="switch-row">
+            <div class="switch-label">开启短期记忆</div>
+            <div class="switch-toggle" id="stm-auto-toggle" onclick="toggleStmAuto()"></div>
+          </div>
+          <div class="setting-desc">短期记忆会在每次对话中自动维护一个滑动窗口，保留最近的关键信息摘要，帮助AI在当前会话中保持连贯性。</div>
+          
+          <div style="margin-top:15px;">
+            <div class="switch-label" style="margin-bottom:8px;">短期记忆容量 (轮数)</div>
+            <input type="number" class="form-input" id="stm-window-size" value="10" min="1" max="30" style="background:var(--bg-cream);">
+            <div class="setting-desc" style="margin-top:4px;">每多少轮对话生成一条短期记忆（最高30轮）。当累计10条短期记忆时，自动归档为长期记忆。</div>
+          </div>
+
+          <div style="margin-top:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div class="switch-label" style="font-weight:600;">短期记忆提示词 (Prompt)</div>
+              <div onclick="resetStmPrompt()" style="font-size:12px; color:var(--main-pink); cursor:pointer;">🔄 恢复默认</div>
+            </div>
+            <textarea class="mask-textarea" id="stm-prompt" style="min-height:80px;">请用1-2句话概括以下对话的核心内容，保留关键信息和情感状态。</textarea>
+          </div>
+        </div>
+
+        <!-- 保存记忆设置按钮 -->
+        <button class="save-btn" onclick="saveMemorySettings()" style="margin-bottom:20px;">💾 保存记忆设置</button>
+
+        <div style="margin:10px 0 20px; border-top:1px solid #f0e8df;"></div>
+
         <div class="form-section">
           <div class="form-label">数据备份与恢复</div>
           <div class="setting-desc">导出所有数据（联系人、聊天记录、设置等）为JSON文件，或从备份文件中恢复数据。</div>
@@ -1113,7 +1192,7 @@ body {
 
     <div class="sub-page" id="addContact">
       <div class="page-header">
-        <div class="page-back" onclick="closeSub('addContact')">←</div>
+        <div class="page-back" onclick="closeSub('addContact')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">新建角色</div>
       </div>
       <div class="page-body">
@@ -1136,6 +1215,14 @@ body {
         <div class="form-section">
           <div class="form-label">人设</div>
           <textarea class="form-textarea" id="contactPersona" placeholder="写TA的性格、外貌、习惯..."></textarea>
+          <div style="margin-top:10px;">
+            <label class="upload-btn" style="display:inline-block; margin:0;">
+              📄 导入文档 (txt/doc/docx/wps, 1M以内)
+              <input type="file" id="persona-file" accept=".txt,.doc,.docx,.wps" onchange="importPersonaFile(this)" style="display:none;">
+            </label>
+            <span style="font-size:12px; color:var(--text-light); margin-left:10px;">支持txt/doc/docx/wps格式</span>
+          </div>
+
         </div>
         <button class="save-btn" onclick="saveContact()">创建角色</button>
       </div>
@@ -1143,16 +1230,15 @@ body {
 
     <div class="sub-page chat-page" id="chat-win">
       <div class="chat-header">
-        <div class="page-back" onclick="closeSub('chat-win')">←</div>
-        <div class="chat-header-avatar" id="chatHeaderAvatar"><img></div>
-        <div class="page-title" id="chatHeaderTitle" onclick="toggleStatusCard()" style="cursor:pointer;">聊天</div>
-        <div class="mode-switch">
-          <span class="mode-switch-label">线上</span>
-          <div class="mode-switch-toggle" id="mode-toggle" onclick="toggleMode()"></div>
-          <span class="mode-switch-label">线下</span>
+        <div class="page-back" onclick="closeSub('chat-win')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <div class="page-title" id="chatHeaderTitle" onclick="toggleStatusCard()" style="cursor:pointer; margin-left:0; font-size:17px;">聊天</div>
+          <span id="typingStatus" style="display:none; font-size:12px; color:var(--text-light); font-weight:400; white-space:nowrap;">（输入中…）</span>
         </div>
-        <div style="margin-left:10px; cursor:pointer; font-size:18px;" onclick="toggleChatMenu()">⋯</div>
+        <div style="cursor:pointer; font-size:18px;" onclick="toggleChatMenu()">⋯</div>
       </div>
+      <!-- 隐藏的头像容器，保留数据用 -->
+      <div id="chatHeaderAvatar" style="display:none;"><img></div>
       
       <!-- 状态卡片 -->
       <div id="statusCard" style="display:none; position:absolute; top:55px; left:50%; transform:translateX(-50%); width:90%; max-width:340px; background:rgba(200,220,200,0.25); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); border-radius:18px; padding:16px; box-shadow:0 8px 32px rgba(0,0,0,0.12); z-index:9999; border:1px solid rgba(255,255,255,0.3);">
@@ -1182,11 +1268,16 @@ body {
         </div>
       </div>
       <div id="chatMenu" style="display:none; position:absolute; top:50px; right:20px; background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); z-index:999; overflow:hidden;">
-        <div onclick="openChatSettings()" style="padding:10px 16px; min-width:140px; cursor:pointer;">聊天设置</div>
-        <div onclick="quickReRoll()" style="padding:10px 16px; min-width:140px; cursor:pointer;">快速重roll</div>
-        <div onclick="batchDeleteMsg()" style="padding:10px 16px; min-width:140px; cursor:pointer;">批量删除</div>
-        <div onclick="clearChatRecord()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:red;">清空记录</div>
-        <div onclick="deleteCurrentContact()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:red; border-top:1px solid #f0e8df;">删除联系人</div>
+        <div style="padding:10px 16px; min-width:140px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0e8df;">
+          <span style="font-size:14px; color:var(--text-dark);" id="mode-label">线上模式</span>
+          <div class="switch-toggle" id="mode-toggle" onclick="toggleMode()" style="width:44px; height:22px;"></div>
+        </div>
+        <div onclick="openChatSettings()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">聊天设置</div>
+        <div onclick="quickReRoll()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">快速重roll</div>
+        <div onclick="batchDeleteMsg()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">批量删除</div>
+        <div onclick="openStmPage()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">短期记忆</div>
+        <div onclick="clearChatRecord()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">清空记录</div>
+        <div onclick="deleteCurrentContact()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark); border-top:1px solid #f0e8df;">删除联系人</div>
       </div>
       <div class="chat-content" id="chatContent"></div>
       <div class="batch-delete-bar" id="batchDeleteBar">
@@ -1236,7 +1327,7 @@ body {
     <!-- 聊天设置页面 - 整合所有功能 -->
     <div class="sub-page" id="chat-settings-page">
       <div class="page-header">
-        <div class="page-back" onclick="closeSub('chat-settings-page')">←</div>
+        <div class="page-back" onclick="closeSub('chat-settings-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">聊天设置</div>
       </div>
       <div class="page-body">
@@ -1351,13 +1442,52 @@ body {
 
     <!-- 朋友圈二级页面 -->
     <div class="sub-page" id="moments-page">
-      <div class="page-header">
-        <div class="page-back" onclick="closeSub('moments-page')">←</div>
+      <!-- 朋友圈顶部背景图 -->
+      <div id="moments-cover" onclick="changeMomentsCover()" style="width:100%; height:200px; background:#e8d5c8; background-size:cover; background-position:center; cursor:pointer; position:relative;">
+        <div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.5); color:white; padding:4px 10px; border-radius:12px; font-size:12px;">点击更换封面</div>
+      </div>
+      <div class="page-header" style="border-top:1px solid #f0e8df;">
+        <div class="page-back" onclick="closeSub('moments-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">朋友圈</div>
         <div style="margin-left:auto; cursor:pointer; font-size:18px;" onclick="refreshMoments()">🔄</div>
       </div>
       <div class="page-body" id="momentsContainer" style="padding:0;">
         <div class="empty-tip">点击右上角刷新按钮查看朋友圈</div>
+      </div>
+    </div>
+
+    <input type="file" id="moments-cover-file" accept="image/*" onchange="uploadMomentsCover(this)" style="display:none;">
+
+    <!-- 短期记忆查看页面 -->
+    <div class="sub-page" id="stm-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('stm-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">📋 短期记忆</div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+          <span style="font-size:13px; color:var(--text-light);" id="stm-count">0/10</span>
+          <div style="font-size:18px; color:var(--main-pink); cursor:pointer;" onclick="toggleStmBatchDelete()" id="stm-delete-btn">🗑️</div>
+        </div>
+      </div>
+      <div class="page-body" id="stmList">
+        <div class="empty-tip">暂无短期记忆</div>
+      </div>
+      <!-- 批量删除底部栏 -->
+      <div class="batch-delete-bar" id="stmBatchDeleteBar">
+        <div class="cancel" onclick="exitStmBatchDelete()">取消</div>
+        <div class="count" id="stmSelectedCount">已选 0 条</div>
+        <div class="delete" onclick="confirmDeleteSelectedStm()">删除</div>
+      </div>
+    </div>
+
+    <!-- 消息编辑弹窗 -->
+    <div id="msgEditModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:99999; align-items:center; justify-content:center;">
+      <div style="width:85%; max-width:320px; background:white; border-radius:18px; padding:20px; box-shadow:0 8px 30px rgba(0,0,0,0.2);">
+        <div style="font-size:15px; font-weight:600; color:var(--text-dark); margin-bottom:12px;">✏️ 编辑消息</div>
+        <textarea id="msgEditTextarea" style="width:100%; min-height:120px; max-height:300px; padding:12px; border:1px solid var(--light-pink); border-radius:12px; outline:none; font-size:14px; font-family:inherit; resize:vertical; line-height:1.5; overflow-y:auto;"></textarea>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+          <button onclick="cancelEditMsg()" style="flex:1; padding:10px; border:1px solid #ddd; background:white; border-radius:12px; font-size:14px; cursor:pointer; color:var(--text-light);">取消</button>
+          <button onclick="confirmEditMsg()" style="flex:1; padding:10px; border:none; background:var(--main-pink); color:white; border-radius:12px; font-size:14px; cursor:pointer;">确认</button>
+        </div>
       </div>
     </div>
 
@@ -1377,6 +1507,10 @@ function pickDock(index) {
   input.onchange = e => {
     const file = e.target.files?.[0];
     if(!file) return;
+    if(file.size > 1 * 1024 * 1024) {
+      alert('⚠️ 图片大小超过1M，请选择更小的图片！');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = res => {
       const data = res.target.result;
@@ -1391,6 +1525,7 @@ function pickDock(index) {
       dock.style.backgroundImage = `url(${data})`;
       dock.style.backgroundSize = 'cover';
       dock.style.backgroundPosition = 'center';
+      dock.classList.add('has-custom-icon');
       
       localStorage.setItem(`dock${index}`, data);
     };
@@ -1407,7 +1542,7 @@ function saveDockIcons() {
       localStorage.setItem(`dock${i}`, src);
     }
   }
-  alert("✅ 图标已保存！刷新不会消失！");
+  alert("✅ 底部图标已永久保存！刷新不会消失！");
   closeSub('theme-setting');
 }
 
@@ -1421,6 +1556,7 @@ function restoreDockIconsOnLoad(){
         dock.style.backgroundImage = `url(${src})`;
         dock.style.backgroundSize = 'cover';
         dock.style.backgroundPosition = 'center';
+        dock.classList.add('has-custom-icon');
       }
       if(prev) {
         prev.style.backgroundImage = `url(${src})`;
@@ -1446,12 +1582,26 @@ function updateTime() {
 }
 setInterval(updateTime, 1000); updateTime();
 
+// 跟踪正在进行的AI请求
+let aiRequestInProgress = false;
+
 function navTo(id, el) {
-    document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('show'));
+    // 关闭所有sub-page
+    document.querySelectorAll('.sub-page').forEach(p => {
+        // 如果AI正在请求中，不真正关闭chat-win，而是移到屏幕外
+        if (p.id === 'chat-win' && p.classList.contains('show') && aiRequestInProgress) {
+            p.style.position = 'fixed';
+            p.style.left = '-9999px';
+            p.dataset.hiddenByNav = 'true';
+        } else {
+            p.classList.remove('show');
+        }
+    });
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
+    document.querySelector('.dock').style.display = 'flex';
     
     const island = document.getElementById('dynamic-island');
     if (id === 'page-chat') {
@@ -1462,10 +1612,19 @@ function navTo(id, el) {
 }
 
 function openSub(id) { 
-    document.getElementById(id).classList.add('show'); 
+    const el = document.getElementById(id);
+    el.classList.add('show'); 
+    // 如果chat-win之前被移到屏幕外，恢复它
+    if(id === 'chat-win' && el.dataset.hiddenByNav === 'true') {
+        el.style.position = '';
+        el.style.left = '';
+        el.dataset.hiddenByNav = '';
+    }
+    el.style.visibility = 'visible';
     if(id === 'chat-win') {
         document.querySelector('.dock').style.display = 'none';
         document.getElementById('dynamic-island').classList.add('hidden');
+        hideChatRedDot(); // 打开聊天窗口时隐藏红点
     }
     // 初始化聊天设置页面
     if (id === 'chat-settings-page') {
@@ -1473,7 +1632,13 @@ function openSub(id) {
     }
 }
 function closeSub(id) { 
-    document.getElementById(id).classList.remove('show'); 
+    const el = document.getElementById(id);
+    el.classList.remove('show');
+    // 重置所有可能的定位样式
+    el.style.visibility = '';
+    el.style.position = '';
+    el.style.left = '';
+    el.dataset.hiddenByNav = '';
     if(id === 'chat-win') {
         document.querySelector('.dock').style.display = 'flex';
         if (document.getElementById('page-chat').classList.contains('active')) {
@@ -1483,8 +1648,27 @@ function closeSub(id) {
 }
 
 function triggerUpload(id) { document.getElementById(id).click(); }
+function safeSave(key, value) {
+    try {
+        localStorage.setItem(key, value);
+        return true;
+    } catch(e) {
+        console.error('localStorage保存失败:', key, e);
+        if (e.name === 'QuotaExceededError' || e.code === 22) {
+            alert('⚠️ 存储空间不足！图片太大无法保存。建议使用链接上传或压缩图片后再试。');
+        }
+        return false;
+    }
+}
+
 function hdlImg(input, tid, type) {
     if (input.files && input.files[0]) {
+        const file = input.files[0];
+        // 如果图片大于2MB，先压缩
+        if (file.size > 2 * 1024 * 1024) {
+            compressAndSave(file, tid, type);
+            return;
+        }
         const reader = new FileReader();
         reader.onload = e => {
             const el = document.getElementById(tid);
@@ -1492,18 +1676,54 @@ function hdlImg(input, tid, type) {
                 el.src = e.target.result;
                 if(tid === 'user-avatar') {
                   userAvatar = e.target.result;
-                  localStorage.setItem('USER_AVATAR', userAvatar);
-                  document.getElementById('userAvatarPreview').innerHTML = `<img src="${e.target.result}">`;
+                  safeSave('USER_AVATAR', userAvatar);
                 }
             } else {
                 el.style.backgroundImage = `url(${e.target.result})`;
                 el.style.backgroundSize = 'cover';
                 el.style.backgroundPosition = 'center';
             }
-            localStorage.setItem('SVD_'+tid, e.target.result);
+            safeSave('SVD_'+tid, e.target.result);
         };
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
     }
+}
+
+// 压缩大图片后保存
+function compressAndSave(file, tid, type) {
+    const reader = new FileReader();
+    reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxSize = 800;
+            let w = img.width, h = img.height;
+            if (w > maxSize || h > maxSize) {
+                if (w > h) { h = h * maxSize / w; w = maxSize; }
+                else { w = w * maxSize / h; h = maxSize; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const compressed = canvas.toDataURL('image/jpeg', 0.7);
+            
+            const el = document.getElementById(tid);
+            if(type==='img') {
+                el.src = compressed;
+                if(tid === 'user-avatar') {
+                  userAvatar = compressed;
+                  safeSave('USER_AVATAR', userAvatar);
+                }
+            } else {
+                el.style.backgroundImage = `url(${compressed})`;
+                el.style.backgroundSize = 'cover';
+                el.style.backgroundPosition = 'center';
+            }
+            safeSave('SVD_'+tid, compressed);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
 let contacts = JSON.parse(localStorage.getItem('CHAT_CONTACTS') || '[]');
@@ -1561,6 +1781,46 @@ function uploadAvatarByUrl() {
   if (u) document.getElementById('avatarPreview').innerHTML = `<img src="${u}">`;
 }
 
+// 导入人设文档
+function importPersonaFile(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  
+  // 检查文件大小（1M = 1024 * 1024 bytes）
+  if (file.size > 1 * 1024 * 1024) {
+    alert('⚠️ 文件大小超过1M，请选择更小的文件！');
+    input.value = '';
+    return;
+  }
+  
+  const fileName = file.name.toLowerCase();
+  
+  // 检查文件类型
+  if (fileName.endsWith('.txt')) {
+    // 处理txt文件
+    const reader = new FileReader();
+    reader.onload = e => {
+      const content = e.target.result;
+      const textarea = document.getElementById('contactPersona');
+      textarea.value = content;
+      alert('✅ 文档内容已导入到人设框！');
+    };
+    reader.onerror = () => {
+      alert('❌ 文件读取失败，请重试！');
+    };
+    reader.readAsText(file, 'UTF-8');
+  } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx') || fileName.endsWith('.wps')) {
+    // 处理doc/docx/wps文件
+    alert('📝 检测到Word/WPS文档！\n\n由于浏览器限制，请按以下步骤操作：\n\n1. 在Word/WPS中打开该文档\n2. 全选内容（Ctrl+A）\n3. 复制（Ctrl+C）\n4. 直接粘贴到人设输入框中\n\n或者：\n将文档另存为.txt格式后重新上传');
+  } else {
+    alert('⚠️ 不支持的文件格式！\n\n支持的格式：\n• .txt（可直接导入）\n• .doc/.docx/.wps（需手动复制粘贴）');
+  }
+  
+  // 清空input，允许重复选择同一文件
+  input.value = '';
+}
+
+
 function saveContact() {
   const name = document.getElementById('contactName').value.trim();
   const p = document.getElementById('contactPersona').value.trim();
@@ -1569,28 +1829,10 @@ function saveContact() {
   contacts.push({ id: Date.now().toString(), name, persona: p, avatar });
   localStorage.setItem('CHAT_CONTACTS', JSON.stringify(contacts));
   renderContactList();
+  alert('✅ 联系人已永久保存！刷新不会消失！');
   closeSub('addContact');
 }
 
-function previewUserAvatarFile(input) {
-  const f = input.files?.[0];
-  if (!f) return;
-  const r = new FileReader();
-  r.onload = e => document.getElementById('userAvatarPreview').innerHTML = `<img src="${e.target.result}">`;
-  r.readAsDataURL(f);
-}
-function uploadUserAvatarByUrl() {
-  const u = prompt('图片链接：');
-  if (u) document.getElementById('userAvatarPreview').innerHTML = `<img src="${u}">`;
-}
-function saveUserAvatar() {
-  const src = document.querySelector('#userAvatarPreview img').src;
-  localStorage.setItem('USER_AVATAR', src);
-  userAvatar = src;
-  document.getElementById('user-avatar').src = src;
-  localStorage.setItem('SVD_user-avatar', src);
-  alert('保存成功');
-}
 
 function openChatPage(contact) {
   currentContactId = contact.id;
@@ -1602,10 +1844,13 @@ function openChatPage(contact) {
   openSub('chat-win');
   
   const toggle = document.getElementById('mode-toggle');
+  const label = document.getElementById('mode-label');
   if (isOfflineMode) {
     toggle.classList.add('active');
+    if (label) label.innerText = '线下模式';
   } else {
     toggle.classList.remove('active');
+    if (label) label.innerText = '线上模式';
   }
   
   // 加载当前联系人的聊天设置
@@ -1616,10 +1861,13 @@ function toggleMode() {
   isOfflineMode = !isOfflineMode;
   localStorage.setItem('isOfflineMode', isOfflineMode);
   const toggle = document.getElementById('mode-toggle');
+  const label = document.getElementById('mode-label');
   if (isOfflineMode) {
     toggle.classList.add('active');
+    if (label) label.innerText = '线下模式';
   } else {
     toggle.classList.remove('active');
+    if (label) label.innerText = '线上模式';
   }
 }
 
@@ -1629,10 +1877,11 @@ function renderChat() {
   const c = contacts.find(x => x.id === currentContactId);
   const showCount = 30;
   const displayRecords = rec.slice(-showCount);
+  const startIdx = Math.max(0, rec.length - showCount);
   el.innerHTML = '';
   displayRecords.forEach((m, idx) => {
     const ava = m.side === 'left' ? c.avatar : userAvatar;
-    addMsgToUI(m.content, m.side, ava, m.quote, idx);
+    addMsgToUI(m.content, m.side, ava, m.quote, startIdx + idx);
   });
   if (rec.length > showCount) {
     const loadMore = document.createElement('div');
@@ -1658,18 +1907,23 @@ function addMsgToUI(content, side, avatar, quote, idx) {
   const escapedContent = content.replace(/'/g, "\\'").replace(/\n/g, "<br>");
   const displayContent = content.replace(/\n/g, "<br>");
   
-  // 根据隐藏头像设置决定是否显示头像
-  let avatarHtml = '';
-  if (!(side === 'left' && chatSettings.hideAvatar)) {
-    avatarHtml = `<div class="msg-avatar"><img src="${avatar}"></div>`;
-  }
+  // 始终生成头像HTML，通过CSS控制显示/隐藏
+  let avatarHtml = `<div class="msg-avatar"><img src="${avatar}"></div>`;
+  
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = `${qhtml}${displayContent}`;
+  bubble.dataset.msgIdx = idx;
   
   div.innerHTML = `
     <div class="check-icon">✓</div>
     ${avatarHtml}
-    <div class="msg-bubble">${qhtml}${displayContent}</div>
     <div class="msg-menu"><div class="msg-menu-item" onclick="replyToMsg('${escapedContent}',this)">回复</div></div>
   `;
+  // Insert bubble before msg-menu
+  const menuEl = div.querySelector('.msg-menu');
+  div.insertBefore(bubble, menuEl);
+  
   div.onclick = () => {
     if (!isBatchDeleteMode) return;
     if (selectedMsgIndices.includes(idx)) {
@@ -1683,6 +1937,12 @@ function addMsgToUI(content, side, avatar, quote, idx) {
   };
   el.appendChild(div);
   el.scrollTop = el.scrollHeight;
+  
+  // 每次添加消息后，应用隐藏头像设置
+  if (chatSettings.hideAvatar) {
+    const newAvatar = div.querySelector('.msg-avatar');
+    if (newAvatar) newAvatar.style.display = 'none';
+  }
 }
 
 function updateSelectedCount() {
@@ -1784,6 +2044,8 @@ async function triggerAIReply() {
   recs.forEach(r => { messages.push({ role: r.side === 'right' ? 'user' : 'assistant', content: r.content }); });
 
   showLoading();
+  aiRequestInProgress = true;
+  document.getElementById('typingStatus').style.display = 'inline';
   try {
     const res = await fetch(`${cfg.url}/chat/completions`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
@@ -1791,6 +2053,8 @@ async function triggerAIReply() {
     });
     const data = await res.json();
     let txt = data.choices?.[0]?.message?.content || '回复失败';
+    aiRequestInProgress = false;
+    document.getElementById('typingStatus').style.display = 'none';
     hideLoading();
     
     // 解析并提取状态信息
@@ -1837,7 +2101,38 @@ async function triggerAIReply() {
     addMsgToUI(displayText, 'left', c.avatar);
     chatRecords[currentContactId].push({ side: 'left', content: displayText, time: Date.now() });
     localStorage.setItem('CHAT_RECORDS', JSON.stringify(chatRecords));
-  } catch (e) { hideLoading(); addMsgToUI('请求失败：' + e.message, 'left', c.avatar); }
+    
+    // 检查是否需要触发短期记忆总结
+    checkAndTriggerStm();
+    
+    // AI回复完成后，如果chat-win被导航隐藏了，显示红点提醒
+    if (document.getElementById('chat-win').dataset.hiddenByNav === 'true') {
+      showChatRedDot();
+    }
+    cleanupHiddenChatWin();
+  } catch (e) { 
+    aiRequestInProgress = false;
+    document.getElementById('typingStatus').style.display = 'none';
+    hideLoading(); 
+    addMsgToUI('请求失败：' + e.message, 'left', c.avatar);
+    cleanupHiddenChatWin();
+  }
+}
+
+// ========== 输入状态提醒（已替代红点） ==========
+function showChatRedDot() {} // 保留空函数避免报错
+function hideChatRedDot() {} // 保留空函数避免报错
+
+// 清理被导航隐藏的chat-win
+function cleanupHiddenChatWin() {
+  const chatWin = document.getElementById('chat-win');
+  if (chatWin.dataset.hiddenByNav === 'true') {
+    chatWin.classList.remove('show');
+    chatWin.style.position = '';
+    chatWin.style.left = '';
+    chatWin.style.visibility = '';
+    chatWin.dataset.hiddenByNav = '';
+  }
 }
 
 function showLoading() {
@@ -2232,8 +2527,25 @@ function loadApiConfig() {
   document.getElementById('api_preset').value = c.preset || '';
   document.getElementById('api_key').value = c.key || '';
   document.getElementById('api_url').value = c.url || '';
-  document.getElementById('api_model').value = c.model || 'gpt-3.5-turbo';
   document.getElementById('api_temperature').value = c.temperature || '0.7';
+  
+  // 先恢复已保存的模型列表
+  const savedModels = JSON.parse(localStorage.getItem('AI_MODEL_LIST') || '[]');
+  if (savedModels.length > 0) {
+    const select = document.getElementById('api_model');
+    select.innerHTML = '';
+    savedModels.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m;
+      select.appendChild(opt);
+    });
+  }
+  
+  // 再设置选中的模型
+  if (c.model) {
+    document.getElementById('api_model').value = c.model;
+  }
 }
 
 // ✅ 修复后的拉取模型函数，适配手机端
@@ -2278,6 +2590,8 @@ async function pullModels() {
       opt.textContent = m; 
       select.appendChild(opt); 
     });
+    // 保存拉取到的模型列表到localStorage
+    localStorage.setItem('AI_MODEL_LIST', JSON.stringify(allModels));
     alert(`拉取成功！共 ${allModels.length} 个模型`);
   } catch (err) { 
     console.error(err);
@@ -2286,14 +2600,39 @@ async function pullModels() {
 }
 
 // ========== 世界书条目管理功能 ==========
+let currentWbFilter = 'all';
+
+function filterWorldBook(category) {
+  currentWbFilter = category;
+  // 更新标签样式
+  document.querySelectorAll('.wb-tab').forEach(tab => {
+    if (tab.dataset.category === category) {
+      tab.style.background = 'var(--main-pink)';
+      tab.style.color = 'white';
+    } else {
+      tab.style.background = '#f5f5f5';
+      tab.style.color = 'var(--text-dark)';
+    }
+  });
+  renderWorldBookList();
+}
+
 function renderWorldBookList() {
   const el = document.getElementById('worldBookList');
-  if (worldBookEntries.length === 0) {
+  
+  // 根据当前筛选条件过滤条目
+  let filteredEntries = worldBookEntries;
+  if (currentWbFilter !== 'all') {
+    filteredEntries = worldBookEntries.filter(e => e.category === currentWbFilter);
+  }
+  
+  if (filteredEntries.length === 0) {
     el.innerHTML = '<div class="empty-tip">暂无世界书条目<br>点击右上角 + 添加</div>';
     return;
   }
   el.innerHTML = '';
-  worldBookEntries.forEach((entry, idx) => {
+  filteredEntries.forEach((entry) => {
+    const idx = worldBookEntries.indexOf(entry);
     const div = document.createElement('div');
     div.className = 'contact-item';
     div.style.position = 'relative';
@@ -2331,7 +2670,7 @@ function saveWorldBookEntry() {
   
   closeSub('add-worldbook');
   renderWorldBookList();
-  alert('✅ 世界书条目已保存！');
+  alert('✅ 世界书条目已永久保存！刷新不会消失！');
 }
 
 function editWorldBookEntry(idx) {
@@ -2437,31 +2776,37 @@ document.addEventListener('DOMContentLoaded', function() {
 function previewMeBgFile(input) {
   const file = input.files?.[0];
   if (!file) return;
+  
+  if (file.size > 2 * 1024 * 1024) {
+    alert('⚠️ 图片大小超过2M，请选择更小的图片！');
+    return;
+  }
+  
   const reader = new FileReader();
   reader.onload = e => {
-    const preview = document.getElementById('me-bg-preview-img');
-    preview.src = e.target.result;
-    // 同步更新到"我"页面
-    const userBg = document.getElementById('user-bg');
-    userBg.style.backgroundImage = `url(${e.target.result})`;
-    userBg.style.backgroundSize = 'cover';
-    userBg.style.backgroundPosition = 'center';
-    localStorage.setItem('SVD_user-bg', e.target.result);
+    applyMeBg(e.target.result);
   };
   reader.readAsDataURL(file);
+}
+
+function applyMeBg(dataOrUrl) {
+  const preview = document.getElementById('me-bg-preview-img');
+  preview.src = dataOrUrl;
+  // 同步更新到"我"页面
+  const userBg = document.getElementById('user-bg');
+  userBg.style.backgroundImage = `url(${dataOrUrl})`;
+  userBg.style.backgroundSize = 'cover';
+  userBg.style.backgroundPosition = 'center';
+  if (!safeSave('SVD_user-bg', dataOrUrl)) {
+    // 保存失败时提示但不影响当前显示
+    console.warn('背景图片保存到localStorage失败，刷新后可能丢失');
+  }
 }
 
 function uploadMeBgByUrl() {
   const url = prompt('请输入图片链接：');
   if (url && url.trim() !== '') {
-    const preview = document.getElementById('me-bg-preview-img');
-    preview.src = url;
-    // 同步更新到"我"页面
-    const userBg = document.getElementById('user-bg');
-    userBg.style.backgroundImage = `url(${url})`;
-    userBg.style.backgroundSize = 'cover';
-    userBg.style.backgroundPosition = 'center';
-    localStorage.setItem('SVD_user-bg', url);
+    applyMeBg(url.trim());
   }
 }
 
@@ -2569,13 +2914,40 @@ function importBackup(input) {
         return;
       }
       
+      // 先清空localStorage腾出空间
+      localStorage.clear();
+      
       // 恢复联系人
       contacts = backupData.contacts || [];
-      localStorage.setItem('CHAT_CONTACTS', JSON.stringify(contacts));
+      if (!safeSave('CHAT_CONTACTS', JSON.stringify(contacts))) {
+        // 如果联系人数据太大，尝试压缩头像
+        contacts.forEach(c => {
+          if (c.avatar && c.avatar.startsWith('data:') && c.avatar.length > 50000) {
+            // 截断过大的base64头像，用默认头像代替
+            c.avatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><circle cx='40' cy='40' r='38' fill='%23f8d7e0'/><text x='40' y='45' text-anchor='middle' font-size='20' fill='%23886677'>" + (c.name?.[0] || '?') + "</text></svg>";
+          }
+        });
+        if (!safeSave('CHAT_CONTACTS', JSON.stringify(contacts))) {
+          alert('❌ 联系人数据太大，无法完全导入！');
+          return;
+        }
+      }
       
       // 恢复聊天记录
       chatRecords = backupData.chatRecords || {};
-      localStorage.setItem('CHAT_RECORDS', JSON.stringify(chatRecords));
+      if (!safeSave('CHAT_RECORDS', JSON.stringify(chatRecords))) {
+        // 如果聊天记录太大，只保留最近的记录
+        Object.keys(chatRecords).forEach(id => {
+          if (chatRecords[id] && chatRecords[id].length > 100) {
+            chatRecords[id] = chatRecords[id].slice(-100);
+          }
+        });
+        if (!safeSave('CHAT_RECORDS', JSON.stringify(chatRecords))) {
+          alert('⚠️ 聊天记录太大，部分记录可能丢失');
+          chatRecords = {};
+          safeSave('CHAT_RECORDS', '{}');
+        }
+      }
       
       // 恢复世界书
       worldBookEntries = backupData.worldBookEntries || [];
@@ -2828,6 +3200,7 @@ window.onload = () => {
   restoreDockIconsOnLoad();
   loadSavedTheme(); // 加载主题颜色
   loadThemeSettings(); // 加载美化设置
+  loadMemorySettings(); // 加载记忆设置
 
   ['user-bg', 'user-avatar', 'p1', 'p2'].forEach(id => {
     const data = localStorage.getItem('SVD_'+id);
@@ -2837,7 +3210,6 @@ window.onload = () => {
         el.src = data;
         if(id === 'user-avatar') {
           userAvatar = data;
-          document.getElementById('userAvatarPreview').innerHTML = `<img src="${data}">`;
         }
       } else {
         el.style.backgroundImage = `url(${data})`;
@@ -2850,9 +3222,20 @@ window.onload = () => {
 
   renderContactList();
   renderWorldBookList();
-  document.getElementById('userAvatarPreview').innerHTML = `<img src="${userAvatar}">`;
+  loadMomentsCover(); // 加载朋友圈封面图
   
   document.getElementById('dynamic-island').classList.remove('hidden');
+  
+  // 事件委托：双击气泡内任意位置触发编辑
+  document.getElementById('chatContent').addEventListener('dblclick', function(e) {
+    if (isBatchDeleteMode) return;
+    const bubble = e.target.closest('.msg-bubble');
+    if (bubble && bubble.dataset.msgIdx !== undefined) {
+      e.preventDefault();
+      e.stopPropagation();
+      openEditMsg(parseInt(bubble.dataset.msgIdx));
+    }
+  });
   
   // 监听签名输入框的变化，实时保存
   const sigEl = document.getElementById('userSignature');
@@ -2890,6 +3273,48 @@ window.onload = () => {
 // ========== 朋友圈功能 ==========
 let moments = JSON.parse(localStorage.getItem('MOMENTS') || '[]');
 let currentMomentId = null;
+
+// 朋友圈封面图上传功能
+function changeMomentsCover() {
+  document.getElementById('moments-cover-file').click();
+}
+
+function uploadMomentsCover(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  
+  // 检查文件大小（2M = 2 * 1024 * 1024 bytes）
+  if (file.size > 2 * 1024 * 1024) {
+    alert('⚠️ 图片大小超过2M，请选择更小的图片！');
+    input.value = '';
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = e => {
+    const coverEl = document.getElementById('moments-cover');
+    coverEl.style.backgroundImage = `url(${e.target.result})`;
+    coverEl.style.backgroundSize = 'cover';
+    coverEl.style.backgroundPosition = 'center';
+    // 保存到localStorage
+    localStorage.setItem('MOMENTS_COVER', e.target.result);
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+// 加载朋友圈封面图
+function loadMomentsCover() {
+  const savedCover = localStorage.getItem('MOMENTS_COVER');
+  if (savedCover) {
+    const coverEl = document.getElementById('moments-cover');
+    if (coverEl) {
+      coverEl.style.backgroundImage = `url(${savedCover})`;
+      coverEl.style.backgroundSize = 'cover';
+      coverEl.style.backgroundPosition = 'center';
+    }
+  }
+}
 
 async function refreshMoments() {
   if (contacts.length === 0) {
@@ -3205,6 +3630,516 @@ function deleteComment(momentId, commentIdx) {
   
   // 局部更新评论区
   updateMomentComments(momentId);
+}
+
+// ========== 记忆总结相关功能 ==========
+const DEFAULT_LTM_PROMPT = `【长期记忆总结 - 生成与归档规则】
+
+请基于以下10条短期记忆，生成一份长期记忆总结：
+
+**时间跨度：** 覆盖这10条短期记忆所对应的全部对话时间段
+**核心提炼：** 基于10条短期记忆，客观提炼该阶段内发生的主要事件脉络、核心讨论议题、关键进展或结论
+**要素记录：** 如短期记忆中有多次提及的稳定地点或明确时间节点，可择要记录。人物固定为 {userName} 与 {charName}
+
+生成要求：
+1. 风格：绝对客观、精简，仅陈述事实
+2. 重点：抓准核心重点，忽略次要细节
+3. 字数：严格控制在 300字以内
+4. 禁止进行任何延展性猜测或补充细节`;
+
+const DEFAULT_STM_PROMPT = `【短期记忆总结 - 生成规则】
+请根据以下10轮对话，生成一条短期记忆总结，严格按照以下格式：
+
+**时间：** [优先记录对话中明确提及的具体时间（如"晚上八点"）。若未提及，则记录当前系统时间]
+**地点：** [仅在对话内容明确提及具体地点时记录，否则省略此项]
+**人物：** {userName} 与 {charName}
+**事件：** [以客观、概要的叙述，总结这10轮对话的核心内容与关键信息，字数严格100字以内]
+
+要求：
+1. 时间信息优先从对话内容中提取，若无则使用系统时间
+2. 地点仅在明确提及时记录
+3. 事件描述客观、简洁，不添加未提及的内容
+4. 总字数控制在100字以内`;
+
+function toggleLtmAuto() {
+  const toggle = document.getElementById('ltm-auto-toggle');
+  toggle.classList.toggle('active');
+}
+
+function toggleStmAuto() {
+  const toggle = document.getElementById('stm-auto-toggle');
+  toggle.classList.toggle('active');
+}
+
+function resetLtmPrompt() {
+  document.getElementById('ltm-prompt').value = DEFAULT_LTM_PROMPT;
+}
+
+function resetStmPrompt() {
+  document.getElementById('stm-prompt').value = DEFAULT_STM_PROMPT;
+}
+
+function saveMemorySettings() {
+  const settings = {
+    ltmAutoEnabled: document.getElementById('ltm-auto-toggle').classList.contains('active'),
+    ltmInterval: parseInt(document.getElementById('ltm-interval').value) || 30,
+    ltmMaxEntries: parseInt(document.getElementById('ltm-max-entries').value) || 20,
+    ltmPrompt: document.getElementById('ltm-prompt').value,
+    stmAutoEnabled: document.getElementById('stm-auto-toggle').classList.contains('active'),
+    stmWindowSize: parseInt(document.getElementById('stm-window-size').value) || 10,
+    stmPrompt: document.getElementById('stm-prompt').value
+  };
+  localStorage.setItem('MEMORY_SETTINGS', JSON.stringify(settings));
+  alert('✅ 记忆设置已保存！');
+}
+
+function loadMemorySettings() {
+  const saved = localStorage.getItem('MEMORY_SETTINGS');
+  
+  // 始终使用最新的默认提示词
+  document.getElementById('ltm-prompt').value = DEFAULT_LTM_PROMPT;
+  document.getElementById('stm-prompt').value = DEFAULT_STM_PROMPT;
+  
+  if (!saved) return;
+  const settings = JSON.parse(saved);
+  
+  if (settings.ltmAutoEnabled) document.getElementById('ltm-auto-toggle').classList.add('active');
+  if (settings.ltmInterval) document.getElementById('ltm-interval').value = settings.ltmInterval;
+  if (settings.stmAutoEnabled) document.getElementById('stm-auto-toggle').classList.add('active');
+  if (settings.stmWindowSize) document.getElementById('stm-window-size').value = settings.stmWindowSize;
+  
+  // 如果用户自定义了提示词，则覆盖默认值
+  if (settings.ltmPrompt && settings.ltmPrompt !== DEFAULT_LTM_PROMPT) {
+    document.getElementById('ltm-prompt').value = settings.ltmPrompt;
+  }
+  if (settings.stmPrompt && settings.stmPrompt !== DEFAULT_STM_PROMPT) {
+    document.getElementById('stm-prompt').value = settings.stmPrompt;
+  }
+}
+
+// ========== 记忆总结功能 ==========
+async function memorySummary() {
+  toggleChatMenu();
+  
+  if (!currentContactId) { alert('请先选择联系人'); return; }
+  
+  const cfg = JSON.parse(localStorage.getItem('AI_CHAT_CONFIG') || '{}');
+  if (!cfg.key || !cfg.url || !cfg.model) { alert('请先配置API设置'); return; }
+  
+  const c = contacts.find(x => x.id === currentContactId);
+  if (!c) { alert('联系人不存在'); return; }
+  
+  const rec = chatRecords[currentContactId] || [];
+  if (rec.length === 0) { alert('暂无聊天记录可总结'); return; }
+  
+  // 获取记忆设置
+  const memSettings = JSON.parse(localStorage.getItem('MEMORY_SETTINGS') || '{}');
+  const ltmPrompt = memSettings.ltmPrompt || DEFAULT_LTM_PROMPT;
+  const ltmMaxEntries = memSettings.ltmMaxEntries || 20;
+  
+  // 构建对话内容文本
+  const userName = localStorage.getItem('USER_NICKNAME') || '用户';
+  let conversationText = '';
+  rec.forEach(r => {
+    const speaker = r.side === 'right' ? userName : c.name;
+    const time = r.time ? new Date(r.time).toLocaleString('zh-CN') : '未知时间';
+    conversationText += `[${time}] ${speaker}：${r.content}\n`;
+  });
+  
+  // 替换提示词中的变量
+  let finalPrompt = ltmPrompt
+    .replace(/\{charName\}/g, c.name)
+    .replace(/\{userName\}/g, userName)
+    .replace(/\{timeHeader\}/g, `【${new Date(rec[0]?.time || Date.now()).toLocaleString('zh-CN')} - ${new Date(rec[rec.length-1]?.time || Date.now()).toLocaleString('zh-CN')}】`);
+  
+  finalPrompt += '\n\n以下是需要总结的对话内容：\n' + conversationText;
+  
+  // 显示加载提示
+  if (!confirm('即将对当前聊天记录进行记忆总结，结果将保存到世界书中。是否继续？')) return;
+  
+  const loadingEl = document.createElement('div');
+  loadingEl.id = 'memory-loading';
+  loadingEl.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.7); color:white; padding:20px 30px; border-radius:12px; z-index:99999; font-size:14px;';
+  loadingEl.innerText = '🧠 正在生成记忆总结...';
+  document.body.appendChild(loadingEl);
+  
+  try {
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({
+        model: cfg.model,
+        temperature: 0.3,
+        messages: [{ role: 'user', content: finalPrompt }]
+      })
+    });
+    
+    const data = await res.json();
+    const summaryText = data.choices?.[0]?.message?.content || '总结生成失败';
+    
+    // 移除加载提示
+    document.getElementById('memory-loading')?.remove();
+    
+    // 保存到世界书
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+    
+    const entryName = `记忆总结 - ${c.name} (${timeStr})`;
+    const entryId = Date.now().toString();
+    
+    // 检查是否超过上限，超过则删除最早的记忆总结
+    const memorySummaries = worldBookEntries.filter(e => e.category === '记忆总结' && e.name.includes(c.name));
+    if (memorySummaries.length >= ltmMaxEntries) {
+      // 删除最早的记忆总结
+      const oldest = memorySummaries[0];
+      const oldIdx = worldBookEntries.findIndex(e => e.id === oldest.id);
+      if (oldIdx > -1) worldBookEntries.splice(oldIdx, 1);
+    }
+    
+    // 添加新的世界书条目
+    worldBookEntries.push({
+      id: entryId,
+      name: entryName,
+      category: '记忆总结',
+      content: summaryText
+    });
+    
+    localStorage.setItem('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    renderWorldBookList();
+    
+    // 自动关联到当前聊天
+    if (!chatSettings.selectedWorldBooks) chatSettings.selectedWorldBooks = [];
+    chatSettings.selectedWorldBooks.push(entryId);
+    localStorage.setItem(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+    
+    alert(`✅ 记忆总结已生成并保存到世界书！\n\n条目名称：${entryName}\n\n你可以在"世界书管理"中查看和编辑。`);
+    
+  } catch (e) {
+    document.getElementById('memory-loading')?.remove();
+    alert('❌ 记忆总结生成失败：' + e.message);
+  }
+}
+
+// ========== 消息编辑功能 ==========
+let editingMsgIdx = -1;
+
+function openEditMsg(idx) {
+  if (isBatchDeleteMode) return;
+  const rec = chatRecords[currentContactId] || [];
+  if (idx < 0 || idx >= rec.length) return;
+  editingMsgIdx = idx;
+  const modal = document.getElementById('msgEditModal');
+  const textarea = document.getElementById('msgEditTextarea');
+  textarea.value = rec[idx].content;
+  modal.style.display = 'flex';
+  setTimeout(() => textarea.focus(), 100);
+}
+
+function cancelEditMsg() {
+  editingMsgIdx = -1;
+  document.getElementById('msgEditModal').style.display = 'none';
+}
+
+function confirmEditMsg() {
+  // 判断是编辑消息还是编辑STM
+  if (editingStmIdx >= 0) {
+    confirmEditStm();
+    return;
+  }
+  
+  if (editingMsgIdx < 0) return;
+  const rec = chatRecords[currentContactId] || [];
+  const textarea = document.getElementById('msgEditTextarea');
+  const newContent = textarea.value.trim();
+  if (!newContent) { alert('消息不能为空'); return; }
+  rec[editingMsgIdx].content = newContent;
+  localStorage.setItem('CHAT_RECORDS', JSON.stringify(chatRecords));
+  cancelEditMsg();
+  renderChat();
+}
+
+// ========== 短期记忆(STM)系统 ==========
+// 获取某联系人的STM数据
+function getStmData(contactId) {
+  return JSON.parse(localStorage.getItem(`STM_${contactId}`) || '{"entries":[],"roundCount":0}');
+}
+function saveStmData(contactId, data) {
+  localStorage.setItem(`STM_${contactId}`, JSON.stringify(data));
+}
+
+// 打开短期记忆页面
+function openStmPage() {
+  toggleChatMenu();
+  if (!currentContactId) { alert('请先选择联系人'); return; }
+  renderStmList();
+  openSub('stm-page');
+}
+
+// 渲染短期记忆列表
+function renderStmList() {
+  const el = document.getElementById('stmList');
+  const countEl = document.getElementById('stm-count');
+  if (!currentContactId) { el.innerHTML = '<div class="empty-tip">暂无短期记忆</div>'; return; }
+  
+  const stm = getStmData(currentContactId);
+  countEl.innerText = `${stm.entries.length}/10`;
+  
+  if (stm.entries.length === 0) {
+    el.innerHTML = '<div class="empty-tip">暂无短期记忆<br><span style="font-size:12px;color:#aaa;">每10轮对话自动生成一条</span></div>';
+    return;
+  }
+  
+  el.innerHTML = '';
+  stm.entries.forEach((entry, idx) => {
+    const div = document.createElement('div');
+    div.className = 'stm-item';
+    div.dataset.stmIdx = idx;
+    if (isStmBatchDeleteMode && selectedStmIndices.includes(idx)) {
+      div.classList.add('selected');
+    }
+    div.style.cssText = 'background:#fff; border-radius:12px; padding:12px 15px; margin-bottom:10px; box-shadow:0 2px 6px rgba(0,0,0,0.05); position:relative; cursor:pointer;';
+    const time = entry.time ? new Date(entry.time).toLocaleString('zh-CN') : '';
+    div.innerHTML = `
+      <div class="check-icon" style="position:absolute; top:8px; left:8px; width:20px; height:20px; background:#ff6b81; color:white; border-radius:50%; display:${isStmBatchDeleteMode?'flex':'none'}; align-items:center; justify-content:center; font-size:12px;">✓</div>
+      <div style="font-size:14px; color:var(--text-dark); line-height:1.6; margin-bottom:6px;"><strong>${idx+1}</strong>【${entry.content}】</div>
+      <div style="font-size:11px; color:#aaa; text-align:right;">${time}</div>
+    `;
+    
+    // 双击编辑
+    div.ondblclick = (e) => {
+      if (isStmBatchDeleteMode) return;
+      e.stopPropagation();
+      openEditStm(idx);
+    };
+    
+    // 批量删除模式下的点击选择
+    div.onclick = () => {
+      if (!isStmBatchDeleteMode) return;
+      if (selectedStmIndices.includes(idx)) {
+        selectedStmIndices = selectedStmIndices.filter(i => i !== idx);
+        div.classList.remove('selected');
+      } else {
+        selectedStmIndices.push(idx);
+        div.classList.add('selected');
+      }
+      updateStmSelectedCount();
+    };
+    
+    el.appendChild(div);
+  });
+  
+  // 显示下次触发信息
+  const infoDiv = document.createElement('div');
+  infoDiv.style.cssText = 'text-align:center; padding:10px; font-size:12px; color:#aaa;';
+  const nextTrigger = 10 - (stm.roundCount % 10);
+  infoDiv.innerText = `再${nextTrigger}轮对话后生成下一条短期记忆`;
+  el.appendChild(infoDiv);
+}
+
+// 每次AI回复后检查是否触发STM
+async function checkAndTriggerStm() {
+  if (!currentContactId) return;
+  const memSettings = JSON.parse(localStorage.getItem('MEMORY_SETTINGS') || '{}');
+  if (!memSettings.stmAutoEnabled) return;
+  
+  const stm = getStmData(currentContactId);
+  stm.roundCount = (stm.roundCount || 0) + 1;
+  
+  const interval = memSettings.stmWindowSize || 10;
+  
+  if (stm.roundCount >= interval) {
+    stm.roundCount = 0;
+    saveStmData(currentContactId, stm);
+    
+    // 如果已有10条STM，先归档到世界书
+    if (stm.entries.length >= 10) {
+      await archiveStmToWorldBook(currentContactId, stm);
+      stm.entries = [];
+    }
+    
+    // 生成新的STM条目
+    await generateStmEntry(currentContactId, stm);
+  } else {
+    saveStmData(currentContactId, stm);
+  }
+}
+
+// 生成一条短期记忆
+async function generateStmEntry(contactId, stm) {
+  const cfg = JSON.parse(localStorage.getItem('AI_CHAT_CONFIG') || '{}');
+  if (!cfg.key || !cfg.url || !cfg.model) return;
+  
+  const c = contacts.find(x => x.id === contactId);
+  if (!c) return;
+  
+  const rec = chatRecords[contactId] || [];
+  if (rec.length === 0) return;
+  
+  const memSettings = JSON.parse(localStorage.getItem('MEMORY_SETTINGS') || '{}');
+  let stmPrompt = memSettings.stmPrompt || DEFAULT_STM_PROMPT;
+  const userName = localStorage.getItem('USER_NICKNAME') || '用户';
+  
+  // 替换提示词中的变量
+  stmPrompt = stmPrompt
+    .replace(/\{charName\}/g, c.name)
+    .replace(/\{userName\}/g, userName);
+  
+  // 取最近10轮对话
+  const recent = rec.slice(-10);
+  let text = '';
+  recent.forEach(r => {
+    const speaker = r.side === 'right' ? userName : c.name;
+    const time = r.time ? new Date(r.time).toLocaleString('zh-CN') : '';
+    text += `[${time}] ${speaker}：${r.content}\n`;
+  });
+  
+  const prompt = stmPrompt + '\n\n以下是需要总结的对话内容：\n' + text;
+  
+  try {
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({ model: cfg.model, temperature: 0.3, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const summary = data.choices?.[0]?.message?.content || '';
+    if (summary) {
+      stm.entries.push({ content: summary.trim(), time: Date.now() });
+      saveStmData(contactId, stm);
+    }
+  } catch (e) { console.error('STM生成失败:', e); }
+}
+
+// STM批量删除相关变量
+let isStmBatchDeleteMode = false;
+let selectedStmIndices = [];
+let editingStmIdx = -1;
+
+// 切换STM批量删除模式
+function toggleStmBatchDelete() {
+  isStmBatchDeleteMode = !isStmBatchDeleteMode;
+  selectedStmIndices = [];
+  if (isStmBatchDeleteMode) {
+    document.getElementById('stmBatchDeleteBar').classList.add('show');
+  } else {
+    document.getElementById('stmBatchDeleteBar').classList.remove('show');
+  }
+  renderStmList();
+}
+
+// 退出STM批量删除模式
+function exitStmBatchDelete() {
+  isStmBatchDeleteMode = false;
+  selectedStmIndices = [];
+  document.getElementById('stmBatchDeleteBar').classList.remove('show');
+  renderStmList();
+}
+
+// 更新STM选中计数
+function updateStmSelectedCount() {
+  document.getElementById('stmSelectedCount').innerText = `已选 ${selectedStmIndices.length} 条`;
+}
+
+// 确认删除选中的STM
+function confirmDeleteSelectedStm() {
+  if (selectedStmIndices.length === 0) { alert('请先选择要删除的记忆'); return; }
+  if (!confirm(`确定删除 ${selectedStmIndices.length} 条短期记忆？`)) return;
+  
+  const stm = getStmData(currentContactId);
+  selectedStmIndices.sort((a,b)=>b-a);
+  selectedStmIndices.forEach(idx => stm.entries.splice(idx,1));
+  saveStmData(currentContactId, stm);
+  exitStmBatchDelete();
+}
+
+// 打开编辑STM弹窗
+function openEditStm(idx) {
+  if (isStmBatchDeleteMode) return;
+  const stm = getStmData(currentContactId);
+  if (idx < 0 || idx >= stm.entries.length) return;
+  editingStmIdx = idx;
+  const modal = document.getElementById('msgEditModal');
+  const textarea = document.getElementById('msgEditTextarea');
+  textarea.value = stm.entries[idx].content;
+  modal.style.display = 'flex';
+  setTimeout(() => textarea.focus(), 100);
+}
+
+// 确认编辑STM（复用消息编辑弹窗）
+function confirmEditStm() {
+  if (editingStmIdx < 0) return;
+  const stm = getStmData(currentContactId);
+  const textarea = document.getElementById('msgEditTextarea');
+  const newContent = textarea.value.trim();
+  if (!newContent) { alert('内容不能为空'); return; }
+  stm.entries[editingStmIdx].content = newContent;
+  saveStmData(currentContactId, stm);
+  editingStmIdx = -1;
+  document.getElementById('msgEditModal').style.display = 'none';
+  renderStmList();
+}
+
+// 归档10条STM到世界书
+async function archiveStmToWorldBook(contactId, stm) {
+  const c = contacts.find(x => x.id === contactId);
+  if (!c) return;
+  
+  const cfg = JSON.parse(localStorage.getItem('AI_CHAT_CONFIG') || '{}');
+  if (!cfg.key || !cfg.url || !cfg.model) return;
+  
+  const userName = localStorage.getItem('USER_NICKNAME') || '用户';
+  
+  // 合并10条短期记忆的内容
+  let mergedText = stm.entries.map((e, i) => `${i+1}. ${e.content}`).join('\n');
+  
+  let ltmPrompt = (JSON.parse(localStorage.getItem('MEMORY_SETTINGS') || '{}')).ltmPrompt || DEFAULT_LTM_PROMPT;
+  
+  // 替换提示词中的变量
+  ltmPrompt = ltmPrompt
+    .replace(/\{charName\}/g, c.name)
+    .replace(/\{userName\}/g, userName);
+  
+  const prompt = ltmPrompt + '\n\n以下是需要归档的10条短期记忆：\n' + mergedText;
+  
+  try {
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({ model: cfg.model, temperature: 0.3, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const archiveText = data.choices?.[0]?.message?.content || mergedText;
+    
+    const entryName = `聊天总结：${c.name}`;
+    const now = new Date().toLocaleString('zh-CN');
+    const separator = `\n\n--- 归档于 ${now} ---\n`;
+    
+    // 查找是否已有同名世界书条目
+    const existing = worldBookEntries.find(e => e.name === entryName);
+    if (existing) {
+      // 追加内容
+      existing.content += separator + archiveText.trim();
+    } else {
+      // 新建条目
+      worldBookEntries.push({
+        id: Date.now().toString(),
+        name: entryName,
+        category: '聊天总结',
+        content: archiveText.trim()
+      });
+    }
+    
+    localStorage.setItem('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    renderWorldBookList();
+    
+    // 自动关联到聊天
+    if (!chatSettings.selectedWorldBooks) chatSettings.selectedWorldBooks = [];
+    const entry = worldBookEntries.find(e => e.name === entryName);
+    if (entry && !chatSettings.selectedWorldBooks.includes(entry.id)) {
+      chatSettings.selectedWorldBooks.push(entry.id);
+      localStorage.setItem(`CHAT_SETTINGS_${contactId}`, JSON.stringify(chatSettings));
+    }
+  } catch (e) { console.error('归档失败:', e); }
 }
 </script>
 </body>
