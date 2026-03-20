@@ -83,31 +83,36 @@ class StorageManager {
 
   // 获取数据（兼容 localStorage.getItem）
   async getItem(key) {
-    const isReady = await this.init();
-    
-    if (!isReady) {
-      return localStorage.getItem(key);
-    }
-    
     try {
-      // 先尝试从 IndexedDB 获取
-      let data = await IndexedDBManager.getData(key);
+      const isReady = await this.init();
       
-      // 如果没有，尝试从图片存储获取
-      if (data === null) {
-        data = await IndexedDBManager.getImage(key);
+      if (!isReady) {
+        try { return localStorage.getItem(key); } catch(e) { return null; }
       }
       
-      // 如果还是没有，尝试从 localStorage 获取（兼容性）
-      if (data === null) {
-        data = localStorage.getItem(key);
+      try {
+        // 先尝试从 IndexedDB 获取
+        let data = await IndexedDBManager.getData(key);
+        
+        // 如果没有，尝试从图片存储获取
+        if (data === null) {
+          data = await IndexedDBManager.getImage(key);
+        }
+        
+        // 如果还是没有，尝试从 localStorage 获取（兼容性）
+        if (data === null) {
+          try { data = localStorage.getItem(key); } catch(e) { data = null; }
+        }
+        
+        return data;
+      } catch (e) {
+        console.error(`读取失败 ${key}:`, e);
+        // 降级到 localStorage
+        try { return localStorage.getItem(key); } catch(e) { return null; }
       }
-      
-      return data;
-    } catch (e) {
-      console.error(`读取失败 ${key}:`, e);
-      // 降级到 localStorage
-      return localStorage.getItem(key);
+    } catch(e) {
+      console.error(`获取流程失败 ${key}:`, e);
+      try { return localStorage.getItem(key); } catch(e) { return null; }
     }
   }
 

@@ -1588,6 +1588,39 @@ body {
 </div>
 
 <script>
+// ========== 强力兼容层：防止外部JS加载失败导致数据丢失 ==========
+if (typeof window.storage === 'undefined') {
+  console.warn('⚠️ 统一存储管理器未加载，自动启用 localStorage 兼容模式');
+  window.storage = {
+    init: async () => false,
+    getItem: async (key) => { try { return localStorage.getItem(key); } catch(e) { return null; } },
+    setItem: async (key, value) => { try { localStorage.setItem(key, value); return true; } catch(e) { return false; } },
+    removeItem: async (key) => { try { localStorage.removeItem(key); return true; } catch(e) { return false; } },
+    clear: async () => { try { localStorage.clear(); return true; } catch(e) { return false; } },
+    getStorageInfo: async () => ({ usage: '0 MB', quota: '0 MB', percentage: '0%' })
+  };
+}
+if (typeof window.storageSync === 'undefined') {
+  window.storageSync = {
+    setItem: (key, value) => { try { localStorage.setItem(key, value); } catch(e) {} },
+    getItem: (key) => { try { return localStorage.getItem(key); } catch(e) { return null; } },
+    removeItem: (key) => { try { localStorage.removeItem(key); } catch(e) {} }
+  };
+}
+if (typeof window.IndexedDBManager === 'undefined') {
+  window.IndexedDBManager = {
+    initDB: async () => { throw new Error('IndexedDBManager not loaded'); },
+    saveImage: async (id, data) => { try { localStorage.setItem('SVD_'+id, data); return true; } catch(e) { return false; } },
+    getImage: async (id) => { try { return localStorage.getItem('SVD_'+id); } catch(e) { return null; } },
+    deleteImage: async (id) => { try { localStorage.removeItem('SVD_'+id); return true; } catch(e) { return false; } },
+    saveData: async (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch(e) { return false; } },
+    getData: async (key) => { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : null; } catch(e) { return null; } },
+    getStorageInfo: async () => ({ usage: '0 MB', quota: '0 MB', percentage: '0%' }),
+    checkMigration: async () => true,
+    migrateFromLocalStorage: async () => true
+  };
+}
+
 // ========== 全局异步存储函数 - 使用 IndexedDB ==========
 async function saveToStorage(key, value) {
   try {
@@ -3768,15 +3801,15 @@ window.onload = async () => {
     if (isReady) {
       console.log('✅ 存储管理器初始化成功');
       // 显示存储空间信息
-      const storageInfo = await window.storage.getStorageInfo();
-      console.log('📊 存储空间使用情况:', storageInfo);
+      try {
+        const storageInfo = await window.storage.getStorageInfo();
+        console.log('📊 存储空间使用情况:', storageInfo);
+      } catch(e) {}
     } else {
       console.warn('⚠️ 存储管理器降级为 localStorage');
-      showToast('⚠️ 存储初始化失败，将继续使用 localStorage', 3000);
     }
   } catch (e) {
     console.error('❌ 存储管理器初始化异常:', e);
-    showToast('⚠️ 存储异常，可能无法保存大数据', 3000);
   }
   
   setInterval(updateTime, 1000); updateTime();
