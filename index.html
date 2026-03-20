@@ -3693,8 +3693,8 @@ function applyThemeColor(main, light, bg) {
     dot.style.border = dot.style.background === main || dot.style.backgroundColor === main 
       ? '3px solid #333' : '3px solid transparent';
   });
-  // 保存到storage
-  saveSyncToStorage('THEME_COLORS', JSON.stringify({ main, light, bg }));
+  // 异步保存到storage以确保可靠性
+  saveToStorage('THEME_COLORS', JSON.stringify({ main, light, bg })).catch(e => console.error('保存主题颜色失败:', e));
 }
 
 function applyCustomColor(hex) {
@@ -3716,12 +3716,29 @@ function hexToRgb(hex) {
 async function loadSavedTheme() {
   const saved = await getFromStorage('THEME_COLORS');
   if (saved) {
-    const { main, light, bg } = typeof saved === 'string' ? JSON.parse(saved) : saved;
-    document.documentElement.style.setProperty('--main-pink', main);
-    document.documentElement.style.setProperty('--light-pink', light);
-    document.documentElement.style.setProperty('--bg-cream', bg);
-    const colorInput = document.getElementById('customThemeColor');
-    if (colorInput && main.startsWith('#')) colorInput.value = main;
+    try {
+      const { main, light, bg } = typeof saved === 'string' ? JSON.parse(saved) : saved;
+      document.documentElement.style.setProperty('--main-pink', main);
+      document.documentElement.style.setProperty('--light-pink', light);
+      document.documentElement.style.setProperty('--bg-cream', bg);
+      
+      // 更新发送按钮颜色
+      const sendBtn = document.querySelector('.chat-send-btn');
+      if (sendBtn) {
+        sendBtn.style.background = `rgba(${hexToRgb(main)}, 0.85)`;
+      }
+      
+      // 高亮选中的颜色点
+      document.querySelectorAll('.color-dot').forEach(dot => {
+        dot.style.border = (dot.style.background === main || dot.style.backgroundColor === main)
+          ? '3px solid #333' : '3px solid transparent';
+      });
+      
+      const colorInput = document.getElementById('customThemeColor');
+      if (colorInput && main.startsWith('#')) colorInput.value = main;
+    } catch(e) {
+      console.error('解析主题颜色失败:', e);
+    }
   }
 }
 
@@ -3749,6 +3766,12 @@ async function saveThemeSettings() {
       sigEl.value = signature;
     }
   }
+  
+  // 保存主题颜色
+  const main = getComputedStyle(document.documentElement).getPropertyValue('--main-pink').trim();
+  const light = getComputedStyle(document.documentElement).getPropertyValue('--light-pink').trim();
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-cream').trim();
+  await saveToStorage('THEME_COLORS', JSON.stringify({ main, light, bg }));
   
   // 保存"我"页面背景
   const meBgData = await getFromStorage('SVD_user-bg');
@@ -3816,8 +3839,8 @@ window.onload = async () => {
   await loadGlobalData(); // 确保加载全局数据，如联系人、聊天记录等
   loadApiConfig();
   restoreDockIconsOnLoad();
-  loadSavedTheme();
-  loadThemeSettings();
+  await loadSavedTheme();
+  await loadThemeSettings();
   loadMemorySettings();
   loadMomentsCover();
   
