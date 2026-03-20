@@ -3762,27 +3762,21 @@ async function loadThemeSettings() {
 }
 
 window.onload = async () => {
-  // 初始化 IndexedDB
+  // 初始化存储管理器
   try {
-    await IndexedDBManager.initDB();
-    console.log('✅ IndexedDB 初始化成功');
-    
-    // 检查是否需要迁移数据
-    const migrated = await IndexedDBManager.checkMigration();
-    if (!migrated) {
-      console.log('🔄 开始迁移数据到 IndexedDB...');
-      const success = await IndexedDBManager.migrateFromLocalStorage();
-      if (success) {
-        showToast('✅ 数据已成功迁移到 IndexedDB！存储容量大幅提升！', 3000);
-      }
+    const isReady = await window.storage.init();
+    if (isReady) {
+      console.log('✅ 存储管理器初始化成功');
+      // 显示存储空间信息
+      const storageInfo = await window.storage.getStorageInfo();
+      console.log('📊 存储空间使用情况:', storageInfo);
+    } else {
+      console.warn('⚠️ 存储管理器降级为 localStorage');
+      showToast('⚠️ 存储初始化失败，将继续使用 localStorage', 3000);
     }
-    
-    // 显示存储空间信息
-    const storageInfo = await IndexedDBManager.getStorageInfo();
-    console.log('📊 存储空间使用情况:', storageInfo);
   } catch (e) {
-    console.error('❌ IndexedDB 初始化失败:', e);
-    showToast('⚠️ IndexedDB 初始化失败，将继续使用 localStorage', 3000);
+    console.error('❌ 存储管理器初始化异常:', e);
+    showToast('⚠️ 存储异常，可能无法保存大数据', 3000);
   }
   
   setInterval(updateTime, 1000); updateTime();
