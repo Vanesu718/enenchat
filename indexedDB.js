@@ -260,9 +260,14 @@ async function migrateFromLocalStorage() {
   try {
     let migratedCount = 0;
     
-    // 迁移所有 localStorage 数据到 IndexedDB
+    // 获取所有 keys 避免在迭代时修改导致跳过
+    const keys = [];
     for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
+      keys.push(localStorage.key(i));
+    }
+    
+    // 迁移所有 localStorage 数据到 IndexedDB
+    for (const key of keys) {
       if (!key) continue;
       
       const value = localStorage.getItem(key);
@@ -271,6 +276,7 @@ async function migrateFromLocalStorage() {
       // 判断是否为图片数据（base64）
       if (value.startsWith('data:image')) {
         await saveImage(key, value, 'image');
+        localStorage.removeItem(key); // 释放空间
         console.log(`✅ 已迁移图片: ${key}`);
       } else {
         // 文本数据
