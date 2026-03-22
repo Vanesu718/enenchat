@@ -5,12 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<style>
-* {
-  touch-action: manipulation;
-}
-</style>
 <title>oho</title>
+<link rel="apple-touch-icon" href="haibaologo.png">
+<link rel="icon" href="haibaologo.png">
 <!-- 引入mammoth.js用于解析docx文件 -->
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -18,8 +15,8 @@
   --main-pink: #f0b8c8; 
   --bg-cream: #fffbf9;
   --light-pink: #f8d7e0;
-  --text-dark: #444;
-  --text-light: #888;
+  --text-dark: #333333;
+  --text-light: #777777;
   --setting-green: var(--main-pink); /* 设置页主调已改为粉色 */
 }
 * { 
@@ -37,7 +34,7 @@ body {
   min-height: 100vh; 
   min-height: calc(var(--vh, 1vh) * 100);
   overflow: hidden;
-  touch-action: none;
+  touch-action: pan-x pan-y;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -135,7 +132,9 @@ body {
 .page { 
   position: absolute; 
   inset: 0; 
-  background: var(--bg-cream); 
+  background: rgba(255, 255, 255, 0.15); 
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   display: none; 
   flex-direction: column; 
   padding-bottom: 90px; 
@@ -170,9 +169,10 @@ body {
   display: flex;
   align-items: center;
   padding: 0 20px;
-  border-bottom: 1px solid #f0e8df;
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 .page-back {
   font-size: 20px;
@@ -219,8 +219,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  border-bottom: 1px solid #f0e8df;
-  background: rgba(255,255,255,0.7);
+  border-bottom: 1px solid var(--header-border, #f0e8df);
+  background: var(--header-bg, rgba(255,255,255,0.7));
   backdrop-filter: blur(10px);
 }
 .contact-list-header h1 {
@@ -228,10 +228,17 @@ body {
   font-weight: 600;
   color: var(--text-dark);
 }
+.group-btn {
+  font-size: 14px;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: color 0.3s;
+}
 .add-contact-btn {
   font-size: 24px;
-  color: var(--main-pink);
+  color: var(--text-dark);
   cursor: pointer;
+  transition: color 0.3s;
 }
 .contact-list-content {
   flex: 1;
@@ -247,10 +254,13 @@ body {
   display: flex;
   align-items: center;
   padding: 12px 15px;
-  background: #fff;
+  background: var(--item-bg, rgba(255, 255, 255, 0.35));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
   margin-bottom: 10px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid var(--item-border, rgba(255,255,255,0.4));
   cursor: pointer;
 }
 .contact-avatar {
@@ -273,10 +283,12 @@ body {
 .contact-name {
   font-size: 16px;
   color: var(--text-dark);
+  transition: color 0.3s;
 }
 .contact-desc {
   font-size: 12px;
   color: var(--text-light);
+  transition: color 0.3s;
 }
 
 .form-section { margin-bottom: 20px; }
@@ -421,7 +433,7 @@ body {
 .upload-options { display: flex; gap: 10px; }
 #avatar-file, #user-avatar-file { display: none; }
 
-.menu-item { padding: 16px; background: white; border-radius: 16px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); color: var(--text-dark); }
+.menu-item { padding: 16px; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.3); color: var(--text-dark); transition: color 0.3s; }
 
 .chat-page { background: var(--bg-cream); }
 .chat-header { height: 50px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #f0e8df; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); }
@@ -435,10 +447,11 @@ body {
 .msg-item.right { align-self: flex-end; flex-direction: row-reverse; }
 .msg-avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid var(--light-pink); margin: 0 8px; }
 .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.msg-bubble { padding: 10px 14px; border-radius: 18px; line-height: 1.4; font-size: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-.msg-item.left .msg-bubble { background: rgba(255, 255, 255, 0.6); color: var(--text-dark); border-bottom-left-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.5); }
+.msg-bubble { padding: 10px 14px; border-radius: 18px; line-height: 1.4; font-size: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
+.chat-content { touch-action: manipulation; }
+.msg-item.left .msg-bubble { background: rgba(255, 255, 255, 0.6); color: #333333; border-bottom-left-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.5); }
 .msg-item.right .msg-bubble { background: rgba(240, 184, 200, 0.85); color: #fff; border-bottom-right-radius: 6px; box-shadow: 0 4px 12px rgba(240, 184, 200, 0.2); border: 1px solid rgba(255,255,255,0.3); }
-.msg-quote { padding: 6px 10px; border-radius: 8px; font-size: 12px; margin-bottom: 6px; line-height: 1.2; background: #f8f5f0; color: var(--text-light); }
+.msg-quote { padding: 6px 10px; border-radius: 8px; font-size: 12px; margin-bottom: 6px; line-height: 1.2; background: #f8f5f0; color: #777777; }
 .msg-menu { position: absolute; top: -5px; right: 10px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 99; display: none; pointer-events: none; }
 .msg-item:active .msg-menu { display: block; pointer-events: auto; }
 .msg-menu-item { padding: 6px 12px; font-size: 12px; color: var(--text-dark); cursor: pointer; }
@@ -454,14 +467,11 @@ body {
 .chat-input-container { flex: 1; position: relative; }
 .reply-tip { padding: 4px 10px; background: rgba(248, 215, 224, 0.8); backdrop-filter: blur(10px); color: var(--text-dark); font-size: 12px; border-radius: 12px 12px 0 0; display: none; }
 .reply-tip-close { cursor: pointer; font-size: 14px; }
-.chat-input { width: 100%; padding: 10px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.5); outline: none; font-size: 16px; resize: none; height: 40px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); line-height: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); overflow: hidden; }
+.chat-input { width: 100%; height: 40px; padding: 0 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.5); outline: none; font-size: 16px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
 .chat-btn-group { display: flex; gap: 8px; }
 .chat-send-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(240, 184, 200, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(240, 184, 200, 0.3); }
 .chat-ai-reply-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(168, 216, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(168, 216, 255, 0.3); }
 
-.emoji-panel { position: absolute; bottom: 60px; left: 0; width: 100%; background: #fff; border-radius: 16px 16px 0 0; padding: 10px; box-shadow: 0 -2px 8px rgba(0,0,0,0.05); display: none; z-index: 99; }
-.emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
-.emoji-item { font-size: 24px; text-align: center; cursor: pointer; }
 .attach-panel { position: absolute; bottom: 60px; left: 0; width: 100%; background: #fff; border-radius: 16px 16px 0 0; padding: 15px; box-shadow: 0 -2px 8px rgba(0,0,0,0.05); display: none; z-index: 99; }
 .attach-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
 .attach-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: var(--text-light); font-size: 12px; }
@@ -519,6 +529,7 @@ body {
   font-size: 48px;
   font-weight: 200;
   color: #333;
+  transition: color 0.3s;
 }
 
 .me-avatar-card {
@@ -907,9 +918,12 @@ body {
       </div>
       <div class="contact-list-header">
         <h1>对话</h1>
-        <div class="add-contact-btn" onclick="openSub('addContact')">+</div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div class="group-btn" onclick="openSub('group-manage')">分组</div>
+          <div class="add-contact-btn" onclick="openSub('addContact')">+</div>
+        </div>
       </div>
-      <div class="contact-list-content" id="contactList">
+      <div class="contact-list-content" id="contactList" style="padding:10px 15px;">
         <div class="empty-tip">暂无联系人<br>点击右上角 + 添加</div>
       </div>
     </div>
@@ -1112,7 +1126,7 @@ body {
       <div class="page-header">
         <div class="page-back" onclick="closeSub('world-win')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">世界书管理</div>
-        <div style="margin-left:auto; font-size:24px; color:var(--main-pink); cursor:pointer;" onclick="openSub('add-worldbook')">+</div>
+        <div style="margin-left:auto; font-size:24px; color:var(--text-dark); cursor:pointer;" onclick="openSub('add-worldbook')">+</div>
       </div>
       <div style="display:flex; gap:8px; padding:10px 20px; border-bottom:1px solid #f0e8df; background:rgba(255,255,255,0.7);">
         <div class="wb-tab active" onclick="filterWorldBook('all')" data-category="all" style="flex:1; text-align:center; padding:8px; border-radius:8px; cursor:pointer; font-size:13px; background:var(--main-pink); color:white;">全部</div>
@@ -1272,6 +1286,27 @@ body {
       </div>
     </div>
 
+    <!-- 分组管理页面 -->
+    <div class="sub-page" id="group-manage">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('group-manage')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">分组管理</div>
+      </div>
+      <div class="page-body">
+        <div class="form-section">
+          <div class="form-label">新增分组</div>
+          <div style="display:flex; gap:8px;">
+            <input class="form-input" id="new-group-name" placeholder="输入分组名称">
+            <button class="pull-btn" onclick="addGroup()">添加</button>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-label">现有分组</div>
+          <div id="group-list-container"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="sub-page" id="addContact">
       <div class="page-header">
         <div class="page-back" onclick="closeSub('addContact')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
@@ -1295,6 +1330,12 @@ body {
           <input class="form-input" id="contactName" placeholder="给TA起个名字">
         </div>
         <div class="form-section">
+          <div class="form-label">分组</div>
+          <select class="form-select" id="contactGroup">
+            <option value="默认">默认</option>
+          </select>
+        </div>
+        <div class="form-section">
           <div class="form-label">人设</div>
           <textarea class="form-textarea" id="contactPersona" placeholder="写TA的性格、外貌、习惯..."></textarea>
           <div style="margin-top:10px;">
@@ -1314,10 +1355,16 @@ body {
       <div class="chat-header">
         <div class="page-back" onclick="closeSub('chat-win')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;">
-          <div class="page-title" id="chatHeaderTitle" onclick="toggleStatusCard()" style="cursor:pointer; margin-left:0; font-size:17px;">聊天</div>
-          <span id="typingStatus" style="display:none; font-size:12px; color:var(--text-light); font-weight:400; white-space:nowrap;">（输入中…）</span>
+          <div class="page-title" id="chatHeaderTitle" style="margin-left:0; font-size:17px; color: #333333;">聊天</div>
+          <span id="typingStatus" style="display:none; font-size:12px; color: #777777; font-weight:400; white-space:nowrap;">（输入中…）</span>
         </div>
-        <div style="cursor:pointer; font-size:18px;" onclick="toggleChatMenu()">⋯</div>
+        <div style="cursor:pointer; width:32px; height:32px; display:flex; align-items:center; justify-content:center; margin-left:auto;" onclick="toggleChatMenu(event)">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1"></circle>
+            <circle cx="19" cy="12" r="1"></circle>
+            <circle cx="5" cy="12" r="1"></circle>
+          </svg>
+        </div>
       </div>
       <!-- 隐藏的头像容器，保留数据用 -->
       <div id="chatHeaderAvatar" style="display:none;"><img></div>
@@ -1365,6 +1412,7 @@ body {
           <div class="switch-toggle" id="mode-toggle" onclick="toggleMode()" style="width:44px; height:22px;"></div>
         </div>
         <div onclick="openChatSettings()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">聊天设置</div>
+        <div onclick="openCoupleSpace()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">情侣空间</div>
         <div onclick="quickReRoll()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">快速重roll</div>
         <div onclick="batchDeleteMsg()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">批量删除</div>
         <div onclick="openStmPage()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">短期记忆</div>
@@ -1379,7 +1427,6 @@ body {
       </div>
       <div class="chat-input-area">
         <div class="chat-func-btn-group">
-          <button class="chat-func-btn" onclick="toggleEmojiPanel()">😀</button>
           <button class="chat-func-btn" onclick="toggleAttachPanel()">📎</button>
         </div>
         <div class="chat-input-container">
@@ -1387,19 +1434,7 @@ body {
             <span>回复：<span id="replyContent"></span></span>
             <span class="reply-tip-close" onclick="cancelReply()">×</span>
           </div>
-          <textarea class="chat-input" id="chatInput" placeholder="输入消息..."></textarea>
-          <div class="emoji-panel" id="emojiPanel">
-            <div class="emoji-grid">
-              <div class="emoji-item" onclick="insertEmoji('😀')">😀</div>
-              <div class="emoji-item" onclick="insertEmoji('😂')">😂</div>
-              <div class="emoji-item" onclick="insertEmoji('😍')">😍</div>
-              <div class="emoji-item" onclick="insertEmoji('🥰')">🥰</div>
-              <div class="emoji-item" onclick="insertEmoji('😜')">😜</div>
-              <div class="emoji-item" onclick="insertEmoji('🤔')">🤔</div>
-              <div class="emoji-item" onclick="insertEmoji('😢')">😢</div>
-              <div class="emoji-item" onclick="insertEmoji('😎')">😎</div>
-            </div>
-          </div>
+          <input type="text" class="chat-input" id="chatInput" placeholder="输入消息..." onkeypress="if(event.key==='Enter')sendMsg()">
           <div class="attach-panel" id="attachPanel">
             <div class="attach-grid">
               <div class="attach-item" onclick="selectFile('image')"><div class="attach-icon">🖼️</div><span>图片</span></div>
@@ -1490,6 +1525,15 @@ body {
           <textarea class="mask-textarea" id="sceneSettingTextarea" placeholder="例如：我们正坐在午后的咖啡馆里，阳光透过玻璃洒在桌面上。我们是刚认识的陌生人..."></textarea>
         </div>
 
+        <!-- 联系人分组设置 -->
+        <div class="setting-section">
+          <div class="setting-section-title">联系人分组</div>
+          <div class="setting-desc">修改当前联系人所属的分组。</div>
+          <select class="form-select" id="chatContactGroup" style="margin-top:10px;">
+            <option value="默认">默认</option>
+          </select>
+        </div>
+
         <!-- 联系人头像和名字设置 -->
         <div class="setting-section">
           <div class="setting-section-title">联系人头像和名字</div>
@@ -1536,6 +1580,34 @@ body {
 
         <!-- 保存按钮 -->
         <button class="save-btn" onclick="saveAllChatSettings()">保存所有设置</button>
+      </div>
+    </div>
+
+    <!-- 情侣空间页面 -->
+    <div class="sub-page" id="couple-space-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('couple-space-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">情侣空间</div>
+      </div>
+      <div class="page-body">
+        <div class="menu-item" onclick="openCoupleAlbum()">💑 情侣相册</div>
+        <div style="text-align:center; margin-top:40px; color:var(--text-light); font-size:12px;">更多甜蜜功能敬请期待...</div>
+      </div>
+    </div>
+
+    <!-- 情侣相册页面 -->
+    <div class="sub-page" id="couple-album-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('couple-album-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">情侣相册</div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
+          <div style="cursor:pointer; font-size:14px; color:var(--main-pink); font-weight:500;" onclick="generateCoupleMemory()">刷新</div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div id="coupleAlbumGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;">
+          <!-- 照片将在此处渲染 -->
+        </div>
       </div>
     </div>
 
@@ -1595,7 +1667,7 @@ body {
               <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
             </svg>
           </div>
-          <div style="cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size: 24px; color: var(--main-pink); font-weight: bold;" onclick="openSub('post-moment-page')">
+          <div style="cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size: 24px; color: var(--text-dark); font-weight: bold;" onclick="openSub('post-moment-page')">
             +
           </div>
         </div>
@@ -1644,6 +1716,7 @@ body {
     <input type="file" id="avatar-input" class="hidden-file" onchange="hdlImg(this, 'user-avatar', 'img')">
     <input type="file" id="pi1" class="hidden-file" onchange="hdlImg(this, 'p1', 'bg')">
     <input type="file" id="pi2" class="hidden-file" onchange="hdlImg(this, 'p2', 'bg')">
+    <input type="file" id="chat-img-input" class="hidden-file" accept="image/*" onchange="handleChatImage(this)">
   </div>
 </div>
 
@@ -1652,6 +1725,22 @@ body {
 function setVh() {
   let vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+function autoHeight(el) {
+  const scrollTop = el.scrollTop;
+  const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 20;
+  
+  el.style.height = '40px';
+  el.style.height = el.scrollHeight + 'px';
+  
+  if (el.scrollHeight > el.clientHeight) {
+    if (isAtBottom) {
+      el.scrollTop = el.scrollHeight;
+    } else {
+      el.scrollTop = scrollTop;
+    }
+  }
 }
 setVh();
 window.addEventListener('resize', setVh);
@@ -1662,18 +1751,6 @@ document.addEventListener('touchstart', function(event) {
   if (event.touches.length > 1) {
     event.preventDefault();
   }
-}, { passive: false });
-
-// 禁用双击缩放 (保留消息气泡的双击编辑功能)
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function(event) {
-  const now = (new Date()).getTime();
-  if (now - lastTouchEnd <= 300) {
-    if (!event.target.closest('.msg-bubble')) {
-      event.preventDefault();
-    }
-  }
-  lastTouchEnd = now;
 }, { passive: false });
 
 // 禁用输入框聚焦时的自动放大 (某些安卓机型)，并处理键盘遮挡问题
@@ -2183,6 +2260,7 @@ async function restoreDockIconsOnLoad(){
 // 改为异步加载初始值，先设置默认值
 let contacts = [];
 let chatRecords = {};
+let contactGroups = ['默认'];
 let currentContactId = '';
 let worldBook = '';
 let worldBookEntries = [];
@@ -2260,6 +2338,10 @@ function navTo(id, el) {
         island.classList.remove('hidden');
     } else {
         island.classList.add('hidden');
+    }
+    // 切换到"我"页面时自动更新文字颜色
+    if (id === 'page-me') {
+        setTimeout(updateMePageTextColor, 100);
     }
 }
 
@@ -2393,28 +2475,23 @@ function hdlImg(input, tid, type) {
     }
 }
 
-// 替换所有alert和prompt为自定义的Toast或Modal以防手机端报错
+// 替换所有alert为自定义的Toast以防手机端报错
 window.alert = function(msg) {
     showToast(msg, 3000);
 };
 
-// 简单的自定义prompt，如果需要用户输入，可以使用这个
+// 保存原生prompt引用（必须在任何覆盖之前）
+const _nativePrompt = window.prompt.bind(window);
+
+// 覆盖prompt，使用原生实现但增加错误处理
 window.prompt = function(msg, defaultText = '') {
-    // 手机端原生prompt可能会被拦截或样式不佳，这里先保留原生，但如果在某些环境报错，可以改为自定义模态框
-    // 出于兼容性，我们先使用原生，如果用户反馈有问题再改写为DOM模态框
-    return window.originalPrompt ? window.originalPrompt(msg, defaultText) : prompt(msg, defaultText);
+    try {
+        return _nativePrompt(msg, defaultText);
+    } catch (e) {
+        console.error('Prompt failed:', e);
+        return defaultText;
+    }
 };
-if (!window.originalPrompt) {
-    window.originalPrompt = window.prompt;
-    window.prompt = function(msg, defaultText = '') {
-        try {
-            return window.originalPrompt(msg, defaultText);
-        } catch (e) {
-            console.error('Prompt failed:', e);
-            return defaultText;
-        }
-    };
-}
 
 // 压缩大图片后保存（使用 IndexedDB）
 async function compressAndSave(file, tid, type) {
@@ -2462,47 +2539,227 @@ async function compressAndSave(file, tid, type) {
     reader.readAsDataURL(file);
 }
 
+let currentContactGroupFilter = 'all';
+
+// ========== 分组管理功能 ==========
+async function loadContactGroups() {
+  const saved = await getFromStorage('CONTACT_GROUPS');
+  if (saved) {
+    try {
+      contactGroups = typeof saved === 'string' ? JSON.parse(saved) : saved;
+      if (!Array.isArray(contactGroups)) contactGroups = ['默认'];
+    } catch(e) { contactGroups = ['默认']; }
+  }
+  // 确保"默认"分组始终存在
+  if (!contactGroups.includes('默认')) {
+    contactGroups.unshift('默认');
+  }
+  // 从联系人中收集已有分组（兼容旧数据）
+  contacts.forEach(c => {
+    if (c.group && !contactGroups.includes(c.group)) {
+      contactGroups.push(c.group);
+    }
+  });
+  renderGroupTabs();
+  updateGroupDropdowns();
+  renderGroupManageList();
+}
+
+async function saveContactGroups() {
+  await saveToStorage('CONTACT_GROUPS', JSON.stringify(contactGroups));
+}
+
+async function addGroup() {
+  const input = document.getElementById('new-group-name');
+  const name = input.value.trim();
+  if (!name) { showToast('请输入分组名称'); return; }
+  if (contactGroups.includes(name)) { showToast('该分组已存在'); return; }
+  contactGroups.push(name);
+  await saveContactGroups();
+  input.value = '';
+  renderGroupTabs();
+  updateGroupDropdowns();
+  renderGroupManageList();
+  showToast('✅ 分组已添加');
+}
+
+async function deleteGroup(name) {
+  if (name === '默认') { showToast('默认分组不可删除'); return; }
+  if (!confirm(`确定删除分组"${name}"吗？该分组下的联系人将移至"默认"分组。`)) return;
+  // 将该分组下的联系人移至默认
+  contacts.forEach(c => {
+    if (c.group === name) c.group = '默认';
+  });
+  await saveToStorage('CHAT_CONTACTS', JSON.stringify(contacts));
+  contactGroups = contactGroups.filter(g => g !== name);
+  await saveContactGroups();
+  renderGroupTabs();
+  updateGroupDropdowns();
+  renderGroupManageList();
+  renderContactList();
+  showToast('✅ 分组已删除');
+}
+
+// renderGroupTabs 已废弃，改为折叠菜单，保留空函数避免报错
+function renderGroupTabs() {}
+
+function updateGroupDropdowns() {
+  // 更新新建联系人页面的分组下拉
+  const contactGroupSelect = document.getElementById('contactGroup');
+  if (contactGroupSelect) {
+    contactGroupSelect.innerHTML = '';
+    contactGroups.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g;
+      opt.textContent = g;
+      contactGroupSelect.appendChild(opt);
+    });
+  }
+  // 更新聊天设置页面的分组下拉
+  const chatContactGroupSelect = document.getElementById('chatContactGroup');
+  if (chatContactGroupSelect) {
+    const currentVal = chatContactGroupSelect.value;
+    chatContactGroupSelect.innerHTML = '';
+    contactGroups.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g;
+      opt.textContent = g;
+      chatContactGroupSelect.appendChild(opt);
+    });
+    // 恢复当前联系人的分组选中状态
+    if (currentContactId) {
+      const contact = contacts.find(c => c.id === currentContactId);
+      if (contact) {
+        chatContactGroupSelect.value = contact.group || '默认';
+      }
+    }
+  }
+}
+
+function renderGroupManageList() {
+  const container = document.getElementById('group-list-container');
+  if (!container) return;
+  container.innerHTML = '';
+  contactGroups.forEach(g => {
+    const count = contacts.filter(c => (c.group || '默认') === g).length;
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:12px 15px; background:#fff; border-radius:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);';
+    div.innerHTML = `
+      <div>
+        <div style="font-size:15px; color:var(--text-dark); font-weight:500;">${g}</div>
+        <div style="font-size:12px; color:var(--text-light); margin-top:2px;">${count} 个联系人</div>
+      </div>
+      ${g !== '默认' ? `<button onclick="deleteGroup('${g.replace(/'/g, "\\'")}')" style="padding:6px 12px; background:#ffcdd2; border:none; border-radius:8px; cursor:pointer; color:#c62828; font-size:13px;">删除</button>` : '<span style="font-size:12px; color:var(--text-light);">默认</span>'}
+    `;
+    container.appendChild(div);
+  });
+}
+
+function filterContacts(groupName) {
+  currentContactGroupFilter = groupName;
+  // 更新标签样式
+  document.querySelectorAll('.group-tab').forEach(tab => {
+    if (tab.dataset.group === groupName) {
+      tab.style.background = 'var(--main-pink)';
+      tab.style.color = 'white';
+    } else {
+      tab.style.background = '#f5f5f5';
+      tab.style.color = 'var(--text-dark)';
+    }
+  });
+  renderContactList();
+}
+
+// 记录每个分组的展开/折叠状态
+let groupCollapsedState = {};
+
 function renderContactList() {
   const el = document.getElementById('contactList');
+  
   if (contacts.length === 0) {
     el.innerHTML = '<div class="empty-tip">暂无联系人<br>点击右上角 + 添加</div>';
     return;
   }
   el.innerHTML = '';
   
-  // 按最后对话时间排序（最近的在前）
-  const sortedContacts = [...contacts].sort((a, b) => {
-    const aRecords = chatRecords[a.id] || [];
-    const bRecords = chatRecords[b.id] || [];
-    
-    const getLatestTime = (recs, contact) => {
-      if (recs.length > 0) return recs[recs.length - 1].time || 0;
-      return parseInt(contact.id) || 0; // 没消息按创建时间排
-    };
-
-    return getLatestTime(bRecords, b) - getLatestTime(aRecords, a);
+  // 按分组归类联系人
+  const groupMap = {};
+  contacts.forEach(c => {
+    const g = c.group || '默认';
+    if (!groupMap[g]) groupMap[g] = [];
+    groupMap[g].push(c);
   });
   
-  sortedContacts.forEach(c => {
-    const recs = chatRecords[c.id] || [];
-    let lastMsg = '暂无消息';
-    if (recs.length > 0) {
-      const msg = recs[recs.length - 1].content;
-      const cleanMsg = msg.replace(/<STATUS>[\s\S]*?<\/STATUS>/, '').trim();
-      lastMsg = cleanMsg;
-    }
+  // 按 contactGroups 顺序渲染，再补充未在列表中的分组
+  const orderedGroups = [...contactGroups];
+  Object.keys(groupMap).forEach(g => {
+    if (!orderedGroups.includes(g)) orderedGroups.push(g);
+  });
+  
+  orderedGroups.forEach(groupName => {
+    const groupContacts = groupMap[groupName];
+    if (!groupContacts || groupContacts.length === 0) return;
     
-    const div = document.createElement('div');
-    div.className = 'contact-item';
-    div.innerHTML = `
-      <div class="contact-avatar"><img src="${c.avatar}"></div>
-      <div class="contact-info" style="flex:1; overflow:hidden;">
-        <div class="contact-name">${c.name}</div>
-        <div class="contact-desc" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${lastMsg}</div>
-      </div>
+    // 默认展开（如果没有记录过折叠状态）
+    const isCollapsed = groupCollapsedState[groupName] === true;
+    
+    // 按最后对话时间排序
+    const sorted = [...groupContacts].sort((a, b) => {
+      const aRecs = chatRecords[a.id] || [];
+      const bRecs = chatRecords[b.id] || [];
+      const getTime = (recs, ct) => recs.length > 0 ? (recs[recs.length - 1].time || 0) : (parseInt(ct.id) || 0);
+      return getTime(bRecs, b) - getTime(aRecs, a);
+    });
+    
+    // 分组标题（可折叠）
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex; align-items:center; padding:10px 5px 6px; cursor:pointer; user-select:none;';
+    header.innerHTML = `
+      <span style="font-size:12px; color:var(--text-dark); margin-right:6px; transition:transform 0.2s; display:inline-block; transform:rotate(${isCollapsed ? '0' : '90'}deg);">▶</span>
+      <span style="font-size:14px; font-weight:600; color:var(--text-dark);">${groupName}</span>
+      <span style="font-size:12px; color:var(--text-dark); margin-left:6px;">(${sorted.length})</span>
     `;
-    div.onclick = () => openChatPage(c);
-    el.appendChild(div);
+    
+    // 联系人容器
+    const body = document.createElement('div');
+    body.style.display = isCollapsed ? 'none' : 'block';
+    
+    sorted.forEach(c => {
+      const recs = chatRecords[c.id] || [];
+      let lastMsg = '暂无消息';
+      if (recs.length > 0) {
+        const msg = recs[recs.length - 1].content;
+        lastMsg = msg.replace(/<STATUS>[\s\S]*?<\/STATUS>/g, '').trim();
+      }
+      const div = document.createElement('div');
+      div.className = 'contact-item';
+      div.innerHTML = `
+        <div class="contact-avatar"><img src="${c.avatar}"></div>
+        <div class="contact-info" style="flex:1; overflow:hidden;">
+          <div class="contact-name">${c.name}</div>
+          <div class="contact-desc" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${lastMsg}</div>
+        </div>
+      `;
+      div.onclick = () => openChatPage(c);
+      body.appendChild(div);
+    });
+    
+    // 点击标题切换折叠
+    header.onclick = () => {
+      const arrow = header.querySelector('span');
+      if (body.style.display === 'none') {
+        body.style.display = 'block';
+        arrow.style.transform = 'rotate(90deg)';
+        groupCollapsedState[groupName] = false;
+      } else {
+        body.style.display = 'none';
+        arrow.style.transform = 'rotate(0deg)';
+        groupCollapsedState[groupName] = true;
+      }
+    };
+    
+    el.appendChild(header);
+    el.appendChild(body);
   });
 }
 
@@ -2688,13 +2945,14 @@ function importWorldBookFile(input) {
 
 async function saveContact() {
   const name = document.getElementById('contactName').value.trim();
+  const group = document.getElementById('contactGroup').value || '默认';
   const p = document.getElementById('contactPersona').value.trim();
   const avatar = document.querySelector('#avatarPreview img').src;
   if (!name) { 
     showToast('请输入名字');
     return; 
   }
-  contacts.push({ id: Date.now().toString(), name, persona: p, avatar });
+  contacts.push({ id: Date.now().toString(), name, group, persona: p, avatar });
   try {
     await saveToStorage('CHAT_CONTACTS', JSON.stringify(contacts));
     renderContactList();
@@ -2706,10 +2964,15 @@ async function saveContact() {
 }
 
 
-function openChatPage(contact) {
+async function openChatPage(contact) {
   currentContactId = contact.id;
-  document.getElementById('chatHeaderAvatar').innerHTML = `<img src="${contact.avatar}">`;
+  // 立即更新标题，提升响应感
   document.getElementById('chatHeaderTitle').innerText = contact.name;
+  document.getElementById('chatHeaderAvatar').innerHTML = `<img src="${contact.avatar}">`;
+  
+  // 清空旧内容，防止切换瞬间看到别人的消息
+  document.getElementById('chatContent').innerHTML = '';
+  
   cancelReply();
   exitBatchDelete();
   
@@ -2717,12 +2980,12 @@ function openChatPage(contact) {
   document.getElementById('typingStatus').style.display = 'none';
   hideLoading();
   
-  // 先加载聊天设置
-  loadChatSettings();
-  
-  // 再渲染聊天（这样才能应用隐藏头像设置）
-  renderChat();
+  // 核心：先跳转页面，再异步加载内容
   openSub('chat-win');
+  
+  // 异步加载设置和渲染，不阻塞跳转动画
+  await loadChatSettings();
+  renderChat();
   
   // 修复：正确显示模式状态
   const toggle = document.getElementById('mode-toggle');
@@ -3005,6 +3268,10 @@ ${favorRules}
       body: JSON.stringify({ model: cfg.model, temperature: parseFloat(cfg.temperature) || 0.3, messages: messages })
     });
     const data = await res.json();
+    // 检查API错误返回
+    if (data.error) {
+      throw new Error(`API错误: ${data.error.message || data.error.type || JSON.stringify(data.error)}`);
+    }
     let txt = data.choices?.[0]?.message?.content || '回复失败';
     
     // 如果当前联系人已经改变，只保存到记录，不更新UI
@@ -3211,19 +3478,66 @@ function showLoading() {
 function hideLoading() { document.querySelectorAll('.loading').forEach(x => x.remove()); }
 
 function hideAllPanels() {
-  document.getElementById('emojiPanel').style.display = 'none';
   document.getElementById('attachPanel').style.display = 'none';
 }
-function toggleEmojiPanel() {
-  const e = document.getElementById('emojiPanel'); const a = document.getElementById('attachPanel');
-  e.style.display = e.style.display === 'block' ? 'none' : 'block'; a.style.display = 'none';
-}
 function toggleAttachPanel() {
-  const a = document.getElementById('attachPanel'); const e = document.getElementById('emojiPanel');
-  a.style.display = a.style.display === 'block' ? 'none' : 'block'; e.style.display = 'none';
+  const a = document.getElementById('attachPanel');
+  a.style.display = a.style.display === 'block' ? 'none' : 'block';
 }
-function insertEmoji(e) { const i = document.getElementById('chatInput'); i.value += e; i.focus(); }
-function selectFile(t) { alert('已选择：'+t); hideAllPanels(); }
+function selectFile(t) { 
+  if (t === 'image') {
+    document.getElementById('chat-img-input').click();
+  } else {
+    alert('已选择：'+t); 
+  }
+  hideAllPanels(); 
+}
+
+async function handleChatImage(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const img = new Image();
+    img.onload = async () => {
+      const canvas = document.createElement('canvas');
+      const maxSize = 1024;
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = h * maxSize / w; w = maxSize; }
+        else { w = w * maxSize / h; h = maxSize; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.8);
+      
+      const q = replyMsg ? replyMsg.shortContent : null;
+      addMsgToUI(compressed, 'right', userAvatar, q, undefined, 'image');
+      
+      if (!chatRecords[currentContactId]) chatRecords[currentContactId] = [];
+      chatRecords[currentContactId].push({ 
+        side: 'right', 
+        content: compressed, 
+        type: 'image',
+        quote: q, 
+        time: Date.now() 
+      });
+      await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+      cancelReply();
+      renderContactList();
+      
+      // 自动触发AI回复
+      if (!isOfflineMode) {
+        triggerAIReply();
+      }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
 
 function toggleChatMenu(e) {
   if (e) e.stopPropagation();
@@ -3235,6 +3549,143 @@ function toggleChatMenu(e) {
 function openChatSettings() {
   toggleChatMenu(); // 先关闭弹出的菜单
   openSub('chat-settings-page'); // 打开聊天设置页面
+}
+
+// ========== 情侣空间功能 ==========
+function openCoupleSpace() {
+  toggleChatMenu();
+  openSub('couple-space-page');
+}
+
+async function openCoupleAlbum() {
+  openSub('couple-album-page');
+  renderCoupleAlbum();
+}
+
+async function renderCoupleAlbum() {
+  const container = document.getElementById('coupleAlbumGrid');
+  if (!currentContactId) return;
+  let album = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`) || [];
+  if (typeof album === 'string') album = JSON.parse(album);
+  
+  if (album.length === 0) {
+    container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-light); font-size:14px;">相册空空如也<br>点击右上角 AI记录 捕捉瞬间</div>';
+    return;
+  }
+  
+  container.innerHTML = '';
+  album.forEach((photo, idx) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'aspect-ratio: 1; border-radius: 12px; overflow: hidden; position: relative; background: #f8f5f2; border: 1px solid rgba(0,0,0,0.05);';
+    
+    let contentHtml = '';
+    if (photo.src) {
+      contentHtml = `<img src="${photo.src}" style="width:100%; height:100%; object-fit:cover;" onclick="viewFullPhoto(null, ${idx})">`;
+    } else {
+      contentHtml = `
+        <div onclick="viewFullPhoto(null, ${idx})" style="width:100%; height:100%; padding:10px; display:flex; align-items:center; justify-content:center; text-align:center; font-size:11px; color:#886677; line-height:1.4; overflow:hidden;">
+          ${photo.description || '瞬间生成中...'}
+        </div>
+      `;
+    }
+
+    div.innerHTML = `
+      ${contentHtml}
+      <div style="position:absolute; top:4px; right:4px; display:flex; gap:4px;">
+        <div onclick="deleteCouplePhoto(${idx})" style="width:20px; height:20px; background:rgba(0,0,0,0.5); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer;">×</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+async function generateCoupleMemory() {
+  if (!currentContactId) { showToast('请先选择联系人'); return; }
+  const c = contacts.find(x => x.id === currentContactId);
+  const rec = chatRecords[currentContactId] || [];
+  if (rec.length === 0) { showToast('暂无聊天记录'); return; }
+
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  if (!cfg.key) { showToast('请先配置API'); return; }
+
+  showToast('🧠 AI正在回忆捕捉瞬间...');
+  
+  const userName = await getFromStorage('USER_NICKNAME') || '用户';
+  let historyText = rec.slice(-15).map(r => `${r.side === 'right' ? userName : c.name}: ${r.content}`).join('\n');
+  
+  const prompt = `你现在是${c.name}。请根据我们最近的聊天记录，抓取一个最让你心动或印象深刻的瞬间，并将其转化为一段唯美的画面描写。
+要求：
+1. 以第三人称视角描写一个静态的画面。
+2. 描写要细腻、有质感，包含光影、动作或环境细节。
+3. 字数控制在40字以内。
+4. 只返回描写文字，不要带任何前缀或后缀。
+
+最近的聊天记录：
+${historyText}`;
+
+  try {
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({
+        model: cfg.model,
+        temperature: 0.8,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const description = data.choices?.[0]?.message?.content || '一个美好的瞬间';
+    
+    let album = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`) || [];
+    if (typeof album === 'string') album = JSON.parse(album);
+    
+    album.unshift({
+      id: Date.now(),
+      description: description.trim(),
+      time: Date.now()
+    });
+    
+    await saveToStorage(`COUPLE_ALBUM_${currentContactId}`, JSON.stringify(album));
+    renderCoupleAlbum();
+    showToast('✨ 瞬间已记录');
+  } catch (e) {
+    console.error(e);
+    showToast('❌ 回忆失败');
+  }
+}
+
+async function deleteCouplePhoto(idx) {
+  if (!confirm('确定要删除这个瞬间吗？')) return;
+  if (!currentContactId) return;
+  let album = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`) || [];
+  if (typeof album === 'string') album = JSON.parse(album);
+  album.splice(idx, 1);
+  await saveToStorage(`COUPLE_ALBUM_${currentContactId}`, JSON.stringify(album));
+  renderCoupleAlbum();
+}
+
+async function viewFullPhoto(src, idx) {
+  if (!currentContactId) return;
+  let album = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`) || [];
+  if (typeof album === 'string') album = JSON.parse(album);
+  const item = album[idx];
+  
+  const viewer = document.createElement('div');
+  viewer.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:10000; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:20px;';
+  
+  if (item.src) {
+    viewer.innerHTML = `<img src="${item.src}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
+  } else {
+    viewer.innerHTML = `
+      <div style="background:white; padding:30px; border-radius:20px; max-width:90%; text-align:center; color:#555; font-size:16px; line-height:1.6; box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+        ${item.description}
+      </div>
+    `;
+  }
+  
+  viewer.onclick = () => viewer.remove();
+  document.body.appendChild(viewer);
 }
 
 // 初始化聊天设置页面
@@ -3276,6 +3727,9 @@ function initChatSettingsPage() {
   
   // 加载联系人头像和名字
   loadContactAvatarAndName();
+  
+  // 更新分组下拉并设置当前联系人的分组
+  updateGroupDropdowns();
   
   // 渲染世界书多选框列表
   renderWorldBookCheckboxList();
@@ -3517,6 +3971,9 @@ async function saveAllChatSettings() {
     }
   }
   
+  // 保存联系人分组
+  const newGroup = document.getElementById('chatContactGroup').value;
+  
   // 保存联系人头像和名字
   const newContactName = document.getElementById('contactNameInput').value.trim();
   const newContactAvatar = document.querySelector('#contactAvatarPreview img')?.src;
@@ -3527,6 +3984,9 @@ async function saveAllChatSettings() {
       contact.name = newContactName;
       if (newContactAvatar) {
         contact.avatar = newContactAvatar;
+      }
+      if (newGroup) {
+        contact.group = newGroup;
       }
       await saveToStorage('CHAT_CONTACTS', JSON.stringify(contacts));
       
@@ -3918,6 +4378,133 @@ function updatePlayerName(name) {
   }
 }
 
+// ========== "我"页面文字颜色自动适配背景深浅 ==========
+function updateMePageTextColor() {
+  const bgEl = document.getElementById('user-bg');
+  if (!bgEl) return;
+  
+  const bgImage = bgEl.style.backgroundImage;
+  const bgColor = bgEl.style.backgroundColor || '#e8d5c8';
+  
+  // 如果有背景图片，用canvas采样分析亮度
+  if (bgImage && bgImage !== 'none' && bgImage.includes('url(')) {
+    const urlMatch = bgImage.match(/url\(["']?([^"')]+)["']?\)/);
+    if (urlMatch && urlMatch[1]) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const size = 50; // 采样尺寸
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, size, size);
+        try {
+          const imageData = ctx.getImageData(0, 0, size, size).data;
+          let totalBrightness = 0;
+          const pixelCount = size * size;
+          for (let i = 0; i < imageData.length; i += 4) {
+            totalBrightness += (imageData[i] * 299 + imageData[i+1] * 587 + imageData[i+2] * 114) / 1000;
+          }
+          const avgBrightness = totalBrightness / pixelCount;
+          applyMeTextColor(avgBrightness < 128);
+        } catch(e) {
+          // canvas跨域或其他错误，默认深色字
+          applyMeTextColor(false);
+        }
+      };
+      img.onerror = function() {
+        // 图片加载失败，根据背景色判断
+        applyMeTextColorByBgColor(bgColor);
+      };
+      img.src = urlMatch[1];
+      return;
+    }
+  }
+  
+  // 没有背景图片，根据背景色判断
+  applyMeTextColorByBgColor(bgColor);
+}
+
+function applyMeTextColorByBgColor(bgColor) {
+  const brightness = getColorBrightness(bgColor);
+  applyMeTextColor(brightness < 128);
+}
+
+function applyMeTextColor(isDark) {
+  // 浅灰色(深色背景用) 和 深灰色(浅色背景用)
+  const textColor = isDark ? '#d0d0d0' : '#555';
+  const subTextColor = isDark ? '#aaa' : '#777';
+  const cardBg = isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.25)';
+  const cardBorder = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.3)';
+  const iconColor = isDark ? '#d0d0d0' : '#555';
+  
+  // 时间
+  const timeEl = document.getElementById('currentTime');
+  if (timeEl) timeEl.style.color = textColor;
+  
+  // 昵称
+  const nicknameEl = document.getElementById('user-nickname');
+  if (nicknameEl) nicknameEl.style.color = textColor;
+  
+  // 签名
+  const sigEl = document.getElementById('userSignature');
+  if (sigEl) sigEl.style.color = subTextColor;
+  
+  // 播放器文字
+  const playerTitle = document.querySelector('.player-title');
+  if (playerTitle) playerTitle.style.color = textColor;
+  const playerSub = document.querySelector('.player-sub');
+  if (playerSub) playerSub.style.color = subTextColor;
+  
+  // 播放器图标盒子
+  const playerIconBox = document.querySelector('.player-icon-box');
+  if (playerIconBox) {
+    playerIconBox.style.color = iconColor;
+    playerIconBox.style.background = isDark ? 'rgba(255,255,255,0.15)' : '#fff';
+  }
+  
+  // 播放器播放按钮
+  const playBtn = document.querySelector('.player-play-btn');
+  if (playBtn) {
+    playBtn.style.color = iconColor;
+    playBtn.style.background = isDark ? 'rgba(255,255,255,0.15)' : '#fff';
+  }
+  
+  // 播放器小圆点
+  document.querySelectorAll('.player-dots span').forEach(dot => {
+    dot.style.background = iconColor;
+  });
+  
+  // 头像卡片背景
+  const avatarCard = document.querySelector('.me-avatar-card');
+  if (avatarCard) {
+    avatarCard.style.background = cardBg;
+    avatarCard.style.borderColor = cardBorder;
+  }
+  
+  // 播放器背景
+  const playerBar = document.querySelector('.player-bar');
+  if (playerBar) {
+    playerBar.style.background = cardBg;
+    playerBar.style.borderColor = cardBorder;
+  }
+  
+  // 照片格子背景和备注标签
+  document.querySelectorAll('.photo-item').forEach(item => {
+    item.style.background = cardBg;
+  });
+  document.querySelectorAll('.memo-tag').forEach(tag => {
+    tag.style.color = subTextColor;
+  });
+  // 图片占位文字
+  document.querySelectorAll('.img-placeholder').forEach(ph => {
+    if (!ph.style.backgroundImage || ph.style.backgroundImage === 'none') {
+      ph.style.color = subTextColor;
+    }
+  });
+}
+
 // ========== 状态卡片功能 ==========
 function toggleStatusCard() {
   const card = document.getElementById('statusCard');
@@ -4085,6 +4672,9 @@ async function applyMeBg(dataOrUrl) {
   userBg.style.backgroundSize = 'cover';
   userBg.style.backgroundPosition = 'center';
   
+  // ✅ 同步背景到其他三个页面
+  syncBgToAllPages(dataOrUrl);
+  
   // ✅ 使用 IndexedDB 保存背景图
   try {
     await IndexedDBManager.saveImage('SVD_user-bg', dataOrUrl, 'image');
@@ -4096,6 +4686,106 @@ async function applyMeBg(dataOrUrl) {
       showToast('⚠️ 背景图保存失败，存储空间不足！');
     }
   }
+  // 背景更新后重新检测文字颜色
+  setTimeout(updateMePageTextColor, 200);
+}
+
+// ========== 四个页面背景图同步 ==========
+function syncBgToAllPages(dataOrUrl) {
+  const bgCss = dataOrUrl ? `url(${dataOrUrl})` : 'none';
+  // 对话、通讯录、发现 三个页面
+  ['page-chat', 'page-contacts', 'page-discover'].forEach(pageId => {
+    const page = document.getElementById(pageId);
+    if (page) {
+      if (dataOrUrl) {
+        page.style.backgroundImage = bgCss;
+        page.style.backgroundSize = 'cover';
+        page.style.backgroundPosition = 'center';
+        page.style.backgroundRepeat = 'no-repeat';
+      } else {
+        page.style.backgroundImage = 'none';
+        page.style.background = 'var(--bg-cream)';
+      }
+    }
+  });
+  // 同步更新通讯录和发现页面的文字颜色
+  setTimeout(() => updatePageTextColors(dataOrUrl), 200);
+}
+
+// ========== 通讯录/发现页面文字颜色自适应背景深浅 ==========
+function updatePageTextColors(dataOrUrl) {
+  const mainColor = getComputedStyle(document.documentElement).getPropertyValue('--main-pink').trim() || '#f0b8c8';
+  const themeBrightness = getColorBrightness(mainColor);
+  const isThemeDark = themeBrightness < 128;
+
+  if (!dataOrUrl) {
+    applyPageTextColors(isThemeDark);
+    return;
+  }
+  
+  // 有背景图，用canvas采样分析亮度
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    const size = 50;
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, size, size);
+    try {
+      const imageData = ctx.getImageData(0, 0, size, size).data;
+      let totalBrightness = 0;
+      const pixelCount = size * size;
+      for (let i = 0; i < imageData.length; i += 4) {
+        totalBrightness += (imageData[i] * 299 + imageData[i+1] * 587 + imageData[i+2] * 114) / 1000;
+      }
+      const avgBrightness = totalBrightness / pixelCount;
+      applyPageTextColors(avgBrightness < 128);
+    } catch(e) {
+      applyPageTextColors(isThemeDark);
+    }
+  };
+  img.onerror = function() {
+    applyPageTextColors(isThemeDark);
+  };
+  // 处理 dataOrUrl 可能是 data:image 或普通 URL
+  img.src = dataOrUrl;
+}
+
+function applyPageTextColors(isDark) {
+  // 主题是深色的时候显示浅灰色字体 (#e0e0e0)，主题是浅色的时候选择深灰色字体 (#333333)
+  const textDark = isDark ? '#e0e0e0' : '#333333';
+  const textLight = isDark ? '#b0b0b0' : '#666666';
+  const backBtnBg = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)';
+
+  const headerBg = isDark ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.75)';
+  const itemBg = isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.35)';
+  const itemBorder = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.4)';
+  const headerBorder = isDark ? 'rgba(255,255,255,0.1)' : '#f0e8df';
+  
+  // 更新对话、通讯录和发现页面的背景和局部样式
+  ['page-chat', 'page-contacts', 'page-discover'].forEach(pageId => {
+    const page = document.getElementById(pageId);
+    if (!page) return;
+
+    // 设置页面局部 CSS 变量，确保跟随背景主题，同时避免影响聊天界面
+    page.style.setProperty('--text-dark', textDark);
+    page.style.setProperty('--text-light', textLight);
+    
+    page.style.setProperty('--header-bg', headerBg);
+    page.style.setProperty('--item-bg', itemBg);
+    page.style.setProperty('--item-border', itemBorder);
+    page.style.setProperty('--header-border', headerBorder);
+    
+    // 返回按钮
+    const pageBack = page.querySelector('.page-back');
+    if (pageBack) {
+      pageBack.style.background = backBtnBg;
+      const svg = pageBack.querySelector('svg');
+      if (svg) svg.style.stroke = textDark;
+    }
+  });
 }
 
 function uploadMeBgByUrl() {
@@ -4140,6 +4830,15 @@ async function exportBackup() {
     const status = await getFromStorage(`STATUS_${c.id}`);
     if (status) {
       backupData.contactStatus[c.id] = typeof status === 'string' ? JSON.parse(status) : status;
+    }
+  }
+  
+  // 保存情侣相册
+  backupData.coupleAlbums = {};
+  for (const c of contacts) {
+    const album = await getFromStorage(`COUPLE_ALBUM_${c.id}`);
+    if (album) {
+      backupData.coupleAlbums[c.id] = typeof album === 'string' ? JSON.parse(album) : album;
     }
   }
   
@@ -4327,6 +5026,16 @@ function importBackup(input) {
       } catch(e) { console.error(`解析状态失败 ${contactId}:`, e); }
     }
   }
+  
+  // 恢复情侣相册
+  if (backupData.coupleAlbums) {
+    for (const contactId of Object.keys(backupData.coupleAlbums)) {
+      try {
+        const album = typeof backupData.coupleAlbums[contactId] === 'string' ? JSON.parse(backupData.coupleAlbums[contactId]) : backupData.coupleAlbums[contactId];
+        await saveToStorage(`COUPLE_ALBUM_${contactId}`, JSON.stringify(album));
+      } catch(e) { console.error(`解析情侣相册失败 ${contactId}:`, e); }
+    }
+  }
       
       // 恢复底部图标
       if (backupData.dockIcons) {
@@ -4421,6 +5130,13 @@ function applyThemeColor(main, light, bg) {
   document.documentElement.style.setProperty('--main-pink', main);
   document.documentElement.style.setProperty('--light-pink', light);
   document.documentElement.style.setProperty('--bg-cream', bg);
+  
+  // 如果没有背景图，则根据新的背景色更新文字颜色
+  const userBgEl = document.getElementById('user-bg');
+  if (!userBgEl || !userBgEl.style.backgroundImage || userBgEl.style.backgroundImage === 'none') {
+    updatePageTextColors(null);
+  }
+
   // 更新发送按钮颜色
   const sendBtn = document.querySelector('.chat-send-btn');
   if (sendBtn) {
@@ -4668,21 +5384,142 @@ window.onload = async () => {
     }
   }
 
+  // ✅ 页面加载时同步背景到所有页面
+  const userBgEl = document.getElementById('user-bg');
+  if (userBgEl && userBgEl.style.backgroundImage && userBgEl.style.backgroundImage !== 'none') {
+    const bgUrl = userBgEl.style.backgroundImage.match(/url\(["']?([^"')]+)["']?\)/);
+    if (bgUrl && bgUrl[1]) {
+      syncBgToAllPages(bgUrl[1]);
+    } else {
+      updatePageTextColors(null);
+    }
+  } else {
+    updatePageTextColors(null);
+  }
+
+  await loadContactGroups(); // 加载分组数据并渲染分组标签
   renderContactList();
   renderWorldBookList();
   
   document.getElementById('dynamic-island').classList.remove('hidden');
   
-  // 事件委托：双击气泡内任意位置触发编辑
-  document.getElementById('chatContent').addEventListener('dblclick', function(e) {
-    if (isBatchDeleteMode) return;
-    const bubble = e.target.closest('.msg-bubble');
-    if (bubble && bubble.dataset.msgIdx !== undefined) {
-      e.preventDefault();
-      e.stopPropagation();
-      openEditMsg(parseInt(bubble.dataset.msgIdx));
+  // 事件委托：双击气泡触发编辑 (兼容 iOS Safari、Android Chrome、桌面端)
+  // iOS Safari 核心问题：
+  // 1. dblclick 在 iOS 上不可靠
+  // 2. touch-action: manipulation 会导致 iOS 吞掉第二次 tap 的 touchstart/touchend
+  // 3. iOS 在快速双击时，第二次 tap 可能只触发 click 而不触发 touchend
+  // 修复方案：统一用 click 事件检测双击（click 在 iOS/Android/桌面端都可靠触发），
+  //          touchend 仅作为辅助加速检测，不再做去重过滤
+  (function() {
+    let lastTapTime = 0;
+    let lastTapBubble = null;
+    let tapTimeout = null;
+    let doubleTapFired = false; // 防止 touchend 和 click 同时触发双击
+    const chatContent = document.getElementById('chatContent');
+    
+    // 记录 touchstart 的目标和位置
+    let touchStartTarget = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    
+    // 统一的双击检测函数
+    function handleTap(bubble, source) {
+      if (!bubble || !bubble.dataset || bubble.dataset.msgIdx === undefined) {
+        lastTapTime = 0;
+        lastTapBubble = null;
+        return false;
+      }
+      
+      const now = Date.now();
+      
+      if (lastTapBubble === bubble && (now - lastTapTime) > 80 && (now - lastTapTime) < 600) {
+        // 检测到双击（间隔80-600ms，iOS需要更宽的窗口）
+        if (doubleTapFired) return false; // 防止重复触发
+        doubleTapFired = true;
+        setTimeout(function() { doubleTapFired = false; }, 300);
+        if (tapTimeout) { clearTimeout(tapTimeout); tapTimeout = null; }
+        const msgIdx = parseInt(bubble.dataset.msgIdx);
+        lastTapTime = 0;
+        lastTapBubble = null;
+        // 延迟执行，避免 iOS 事件冲突
+        setTimeout(function() { openEditMsg(msgIdx); }, 10);
+        return true; // 表示检测到双击
+      } else {
+        lastTapTime = now;
+        lastTapBubble = bubble;
+        if (tapTimeout) clearTimeout(tapTimeout);
+        tapTimeout = setTimeout(function() {
+          lastTapTime = 0;
+          lastTapBubble = null;
+        }, 650);
+        return false;
+      }
     }
-  });
+    
+    // 从事件目标中查找气泡元素
+    function findBubble(target) {
+      if (!target) return null;
+      if (target.nodeType === 3) target = target.parentNode; // 文本节点
+      return target && target.closest ? target.closest('.msg-bubble') : null;
+    }
+    
+    chatContent.addEventListener('touchstart', function(e) {
+      if (isBatchDeleteMode) return;
+      const touch = e.touches[0];
+      touchStartX = touch ? touch.clientX : 0;
+      touchStartY = touch ? touch.clientY : 0;
+      touchStartTarget = findBubble(e.target);
+    }, { passive: true });
+    
+    chatContent.addEventListener('touchend', function(e) {
+      if (isBatchDeleteMode) return;
+      
+      // 检查是否有明显的滑动（超过15px则不算点击）
+      const touch = e.changedTouches[0];
+      if (touch) {
+        const dx = Math.abs(touch.clientX - touchStartX);
+        const dy = Math.abs(touch.clientY - touchStartY);
+        if (dx > 15 || dy > 15) {
+          touchStartTarget = null;
+          return;
+        }
+      }
+      
+      const bubble = touchStartTarget;
+      touchStartTarget = null;
+      
+      if (handleTap(bubble, 'touchend')) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, { passive: false });
+    
+    // 核心修复：click 事件是 iOS Safari 上最可靠的 tap 检测方��
+    // iOS Safari 即使在 touch-action: manipulation 下，click 事件也始终会触发
+    chatContent.addEventListener('click', function(e) {
+      if (isBatchDeleteMode) return;
+      
+      const bubble = findBubble(e.target);
+      if (handleTap(bubble, 'click')) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+    
+    // 桌面端后备：使用原生 dblclick 事件
+    chatContent.addEventListener('dblclick', function(e) {
+      if (isBatchDeleteMode) return;
+      // 如果是触摸设备，跳过（已由 touch/click 处理）
+      if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+      
+      const bubble = findBubble(e.target);
+      if (bubble && bubble.dataset.msgIdx !== undefined) {
+        e.preventDefault();
+        e.stopPropagation();
+        openEditMsg(parseInt(bubble.dataset.msgIdx));
+      }
+    });
+  })();
   
   // 监听签名输入框的变化，实时保存
   const sigEl = document.getElementById('userSignature');

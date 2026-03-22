@@ -224,9 +224,15 @@ body {
   color: var(--text-dark);
 }
 
+.group-btn {
+  font-size: 14px;
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
 .add-contact-btn {
   font-size: 24px;
-  color: var(--main-pink);
+  color: var(--text-dark);
   cursor: pointer;
 }
 
@@ -440,7 +446,7 @@ body {
 .upload-options { display: flex; gap: 10px; }
 #avatar-file, #user-avatar-file { display: none; }
 
-.menu-item { padding: 16px; background: white; border-radius: 16px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); color: var(--text-dark); }
+.menu-item { padding: 16px; background: var(--item-bg, white); border-radius: 16px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); color: var(--text-dark); border: 1px solid var(--item-border, transparent); }
 
 /* 聊天背景预览样式 */
 .chat-bg-preview {
