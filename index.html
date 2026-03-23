@@ -7,7 +7,14 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>oho</title>
 <link rel="apple-touch-icon" href="haibaologo.png">
+<link rel="apple-touch-icon" sizes="152x152" href="haibaologo.png">
+<link rel="apple-touch-icon" sizes="180x180" href="haibaologo.png">
+<link rel="apple-touch-icon" sizes="167x167" href="haibaologo.png">
 <link rel="icon" href="haibaologo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f0b8c8">
+<meta name="apple-mobile-web-app-title" content="oho">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!-- 引入mammoth.js用于解析docx文件 -->
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -169,8 +176,8 @@ body {
   display: flex;
   align-items: center;
   padding: 0 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255, 255, 255, 0.25);
+  border-bottom: 1px solid var(--header-border, rgba(255,255,255,0.2));
+  background: var(--header-bg, rgba(255, 255, 255, 0.25));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -204,7 +211,7 @@ body {
   margin-left: 15px;
   font-size: 18px;
   font-weight: 500;
-  color: var(--text-dark);
+  color: var(--text-dark, #333333);
 }
 
 .page-body {
@@ -433,7 +440,7 @@ body {
 .upload-options { display: flex; gap: 10px; }
 #avatar-file, #user-avatar-file { display: none; }
 
-.menu-item { padding: 16px; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.3); color: var(--text-dark); transition: color 0.3s; }
+.menu-item { padding: 16px; background: var(--item-bg, rgba(255, 255, 255, 0.25)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--item-border, rgba(255,255,255,0.3)); color: var(--text-dark, #333333); transition: color 0.3s, background 0.3s; }
 
 .chat-page { background: var(--bg-cream); }
 .chat-header { height: 50px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #f0e8df; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); }
@@ -470,7 +477,7 @@ body {
 .chat-input { width: 100%; height: 40px; padding: 0 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.5); outline: none; font-size: 16px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
 .chat-btn-group { display: flex; gap: 8px; }
 .chat-send-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(240, 184, 200, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(240, 184, 200, 0.3); }
-.chat-ai-reply-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(168, 216, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(168, 216, 255, 0.3); }
+.chat-ai-reply-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(106, 184, 212, 0.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.5); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(80, 160, 200, 0.35); display: flex; align-items: center; justify-content: center; }
 
 .attach-panel { position: absolute; bottom: 60px; left: 0; width: 100%; background: #fff; border-radius: 16px 16px 0 0; padding: 15px; box-shadow: 0 -2px 8px rgba(0,0,0,0.05); display: none; z-index: 99; }
 .attach-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
@@ -521,8 +528,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 20px;
-  justify-content: space-evenly;
+  padding: 42px 20px 90px;
+  justify-content: flex-start;
 }
 
 .me-time {
@@ -530,6 +537,7 @@ body {
   font-weight: 200;
   color: #333;
   transition: color 0.3s;
+  margin-bottom: 46px;
 }
 
 .me-avatar-card {
@@ -540,6 +548,7 @@ body {
   padding: 20px;
   border: 1px solid rgba(255,255,255,0.3);
   text-align: center;
+  margin-bottom: 14px;
 }
 .me-avatar-img {
   width: 70px;
@@ -556,6 +565,7 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   width: 100%;
+  margin-bottom: 10px;
 }
 .photo-item {
   background: rgba(255, 255, 255, 0.3);
@@ -812,10 +822,12 @@ body {
 }
 .moment-comment-text {
   flex: 1;
+  cursor: pointer;
 }
 .comment-author {
   color: var(--main-pink);
   font-weight: 500;
+  cursor: pointer;
 }
 .comment-reply-to {
   color: var(--text-light);
@@ -1067,6 +1079,16 @@ body {
         </div>
         <button class="save-btn" onclick="saveDockIcons()">保存全部图标</button>
         <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
+        <div class="form-label">🎨 美化备份与恢复</div>
+        <div class="setting-desc" style="margin-top:6px;">仅备份/恢复美化相关设置：主题色、昵称、签名、dock图标、背景图、头像、照片及备注。</div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button class="upload-btn" style="flex:1; margin:0;" onclick="exportThemeSettings()">📤 导出美化</button>
+          <label class="upload-btn" style="flex:1; margin:0; text-align:center; cursor:pointer;">
+            📥 导入美化
+            <input type="file" id="import-theme-file" accept=".json" onchange="importThemeSettings(this)" style="display:none;">
+          </label>
+        </div>
+        <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
         <div class="form-label">"我"页面背景图片（仅支持2M以内图片上传）</div>
         <div style="margin-top:10px;">
           <div style="width:100%; height:120px; border-radius:12px; border:2px solid var(--light-pink); overflow:hidden; margin-bottom:10px;" id="me-bg-preview">
@@ -1147,19 +1169,35 @@ body {
       <div class="page-body">
         <div class="form-section">
           <div class="form-label">名称</div>
-          <input class="form-input" id="worldbook-name" placeholder="输入条目名称">
+          <input class="form-input" id="worldbook-name" placeholder="输入条目名称" oninput="saveWorldBookDraft()">
         </div>
         <div class="form-section">
           <div class="form-label">分类</div>
-          <select class="form-select" id="worldbook-category">
+          <select class="form-select" id="worldbook-category" onchange="saveWorldBookDraft()">
             <option value="记忆总结">记忆总结</option>
             <option value="语言规范">语言规范</option>
             <option value="html">html</option>
           </select>
         </div>
         <div class="form-section">
+          <div class="form-label">触发方式</div>
+          <div style="display:flex; gap:15px; margin-top:8px; margin-bottom:10px;">
+            <label style="display:flex; align-items:center; font-size:14px; color:var(--text-dark); cursor:pointer;" onclick="setTimeout(() => { toggleWbKeywordInput(); saveWorldBookDraft(); }, 10)">
+              <input type="radio" name="wb-trigger-type" value="always" checked style="margin-right:6px;"> 常驻（全局生效）
+            </label>
+            <label style="display:flex; align-items:center; font-size:14px; color:var(--text-dark); cursor:pointer;" onclick="setTimeout(() => { toggleWbKeywordInput(); saveWorldBookDraft(); }, 10)">
+              <input type="radio" name="wb-trigger-type" value="keyword" style="margin-right:6px;"> 关键词触发
+            </label>
+          </div>
+          <div id="wb-keyword-container" style="display:none; background: #fff8fa; padding: 12px; border-radius: 12px; border: 1px solid var(--light-pink); margin-bottom: 10px;">
+            <div style="font-size:13px; color:var(--main-pink); margin-bottom:8px; font-weight: 500;">🔑 触发关键词</div>
+            <input class="form-input" id="worldbook-keywords" placeholder="多个用逗号隔开 (如: 咖啡馆，左岸)" oninput="saveWorldBookDraft()">
+            <div class="tip-text" style="margin-top:8px; line-height: 1.4;">当最近的聊天记录中包含上述关键词时，此设定才会被发送给AI。推荐使用关键词触发以节省Token并减少AI幻觉。</div>
+          </div>
+        </div>
+        <div class="form-section">
           <div class="form-label">世界观设定</div>
-          <textarea class="form-textarea" id="worldbook-content" placeholder="输入详细的世界观设定内容..."></textarea>
+          <textarea class="form-textarea" id="worldbook-content" placeholder="输入详细的世界观设定内容..." oninput="saveWorldBookDraft()"></textarea>
           <div style="margin-top:10px;">
             <label class="upload-btn" style="display:inline-block; margin:0;">
               📄 导入文档 (支持txt/docx, 1M以内)
@@ -1266,11 +1304,21 @@ body {
       <div class="page-body">
         <div class="form-section">
           <div class="form-label">数据备份与恢复</div>
-          <div class="setting-desc">导出所有数据（联系人、聊天记录、设置等）为JSON文件，或从备份文件中恢复数据。</div>
-          <div style="display:flex; gap:10px; margin-top:15px;">
-            <button class="upload-btn" style="flex:1; margin:0;" onclick="exportBackup()">📤 导出备份</button>
-            <label class="upload-btn" style="flex:1; margin:0; text-align:center;">
-              📥 导入备份
+          <div class="setting-desc">导出数据为JSON文件，或从备份文件中恢复数据。</div>
+          <div style="margin-top:12px; background:#fff8fa; border:1px solid var(--light-pink); border-radius:12px; padding:12px;">
+            <div style="font-size:13px; font-weight:600; color:var(--main-pink); margin-bottom:6px;">📤 选择导出范围</div>
+            <div style="font-size:12px; color:var(--text-light); margin-bottom:10px;">
+              <b>仅聊天备份</b>：导出联系人 + 所有聊天记录（不含API配置、世界书、美化等）<br>
+              <b>全局备份</b>：导出全部数据（含API、世界书、主题、图片等）
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="upload-btn" style="flex:1; margin:0;" onclick="exportBackup('chat')">💬 仅聊天备份</button>
+              <button class="upload-btn" style="flex:1; margin:0;" onclick="exportBackup('full')">📦 全局备份</button>
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            <label class="upload-btn" style="width:100%; margin:0; text-align:center; display:block; box-sizing:border-box;">
+              📥 导入备份（聊天版 / 全局版均可）
               <input type="file" id="import-backup-file" accept=".json" onchange="importBackup(this)" style="display:none;">
             </label>
           </div>
@@ -1354,7 +1402,7 @@ body {
     <div class="sub-page chat-page" id="chat-win">
       <div class="chat-header">
         <div class="page-back" onclick="closeSub('chat-win')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;" onclick="toggleStatusCard()">
           <div class="page-title" id="chatHeaderTitle" style="margin-left:0; font-size:17px; color: #333333;">聊天</div>
           <span id="typingStatus" style="display:none; font-size:12px; color: #777777; font-weight:400; white-space:nowrap;">（输入中…）</span>
         </div>
@@ -1434,7 +1482,7 @@ body {
             <span>回复：<span id="replyContent"></span></span>
             <span class="reply-tip-close" onclick="cancelReply()">×</span>
           </div>
-          <input type="text" class="chat-input" id="chatInput" placeholder="输入消息..." onkeypress="if(event.key==='Enter')sendMsg()">
+          <input type="text" class="chat-input" id="chatInput" placeholder="输入消息..." autocomplete="off" onkeypress="if(event.key==='Enter')sendMsg()">
           <div class="attach-panel" id="attachPanel">
             <div class="attach-grid">
               <div class="attach-item" onclick="selectFile('image')"><div class="attach-icon">🖼️</div><span>图片</span></div>
@@ -1446,7 +1494,17 @@ body {
         </div>
         <div class="chat-btn-group">
           <button class="chat-send-btn" onclick="sendMsg()">✓</button>
-          <button class="chat-ai-reply-btn" onclick="triggerAIReply()">AI</button>
+          <button class="chat-ai-reply-btn" onclick="triggerAIReply()" title="AI回复">
+            <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- 猫爪掌心 - 大的豆子形 -->
+              <ellipse cx="50" cy="68" rx="24" ry="20" fill="white"/>
+              <!-- 4个圆润小趾垫 排成弧形 -->
+              <ellipse cx="20" cy="47" rx="10" ry="11" fill="white"/>
+              <ellipse cx="38" cy="33" rx="10" ry="11" fill="white"/>
+              <ellipse cx="62" cy="33" rx="10" ry="11" fill="white"/>
+              <ellipse cx="80" cy="47" rx="10" ry="11" fill="white"/>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -1629,6 +1687,14 @@ body {
         </div>
         
         <div class="form-section">
+          <div class="form-label">谁可以看</div>
+          <div class="menu-item" style="margin-bottom:0; display:flex; justify-content:space-between; align-items:center; padding: 12px 16px;" onclick="openVisibilityPage()">
+            <span id="post-moment-visibility-text">公开</span>
+            <span style="color:var(--text-light);">></span>
+          </div>
+        </div>
+        
+        <div class="form-section">
           <div class="form-label">图片上传 (可选)</div>
           <div class="setting-desc">本地上传限1张（2M以内），链接上传最多4张。</div>
           
@@ -1644,6 +1710,56 @@ body {
             <button class="upload-btn" style="flex:1; margin:0;" onclick="handlePostMomentUrlUpload()">链接上传</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 朋友圈可见性选择页面 -->
+    <div class="sub-page" id="moment-visibility-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('moment-visibility-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">谁可以看</div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
+          <div style="cursor:pointer; font-size: 14px; color: var(--main-pink); font-weight:500;" onclick="confirmVisibility()">完成</div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="menu-item" onclick="selectVisibility('public')">
+          <div style="font-weight:500; display:flex; justify-content:space-between;">公开 <span class="visibility-check" id="vis-check-public" style="color:var(--main-pink);">✓</span></div>
+          <div style="font-size:12px; color:var(--text-light); margin-top:4px;">所有朋友可见</div>
+        </div>
+        <div class="menu-item" onclick="selectVisibility('private')">
+          <div style="font-weight:500; display:flex; justify-content:space-between;">私密 <span class="visibility-check" id="vis-check-private" style="display:none; color:var(--main-pink);">✓</span></div>
+          <div style="font-size:12px; color:var(--text-light); margin-top:4px;">仅自己可见</div>
+        </div>
+        <div class="menu-item" onclick="selectVisibility('visible_to')">
+          <div style="font-weight:500; display:flex; justify-content:space-between;">部分可见 <span class="visibility-check" id="vis-check-visible_to" style="display:none; color:var(--main-pink);">✓</span></div>
+          <div style="font-size:12px; color:var(--text-light); margin-top:4px;">选中的朋友可见</div>
+          <div id="vis-desc-visible_to" style="font-size:12px; color:var(--main-pink); margin-top:4px; display:none;"></div>
+        </div>
+        <div class="menu-item" onclick="selectVisibility('invisible_to')">
+          <div style="font-weight:500; display:flex; justify-content:space-between;">不给谁看 <span class="visibility-check" id="vis-check-invisible_to" style="display:none; color:var(--main-pink);">✓</span></div>
+          <div style="font-size:12px; color:var(--text-light); margin-top:4px;">选中的朋友不可见</div>
+          <div id="vis-desc-invisible_to" style="font-size:12px; color:var(--main-pink); margin-top:4px; display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 朋友圈联系人选择页面 -->
+    <div class="sub-page" id="moment-contact-select-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('moment-contact-select-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title" id="contact-select-title">选择联系人</div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
+          <div style="cursor:pointer; font-size: 14px; color: var(--main-pink); font-weight:500;" onclick="confirmContactSelect()">确定</div>
+        </div>
+      </div>
+      <div class="page-body" style="padding:0; display:flex; flex-direction:column;">
+        <div style="display:flex; border-bottom:1px solid #f0e8df; background:rgba(255,255,255,0.7); flex-shrink:0;">
+          <div id="tab-select-group" style="flex:1; text-align:center; padding:12px; font-size:14px; color:var(--main-pink); border-bottom:2px solid var(--main-pink); cursor:pointer;" onclick="switchContactSelectTab('group')">按分组选择</div>
+          <div id="tab-select-contact" style="flex:1; text-align:center; padding:12px; font-size:14px; color:var(--text-light); border-bottom:2px solid transparent; cursor:pointer;" onclick="switchContactSelectTab('contact')">按联系人选择</div>
+        </div>
+        <div id="select-group-list" style="padding:15px; overflow-y:auto; flex:1;"></div>
+        <div id="select-contact-list" style="padding:15px; overflow-y:auto; flex:1; display:none;"></div>
       </div>
     </div>
 
@@ -1667,13 +1783,35 @@ body {
               <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
             </svg>
           </div>
-          <div style="cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size: 24px; color: var(--text-dark); font-weight: bold;" onclick="openSub('post-moment-page')">
+          <div style="cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size: 24px; color: var(--text-dark); font-weight: bold;" onclick="openPostMomentPage()">
             +
           </div>
         </div>
       </div>
       <div class="page-body" id="momentsContainer" style="padding:0;">
         <div class="empty-tip">点击右上角刷新按钮查看朋友圈</div>
+      </div>
+    </div>
+
+    <!-- 朋友圈设置页面 -->
+    <div class="sub-page" id="moments-settings">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('moments-settings')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">朋友圈设置</div>
+      </div>
+      <div class="page-body">
+        <div class="setting-section">
+          <div class="setting-section-title">朋友圈可见性说明</div>
+          <div class="setting-desc">
+            你可以在发布朋友圈时设置谁可以看：<br>
+            • <b>公开</b>：所有朋友可见<br>
+            • <b>私密</b>：仅自己可见<br>
+            • <b>部分可见</b>：选中的朋友或分组可见<br>
+            • <b>不给谁看</b>：选中的朋友或分组不可见<br>
+            <br>
+            目前仅支持用户发布朋友圈时设置可见性，AI发布的朋友圈默认为公开。
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2348,6 +2486,23 @@ function navTo(id, el) {
 let subPageZIndex = 6000;
 function openSub(id) { 
     const el = document.getElementById(id);
+    
+    // 如果打开的是添加世界书页面，重置一下表单状态
+    if (id === 'add-worldbook' && !window._isEditingWb) {
+        const nameEl = document.getElementById('worldbook-name');
+        if (nameEl) nameEl.value = '';
+        const catEl = document.getElementById('worldbook-category');
+        if (catEl) catEl.value = '记忆总结';
+        const contentEl = document.getElementById('worldbook-content');
+        if (contentEl) contentEl.value = '';
+        const kwEl = document.getElementById('worldbook-keywords');
+        if (kwEl) kwEl.value = '';
+        const alwaysRadio = document.querySelector('input[name="wb-trigger-type"][value="always"]');
+        if (alwaysRadio) alwaysRadio.checked = true;
+        if (typeof window.toggleWbKeywordInput === 'function') window.toggleWbKeywordInput();
+    }
+    window._isEditingWb = false;
+
     // 使用 requestAnimationFrame 确保在下一帧渲染，提高响应速度
     requestAnimationFrame(() => {
         subPageZIndex++;
@@ -2987,33 +3142,42 @@ async function openChatPage(contact) {
   await loadChatSettings();
   renderChat();
   
-  // 修复：正确显示模式状态
+  // ✅ 每个联系人独立加载线上/线下模式
+  const rawContactOffline = await getFromStorage(`isOfflineMode_${contact.id}`);
+  if (rawContactOffline !== null) {
+    isOfflineMode = String(rawContactOffline) === 'true';
+  } else {
+    // 没有单独设置时，使用全局默认值（兼容旧数据）
+    const rawGlobal = await getFromStorage('isOfflineMode');
+    isOfflineMode = String(rawGlobal) === 'true';
+  }
+  
+  // 更新UI开关状态
   const toggle = document.getElementById('mode-toggle');
   const label = document.getElementById('mode-label');
   if (isOfflineMode) {
     toggle.classList.remove('active'); // 线下模式 = 灰色（关闭状态）
-    if (label) label.innerText = '线上模式';
   } else {
     toggle.classList.add('active'); // 线上模式 = 粉色（打开状态）
-    if (label) label.innerText = '线上模式';
   }
+  if (label) label.innerText = '线上模式';
 }
 
 async function toggleMode() {
   isOfflineMode = !isOfflineMode;
-  // 保存为字符串 'true' 或 'false'
-  await saveToStorage('isOfflineMode', String(isOfflineMode));
+  // ✅ 保存为当前联系人独立的模式设置
+  if (currentContactId) {
+    await saveToStorage(`isOfflineMode_${currentContactId}`, String(isOfflineMode));
+  }
   const toggle = document.getElementById('mode-toggle');
   const label = document.getElementById('mode-label');
-  // 灰色(关闭) = 线下模式，粉色(打开) = 线上模式
-  // 文字始终显示"线上模式"
   if (isOfflineMode) {
     toggle.classList.remove('active'); // 灰色 = 线下模式
   } else {
     toggle.classList.add('active'); // 粉色 = 线上模式
   }
-  // 文字不变，始终显示"线上模式"
   if (label) label.innerText = '线上模式';
+  showToast(isOfflineMode ? '已切换为线下模式 🏃' : '已切换为线上模式 💬');
 }
 
 function renderChat() {
@@ -3026,7 +3190,7 @@ function renderChat() {
   el.innerHTML = '';
   displayRecords.forEach((m, idx) => {
     const ava = m.side === 'left' ? c.avatar : userAvatar;
-    addMsgToUI(m.content, m.side, ava, m.quote, startIdx + idx);
+    addMsgToUI(m.content, m.side, ava, m.quote, startIdx + idx, m.type);
   });
   if (rec.length > showCount) {
     const loadMore = document.createElement('div');
@@ -3061,32 +3225,46 @@ function applyHideAvatarSetting() {
   }
 }
 
-function addMsgToUI(content, side, avatar, quote, idx) {
+function addMsgToUI(content, side, avatar, quote, idx, type) {
   const el = document.getElementById('chatContent');
   const div = document.createElement('div');
   div.className = `msg-item ${side}`;
   if (selectedMsgIndices.includes(idx)) div.classList.add('selected');
   const qhtml = quote ? `<div class="msg-quote">${quote}</div>` : '';
-  const escapedContent = content.replace(/'/g, "\\'").replace(/\n/g, "<br>");
-  const displayContent = content.replace(/\n/g, "<br>");
-  
+
+  // 用于回复菜单的文本（图片显示占位符）
+  const replyText = (type === 'image' ? '[图片]' : content).replace(/'/g, "\\'").replace(/\n/g, "<br>");
+
   // 始终生成头像HTML，通过CSS控制显示/隐藏
   let avatarHtml = `<div class="msg-avatar"><img src="${avatar}"></div>`;
-  
+
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
-  bubble.innerHTML = `${qhtml}${displayContent}`;
   bubble.dataset.msgIdx = idx;
-  
+
+  if (type === 'image') {
+    // 图片消息：气泡去掉背景，直接显示缩略图
+    bubble.style.cssText = 'padding:4px; background:transparent !important; border:none !important; box-shadow:none !important;';
+    if (qhtml) bubble.innerHTML = qhtml;
+    const imgEl = document.createElement('img');
+    imgEl.src = content;
+    imgEl.style.cssText = 'max-width:180px; max-height:180px; border-radius:10px; display:block; cursor:zoom-in; object-fit:cover;';
+    imgEl.onclick = (e) => { e.stopPropagation(); viewFullImage(content); };
+    bubble.appendChild(imgEl);
+  } else {
+    const displayContent = content.replace(/\n/g, "<br>");
+    bubble.innerHTML = `${qhtml}${displayContent}`;
+  }
+
   div.innerHTML = `
     <div class="check-icon">✓</div>
     ${avatarHtml}
-    <div class="msg-menu"><div class="msg-menu-item" onclick="replyToMsg('${escapedContent}',this)">回复</div></div>
+    <div class="msg-menu"><div class="msg-menu-item" onclick="replyToMsg('${replyText}',this)">回复</div></div>
   `;
-  // Insert bubble before msg-menu
+  // 将气泡插入到 msg-menu 之前
   const menuEl = div.querySelector('.msg-menu');
   div.insertBefore(bubble, menuEl);
-  
+
   div.onclick = () => {
     if (!isBatchDeleteMode) return;
     if (selectedMsgIndices.includes(idx)) {
@@ -3100,12 +3278,24 @@ function addMsgToUI(content, side, avatar, quote, idx) {
   };
   el.appendChild(div);
   el.scrollTop = el.scrollHeight;
-  
+
   // 每次添加消息后，应用隐藏头像设置
   if (chatSettings.hideAvatar) {
     const newAvatar = div.querySelector('.msg-avatar');
     if (newAvatar) newAvatar.style.display = 'none';
   }
+}
+
+// 全屏查看图片
+function viewFullImage(src) {
+  const viewer = document.createElement('div');
+  viewer.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:99999; display:flex; align-items:center; justify-content:center; cursor:zoom-out;';
+  const img = document.createElement('img');
+  img.src = src;
+  img.style.cssText = 'max-width:92%; max-height:92%; object-fit:contain; border-radius:10px; box-shadow:0 8px 40px rgba(0,0,0,0.5);';
+  viewer.appendChild(img);
+  viewer.onclick = () => viewer.remove();
+  document.body.appendChild(viewer);
 }
 
 function updateSelectedCount() {
@@ -3138,6 +3328,90 @@ async function sendMsg() {
   renderContactList();
 }
 
+function checkVisibilityForContact(moment, contactId) {
+  if (!moment.visibility || moment.visibility.type === 'public') return true;
+  if (moment.visibility.type === 'private') return false;
+  
+  const contact = contacts.find(c => c.id === contactId);
+  if (!contact) return false;
+  
+  const inContacts = moment.visibility.contacts && moment.visibility.contacts.includes(contactId);
+  const inGroups = moment.visibility.groups && moment.visibility.groups.includes(contact.group || '默认');
+  
+  if (moment.visibility.type === 'visible_to') {
+    return inContacts || inGroups;
+  }
+  
+  if (moment.visibility.type === 'invisible_to') {
+    return !(inContacts || inGroups);
+  }
+  
+  return true;
+}
+
+async function forceAICommentOnMoment(momentId, contactId) {
+  const moment = moments.find(m => m.id === momentId);
+  const contact = contacts.find(c => c.id === contactId);
+  if (!moment || !contact) return;
+  
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  if (!cfg.key || !cfg.url || !cfg.model) return;
+  
+  const plainContent = moment.content.replace(/<[^>]*>?/gm, '').trim();
+  const contentText = plainContent ? `"${plainContent}"` : "[图片]";
+  
+  try {
+    const prompt = `你是${contact.name}。你的好友（用户）发了一条朋友圈。
+【朋友圈内容】${contentText}
+【你的人设设定】
+${contact.persona}
+
+用户刚刚在聊天里提醒你去看/去评论这条朋友圈。
+请**严格扮演**上述人设，给这条朋友圈写一条评论。要求：
+1. **必须完全符合你的人设设定**（包括性格、说话方式、口癖等），绝对不能偏离人设。
+2. 语气要自然真实，像真人在评论，不要像AI。
+3. 字数在15字以内。
+4. 只需要返回评论内容，不要带引号或你的名字等前缀。`;
+
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({
+        model: cfg.model,
+        temperature: 0.8,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    
+    const data = await res.json();
+    const reply = data.choices?.[0]?.message?.content || '来了来了！👍';
+    
+    if (!moment.likes) moment.likes = [];
+    if (!moment.likes.includes(contact.name)) {
+      moment.likes.push(contact.name);
+    }
+    
+    if (!moment.comments) moment.comments = [];
+    moment.comments.push({
+      author: contact.name,
+      content: reply.trim().replace(/^"|"$/g, ''),
+      replyTo: null,
+      time: Date.now(),
+      isAI: true
+    });
+    
+    await saveMomentsToDB();
+    
+    if (document.getElementById('moments-page').classList.contains('show')) {
+      updateMomentComments(moment.id);
+      updateMomentLikes(moment.id);
+    }
+  } catch (e) {
+    console.error('强制AI评论朋友圈失败:', e);
+  }
+}
+
 async function triggerAIReply() {
   if (!currentContactId) { alert('请先选联系人'); return; }
   const c = contacts.find(x => x.id === currentContactId);
@@ -3161,11 +3435,69 @@ async function triggerAIReply() {
 
   let systemPrompt = `${jailbreakPrompt}\n\n【人设】${c.persona || '无'}\n`;
   
-  // 根据设置决定是否加入世界书
-  if (chatSettings.useWorldBook && worldBook) {
-    systemPrompt += `【世界观】${worldBook}\n`;
+  // ================= 记忆与世界书注入逻辑开始 =================
+  let ltmContent = '';
+  let activeWorldBooks = [];
+  let stmContent = '';
+
+  // 1. 提取被选中的世界书（常驻 + 关键词触发）
+  if (chatSettings.useWorldBook) {
+    // 全局世界书（旧版兼容）
+    if (worldBook) activeWorldBooks.push(`全局世界观：\n${worldBook}`);
+
+    // 处理条目式世界书
+    if (chatSettings.selectedWorldBooks && chatSettings.selectedWorldBooks.length > 0) {
+      const selectedEntries = worldBookEntries.filter(e => chatSettings.selectedWorldBooks.includes(e.id));
+      
+      // 获取最近的聊天记录用于关键词匹配
+      const recentRecs = (chatRecords[currentContactId] || []).slice(-10);
+      const recentChatText = recentRecs.map(r => r.content).join('\n');
+
+      selectedEntries.forEach(entry => {
+        if (entry.category === '记忆总结') {
+          // 记忆总结默认作为LTM处理
+          ltmContent += `[${entry.name}]\n${entry.content}\n\n`;
+        } else {
+          // 其他世界书根据触发类型处理
+          if (entry.triggerType === 'keyword' && entry.keywords) {
+            // 关键词触发逻辑
+            const keywords = entry.keywords.split(/[,，]/).map(k => k.trim()).filter(k => k);
+            const isTriggered = keywords.some(kw => recentChatText.includes(kw));
+            if (isTriggered) {
+              activeWorldBooks.push(`[${entry.name} - 设定]\n${entry.content}`);
+              console.log(`[世界书触发] 关键词命中: ${entry.name}`);
+            }
+          } else {
+            // 常驻触发
+            activeWorldBooks.push(`[${entry.name} - 设定]\n${entry.content}`);
+          }
+        }
+      });
+    }
+  }
+
+  // 2. 提取短期记忆 (STM)
+  try {
+    const stmData = await getStmData(currentContactId);
+    if (stmData && stmData.entries && stmData.entries.length > 0) {
+      stmContent = stmData.entries.map((e, i) => `${i+1}. ${e.content}`).join('\n');
+    }
+  } catch(e) { console.error('读取STM失败', e); }
+
+  // 3. 按优先级拼接 Prompt (人设 -> LTM -> 世界书 -> STM)
+  if (ltmContent) {
+    systemPrompt += `\n【长期记忆 (LTM)】\n${ltmContent.trim()}\n`;
   }
   
+  if (activeWorldBooks.length > 0) {
+    systemPrompt += `\n【世界书/背景设定】\n${activeWorldBooks.join('\n\n')}\n`;
+  }
+
+  if (stmContent) {
+    systemPrompt += `\n【短期记忆 (STM)】\n以下是最近发生的事情总结：\n${stmContent}\n`;
+  }
+  // ================= 记忆与世界书注入逻辑结束 =================
+
   // 加入场景设定、用户面具和联系人面具
   if (chatSettings.sceneSetting) {
     systemPrompt += `【场景设定】${chatSettings.sceneSetting}\n`;
@@ -3195,6 +3527,22 @@ async function triggerAIReply() {
 2. 增加限制：如果对方有让你开心、心动或有好感的行为，一次对话最多只能增加1%到5%的好感度。
 3. 下降限制：如果对方做了让你反感、讨厌、愤怒的事，一次对话最多只能下降1%到15%的好感度。`;
 
+  const statusRules = `
+【角色状态监控系统：SYS_STATUS_MONITOR】
+请在每次回复的最后，必须严格按照以下格式添加角色当前的状态信息（必须包含在<STATUS>标签内）：
+<STATUS>
+地点：[当前所在地点]
+心情：[当前心情，如：开心、紧张、疲惫等]
+心声：[内容必须反映角色内心最真实的潜意识想法，必须包含角色真实的情感波动、隐秘的欲望或对用户的真实评价，30字以内]
+好感度：[0-100的数字，反映对用户的好感程度]
+</STATUS>
+
+【心声生成准则】
+1. 真实性：心声必须反映角色内心最真实、最私密的潜意识想法，即使与表面的言语完全相反。
+2. 隐秘性：展现角色不愿公开表达的欲望、吐槽、秘密、生理反应或对用户的真实心理评价。
+3. 动态性：必须根据当前这一轮对话的最新进展进行即时更新。
+4. 深度：挖掘角色性格深处的动机，心声是角色灵魂的独白。`;
+
   if (isOfflineMode) {
     systemPrompt += `【场景设定：线下模式 - 面对面互动】
 你们此刻正处于同一个物理空间中，面对面交流。你可以看到对方的表情、动作，能感受到周围的环境氛围。
@@ -3205,13 +3553,7 @@ async function triggerAIReply() {
 - 动作和神态直接描写，不加任何符号，如：他笑着挠了挠头
 请自然流畅地组合这些元素，不要使用【】或其他多余符号。
 ${favorRules}
-【重要】在每次回复的最后，必须添加角色当前状态信息，格式如下：
-<STATUS>
-地点：[当前所在地点]
-心情：[当前心情，如：开心、紧张、疲惫等]
-心声：[内心想法，一句话概括]
-好感度：[0-100的数字，表示对用户的好感度百分比]
-</STATUS>
+${statusRules}
 
 请根据剧情发展自然更新这些状态信息。`;
   } else {
@@ -3241,23 +3583,46 @@ ${favorRules}
 - 回复要简洁自然，符合网络聊天的习惯
 - 严格遵守一句话一条消息的规则
 ${favorRules}
-【重要】在每次回复的最后，必须添加角色当前状态信息，格式如下：
-<STATUS>
-地点：[当前所在地点]
-心情：[当前心情，如：开心、紧张、疲惫等]
-心声：[内心想法，一句话概括]
-好感度：[0-100的数字，表示对用户的好感度百分比]
-</STATUS>
+${statusRules}
 
 请根据剧情发展自然更新这些状态信息。`;
   }
   
   const messages = [{ role: 'system', content: systemPrompt }];
   const recs = (chatRecords[currentContactId] || []).slice(-8);
-  recs.forEach(r => { messages.push({ role: r.side === 'right' ? 'user' : 'assistant', content: r.content }); });
+  recs.forEach(r => {
+    const role = r.side === 'right' ? 'user' : 'assistant';
+    if (r.type === 'image') {
+      // 图片消息：使用 Vision API 格式传递 image_url
+      messages.push({
+        role: role,
+        content: [
+          {
+            type: 'image_url',
+            image_url: { url: r.content }
+          }
+        ]
+      });
+    } else {
+      messages.push({ role: role, content: r.content });
+    }
+  });
 
   // 记录请求发起时的联系人ID
   const requestContactId = currentContactId;
+
+  // 检查是否在聊天中提醒了看朋友圈
+  const rawRecs = chatRecords[currentContactId] || [];
+  const latestUserMsg = [...rawRecs].reverse().find(r => r.side === 'right');
+  if (latestUserMsg && typeof latestUserMsg.content === 'string' && /朋友圈|动态|点赞|评论|回复|去看看/.test(latestUserMsg.content)) {
+    const visibleMoments = moments.filter(m => m.contactId === 'user_self' && checkVisibilityForContact(m, currentContactId));
+    if (visibleMoments.length > 0) {
+      const latestMoment = visibleMoments[0];
+      setTimeout(() => {
+        forceAICommentOnMoment(latestMoment.id, currentContactId);
+      }, 3000);
+    }
+  }
 
   showLoading();
   aiRequestInProgress = true;
@@ -3290,46 +3655,52 @@ ${favorRules}
         document.getElementById('typingStatus').style.display = 'none';
       }
     
-    // 解析并提取状态信息
-    const statusMatch = txt.match(/<STATUS>([\s\S]*?)<\/STATUS>/);
+    // 解析并提取状态信息 (增强正则兼容性)
+    const statusMatch = txt.match(/<STATUS>([\s\S]*?)<\/STATUS>/i);
     let displayText = txt;
     
     if (statusMatch) {
-      // 提取状态信息
       const statusContent = statusMatch[1];
-      const locationMatch = statusContent.match(/地点[：:]\s*(.+)/);
-      const moodMatch = statusContent.match(/心情[：:]\s*(.+)/);
-      const thoughtsMatch = statusContent.match(/心声[：:]\s*(.+)/);
+      const locationMatch = statusContent.match(/地点[：:]\s*([^\n]+)/);
+      const moodMatch = statusContent.match(/心情[：:]\s*([^\n]+)/);
+      const thoughtsMatch = statusContent.match(/心声[：:]\s*([^\n]+)/);
       const favorMatch = statusContent.match(/好感度[：:]\s*(\d+)/);
       
+      // 保存状态数据
+      const statusData = {
+        location: locationMatch ? locationMatch[1].trim() : '未知',
+        mood: moodMatch ? moodMatch[1].trim() : '平静',
+        thoughts: thoughtsMatch ? thoughtsMatch[1].trim() : '暂无数据',
+        favor: favorMatch ? parseInt(favorMatch[1]) : 0
+      };
+
       // 只有在当前窗口才更新状态卡片UI
       if (isCurrentContact) {
-        if (locationMatch) {
-          document.getElementById('status-location').textContent = locationMatch[1].trim();
-        }
-        if (moodMatch) {
-          document.getElementById('status-mood').textContent = moodMatch[1].trim();
-        }
-        if (thoughtsMatch) {
-          document.getElementById('status-thoughts').textContent = thoughtsMatch[1].trim();
-        }
-        if (favorMatch) {
-          let favorValue = parseInt(favorMatch[1]);
-          
-          // 检查角色人设是否包含"无法爱人"相关关键词
-          const contact = contacts.find(c => c.id === requestContactId);
-          if (contact && contact.persona) {
-            const lowerPersona = contact.persona.toLowerCase();
-            const lockKeywords = ['无法爱人', '不会爱上任何人', '不会爱上user', '不会爱上用户', '无法产生爱情', '不懂爱', '没有爱的能力'];
-            const isLocked = lockKeywords.some(keyword => lowerPersona.includes(keyword));
-            
-            if (isLocked) {
-              favorValue = 0; // 锁定为0
-            }
+        document.getElementById('status-location').textContent = statusData.location;
+        document.getElementById('status-mood').textContent = statusData.mood;
+        document.getElementById('status-thoughts').textContent = statusData.thoughts;
+        
+        let favorValue = statusData.favor;
+        const contact = contacts.find(c => c.id === requestContactId);
+        if (contact && contact.persona) {
+          const lowerPersona = contact.persona.toLowerCase();
+          const lockKeywords = ['无法爱人', '不会爱上任何人', '不会爱上user', '不会爱上用户', '无法产生爱情', '不懂爱', '没有爱的能力'];
+          if (lockKeywords.some(keyword => lowerPersona.includes(keyword))) {
+            favorValue = 0;
           }
-          
-          document.getElementById('status-favor').style.width = favorValue + '%';
-          document.getElementById('status-favor-text').textContent = favorValue + '%';
+        }
+        document.getElementById('status-favor').style.width = favorValue + '%';
+        document.getElementById('status-favor-text').textContent = favorValue + '%';
+        
+        // 如果面板开着，闪烁一下提示更新
+        const statusCard = document.getElementById('statusCard');
+        if (statusCard.style.display === 'block') {
+          statusCard.style.transition = 'none';
+          statusCard.style.opacity = '0.7';
+          setTimeout(() => {
+            statusCard.style.transition = 'opacity 0.3s';
+            statusCard.style.opacity = '1';
+          }, 50);
         }
       }
       
@@ -3527,11 +3898,7 @@ async function handleChatImage(input) {
       await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
       cancelReply();
       renderContactList();
-      
-      // 自动触发AI回复
-      if (!isOfflineMode) {
-        triggerAIReply();
-      }
+      // 不自动触发AI回复，需要用户手动点击小熊按钮
     };
     img.src = e.target.result;
   };
@@ -3723,7 +4090,9 @@ function initChatSettingsPage() {
   // 加载场景设定、用户面具和联系人面具
   document.getElementById('sceneSettingTextarea').value = chatSettings.sceneSetting || '';
   document.getElementById('userMaskTextarea').value = chatSettings.userMask || '';
-  document.getElementById('contactMaskTextarea').value = chatSettings.contactMask || '';
+  // 联系人设定：优先使用已保存的设定，若为空则回退到创建联系人时输入的人设
+  const currentContact = contacts.find(c => c.id === currentContactId);
+  document.getElementById('contactMaskTextarea').value = chatSettings.contactMask || (currentContact ? currentContact.persona : '') || '';
   
   // 加载联系人头像和名字
   loadContactAvatarAndName();
@@ -4016,7 +4385,10 @@ async function quickReRoll() {
   const rec = chatRecords[currentContactId] || [];
   if (rec.length < 2) { alert('暂无消息可重roll'); return; }
   if (rec[rec.length-1].side !== 'left') { alert('最后一条不是AI回复'); return; }
-  rec.pop();
+  // 线上模式AI一次回复多条，需循环删除末尾所有AI消息
+  while (rec.length > 0 && rec[rec.length - 1].side === 'left') {
+    rec.pop();
+  }
   await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
   renderChat();
   await triggerAIReply();
@@ -4291,11 +4663,21 @@ function renderWorldBookList() {
     const div = document.createElement('div');
     div.className = 'contact-item';
     div.style.position = 'relative';
+    
+    let triggerTag = '';
+    if (entry.category === '记忆总结' || entry.category === '聊天总结') {
+      triggerTag = '<span style="font-size:10px; color:#fff; background:var(--main-pink); padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle;">常驻</span>';
+    } else if (entry.triggerType === 'keyword') {
+      triggerTag = `<span style="font-size:10px; color:#fff; background:#52c41a; padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle;">关键词</span> <span style="font-size:11px; color:#52c41a; margin-left:4px;">[${entry.keywords}]</span>`;
+    } else {
+      triggerTag = '<span style="font-size:10px; color:#fff; background:var(--main-pink); padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle;">常驻</span>';
+    }
+
     div.innerHTML = `
       <div style="flex:1;">
-        <div class="contact-name">${entry.name}</div>
-        <div class="contact-desc" style="color:var(--main-pink);">分类：${entry.category}</div>
-        <div class="contact-desc">${entry.content.slice(0,40)}${entry.content.length>40?'...':''}</div>
+        <div class="contact-name" style="display:flex; align-items:center; flex-wrap:wrap;">${entry.name}${triggerTag}</div>
+        <div class="contact-desc" style="color:var(--main-pink); margin-top:4px;">分类：${entry.category}</div>
+        <div class="contact-desc" style="margin-top:4px;">${entry.content.slice(0,40)}${entry.content.length>40?'...':''}</div>
       </div>
       <div style="display:flex; gap:8px;">
         <button onclick="editWorldBookEntry(${idx})" style="padding:6px 12px; background:var(--light-pink); border:none; border-radius:8px; cursor:pointer;">编辑</button>
@@ -4306,22 +4688,46 @@ function renderWorldBookList() {
   });
 }
 
+function toggleWbKeywordInput() {
+  const isKeyword = document.querySelector('input[name="wb-trigger-type"][value="keyword"]').checked;
+  const container = document.getElementById('wb-keyword-container');
+  if (isKeyword) {
+    container.style.display = 'block';
+  } else {
+    container.style.display = 'none';
+  }
+}
+
 async function saveWorldBookEntry() {
   const name = document.getElementById('worldbook-name').value.trim();
   const category = document.getElementById('worldbook-category').value.trim();
   const content = document.getElementById('worldbook-content').value.trim();
+  const triggerType = document.querySelector('input[name="wb-trigger-type"]:checked').value;
+  const keywords = document.getElementById('worldbook-keywords').value.trim();
   
   if (!name) { alert('请输入名称'); return; }
   if (!category) { alert('请输入分类'); return; }
   if (!content) { alert('请输入世界观设定'); return; }
+  if (triggerType === 'keyword' && !keywords) { alert('请输入触发关键词'); return; }
   
-  worldBookEntries.push({ id: Date.now().toString(), name, category, content });
+  worldBookEntries.push({ 
+    id: Date.now().toString(), 
+    name, 
+    category, 
+    content,
+    triggerType,
+    keywords
+  });
   await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
   
   // 清空表单
   document.getElementById('worldbook-name').value = '';
-  document.getElementById('worldbook-category').value = '';
+  document.getElementById('worldbook-category').value = '记忆总结';
   document.getElementById('worldbook-content').value = '';
+  document.getElementById('worldbook-keywords').value = '';
+  const alwaysRadio = document.querySelector('input[name="wb-trigger-type"][value="always"]');
+  if (alwaysRadio) alwaysRadio.checked = true;
+  toggleWbKeywordInput();
   
   closeSub('add-worldbook');
   renderWorldBookList();
@@ -4330,15 +4736,29 @@ async function saveWorldBookEntry() {
 
 async function editWorldBookEntry(idx) {
   const entry = worldBookEntries[idx];
-  document.getElementById('worldbook-name').value = entry.name;
-  document.getElementById('worldbook-category').value = entry.category;
-  document.getElementById('worldbook-content').value = entry.content;
+  window._isEditingWb = true;
+  openSub('add-worldbook');
+  
+  setTimeout(() => {
+    document.getElementById('worldbook-name').value = entry.name;
+    document.getElementById('worldbook-category').value = entry.category || '记忆总结';
+    document.getElementById('worldbook-content').value = entry.content;
+    
+    if (entry.triggerType === 'keyword') {
+      const kwRadio = document.querySelector('input[name="wb-trigger-type"][value="keyword"]');
+      if (kwRadio) kwRadio.checked = true;
+      document.getElementById('worldbook-keywords').value = entry.keywords || '';
+    } else {
+      const alwaysRadio = document.querySelector('input[name="wb-trigger-type"][value="always"]');
+      if (alwaysRadio) alwaysRadio.checked = true;
+      document.getElementById('worldbook-keywords').value = '';
+    }
+    toggleWbKeywordInput();
+  }, 50);
   
   // 删除旧条目
   worldBookEntries.splice(idx, 1);
   await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
-  
-  openSub('add-worldbook');
 }
 
 async function deleteWorldBookEntry(idx) {
@@ -4796,26 +5216,25 @@ function uploadMeBgByUrl() {
 }
 
 // ========== 导出备份功能 ==========
-async function exportBackup() {
-  const apiConfigStr = await getFromStorage('AI_CHAT_CONFIG');
+// mode: 'chat' = 仅聊天数据；'full' = 全局完整备份（默认）
+async function exportBackup(mode = 'full') {
+  const isChatOnly = (mode === 'chat');
+  showToast(isChatOnly ? '⏳ 正在打包聊天数据...' : '⏳ 正在打包全局数据...');
+
   const userNickname = await getFromStorage('USER_NICKNAME') || '';
-  
+
+  // ===== 聊天备份和全局备份共同的基础数据 =====
   const backupData = {
     version: '1.0',
+    backupMode: mode,
     exportTime: new Date().toISOString(),
     contacts: contacts,
     chatRecords: chatRecords,
-    worldBookEntries: worldBookEntries,
-    worldBook: worldBook,
-    apiConfig: apiConfigStr ? (typeof apiConfigStr === 'string' ? JSON.parse(apiConfigStr) : apiConfigStr) : {},
-    userAvatar: userAvatar,
     userNickname: userNickname,
-    userSignature: document.getElementById('userSignature')?.value || '',
     isOfflineMode: isOfflineMode,
-    // 保存所有聊天设置
     chatSettings: {}
   };
-  
+
   // 保存每个联系人的聊天设置
   for (const c of contacts) {
     const settings = await getFromStorage(`CHAT_SETTINGS_${c.id}`);
@@ -4823,8 +5242,8 @@ async function exportBackup() {
       backupData.chatSettings[c.id] = typeof settings === 'string' ? JSON.parse(settings) : settings;
     }
   }
-  
-  // 保存每个联系人的状态
+
+  // 保存每个联系人的状态（地点/心情/心声/好感度）
   backupData.contactStatus = {};
   for (const c of contacts) {
     const status = await getFromStorage(`STATUS_${c.id}`);
@@ -4832,7 +5251,7 @@ async function exportBackup() {
       backupData.contactStatus[c.id] = typeof status === 'string' ? JSON.parse(status) : status;
     }
   }
-  
+
   // 保存情侣相册
   backupData.coupleAlbums = {};
   for (const c of contacts) {
@@ -4841,60 +5260,71 @@ async function exportBackup() {
       backupData.coupleAlbums[c.id] = typeof album === 'string' ? JSON.parse(album) : album;
     }
   }
-  
-  // 保存底部图标
-  backupData.dockIcons = {};
-  for(let i=1; i<=4; i++) {
-    const icon = await getFromStorage(`dock${i}`);
-    if (icon) {
-      backupData.dockIcons[`dock${i}`] = icon;
+
+  // ===== 仅全局备份才包含的额外数据 =====
+  if (!isChatOnly) {
+    // API配置
+    const apiConfigStr = await getFromStorage('AI_CHAT_CONFIG');
+    backupData.apiConfig = apiConfigStr ? (typeof apiConfigStr === 'string' ? JSON.parse(apiConfigStr) : apiConfigStr) : {};
+
+    // 世界书
+    backupData.worldBookEntries = worldBookEntries;
+    backupData.worldBook = worldBook;
+
+    // 用户头像 & 签名
+    backupData.userAvatar = userAvatar;
+    backupData.userSignature = document.getElementById('userSignature')?.value || '';
+
+    // Dock图标
+    backupData.dockIcons = {};
+    for (let i = 1; i <= 4; i++) {
+      const icon = await IndexedDBManager.getImage(`dock${i}`);
+      if (icon) backupData.dockIcons[`dock${i}`] = icon;
     }
-  }
-  
-  // 保存其他图片资源
-  backupData.savedImages = {};
-  for (const id of ['user-bg', 'user-avatar', 'p1', 'p2']) {
-    const data = await getFromStorage('SVD_'+id);
-    if (data) {
-      backupData.savedImages[id] = data;
+
+    // 其他图片资源（背景图、头像、p1、p2）
+    backupData.savedImages = {};
+    for (const id of ['user-bg', 'user-avatar', 'p1', 'p2']) {
+      const imgData = await IndexedDBManager.getImage('SVD_' + id);
+      if (imgData) backupData.savedImages[id] = imgData;
     }
+
+    // 朋友圈封面
+    const momentsCover = await getFromStorage('MOMENTS_COVER');
+    if (momentsCover) backupData.savedImages['moments-cover'] = momentsCover;
+
+    // 备注标签
+    backupData.memoTags = {};
+    const memoTags = document.querySelectorAll('.memo-tag');
+    for (let idx = 0; idx < memoTags.length; idx++) {
+      const val = await getFromStorage(`MEMO_TAG_${idx}`);
+      if (val) backupData.memoTags[`MEMO_TAG_${idx}`] = val;
+    }
+
+    // 主题颜色
+    const themeColors = await getFromStorage('THEME_COLORS');
+    if (themeColors) backupData.themeColors = typeof themeColors === 'string' ? JSON.parse(themeColors) : themeColors;
+
+    // 播放器副标题
+    const playerSub = await getFromStorage('PLAYER_SUB');
+    if (playerSub) backupData.playerSub = playerSub;
   }
-  
-  // 保存朋友圈封面
-  const momentsCover = await getFromStorage('MOMENTS_COVER');
-  if (momentsCover) {
-    backupData.savedImages['moments-cover'] = momentsCover;
-  }
-  
-  // 保存备注标签
-  backupData.memoTags = {};
-  const memoTags = document.querySelectorAll('.memo-tag');
-  for (let idx = 0; idx < memoTags.length; idx++) {
-    const val = await getFromStorage(`MEMO_TAG_${idx}`);
-    if (val) backupData.memoTags[`MEMO_TAG_${idx}`] = val;
-  }
-  
-  // 保存主题颜色
-  const themeColors = await getFromStorage('THEME_COLORS');
-  if (themeColors) backupData.themeColors = typeof themeColors === 'string' ? JSON.parse(themeColors) : themeColors;
-  
-  // 保存播放器副标题
-  const playerSub = await getFromStorage('PLAYER_SUB');
-  if (playerSub) backupData.playerSub = playerSub;
-  
+
   // 生成JSON文件并下载
   const jsonStr = JSON.stringify(backupData, null, 2);
   const blob = new Blob([jsonStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+  const dlUrl = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = `oho_backup_${new Date().getTime()}.json`;
+  a.href = dlUrl;
+  a.download = isChatOnly
+    ? `oho_chat_${new Date().getTime()}.json`
+    : `oho_backup_${new Date().getTime()}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  
-  alert('✅ 备份文件已导出！');
+  URL.revokeObjectURL(dlUrl);
+
+  showToast(isChatOnly ? '✅ 聊天备份已导出！' : '✅ 全局备份已导出！');
 }
 
 // ========== 恢复出厂设置功能 ==========
@@ -5582,7 +6012,162 @@ window.onload = async () => {
 // ========== 朋友圈功能 - 使用IndexedDB ==========
 let moments = [];
 let currentMomentId = null;
+let currentReplyTo = null;
 let postMomentImages = []; // 用于存储即将发布的朋友圈图片
+
+// 可见性相关变量
+let currentVisibilityType = 'public';
+let currentVisibilityData = { contacts: [], groups: [] };
+let tempVisibilityData = { contacts: [], groups: [] };
+let selectingVisibilityType = '';
+
+function openPostMomentPage() {
+  currentVisibilityType = 'public';
+  currentVisibilityData = { contacts: [], groups: [] };
+  const visTextEl = document.getElementById('post-moment-visibility-text');
+  if (visTextEl) visTextEl.innerText = '公开';
+  document.getElementById('postMomentContent').value = '';
+  postMomentImages = [];
+  renderPostMomentImages();
+  openSub('post-moment-page');
+}
+
+function openVisibilityPage() {
+  document.querySelectorAll('.visibility-check').forEach(el => el.style.display = 'none');
+  const checkEl = document.getElementById('vis-check-' + currentVisibilityType);
+  if (checkEl) checkEl.style.display = 'inline';
+  
+  if (currentVisibilityType === 'visible_to') {
+    updateVisDesc('visible_to', currentVisibilityData);
+  } else if (currentVisibilityType === 'invisible_to') {
+    updateVisDesc('invisible_to', currentVisibilityData);
+  }
+  
+  openSub('moment-visibility-page');
+}
+
+function selectVisibility(type) {
+  if (type === 'public' || type === 'private') {
+    document.querySelectorAll('.visibility-check').forEach(el => el.style.display = 'none');
+    document.getElementById('vis-check-' + type).style.display = 'inline';
+    currentVisibilityType = type;
+  } else {
+    selectingVisibilityType = type;
+    tempVisibilityData = { 
+      contacts: currentVisibilityType === type ? [...currentVisibilityData.contacts] : [], 
+      groups: currentVisibilityType === type ? [...currentVisibilityData.groups] : [] 
+    };
+    openContactSelectPage(type);
+  }
+}
+
+function updateVisDesc(type, data) {
+  const descEl = document.getElementById('vis-desc-' + type);
+  if (data.groups.length > 0 || data.contacts.length > 0) {
+    let text = [];
+    if (data.groups.length > 0) text.push(`${data.groups.length}个分组`);
+    if (data.contacts.length > 0) text.push(`${data.contacts.length}个联系人`);
+    descEl.innerText = `已选: ${text.join('，')}`;
+    descEl.style.display = 'block';
+  } else {
+    descEl.style.display = 'none';
+  }
+}
+
+function openContactSelectPage(type) {
+  document.getElementById('contact-select-title').innerText = type === 'visible_to' ? '部分可见' : '不给谁看';
+  switchContactSelectTab('group');
+  renderContactSelectLists();
+  openSub('moment-contact-select-page');
+}
+
+function switchContactSelectTab(tab) {
+  if (tab === 'group') {
+    document.getElementById('tab-select-group').style.color = 'var(--main-pink)';
+    document.getElementById('tab-select-group').style.borderBottom = '2px solid var(--main-pink)';
+    document.getElementById('tab-select-contact').style.color = 'var(--text-light)';
+    document.getElementById('tab-select-contact').style.borderBottom = '2px solid transparent';
+    document.getElementById('select-group-list').style.display = 'block';
+    document.getElementById('select-contact-list').style.display = 'none';
+  } else {
+    document.getElementById('tab-select-contact').style.color = 'var(--main-pink)';
+    document.getElementById('tab-select-contact').style.borderBottom = '2px solid var(--main-pink)';
+    document.getElementById('tab-select-group').style.color = 'var(--text-light)';
+    document.getElementById('tab-select-group').style.borderBottom = '2px solid transparent';
+    document.getElementById('select-group-list').style.display = 'none';
+    document.getElementById('select-contact-list').style.display = 'block';
+  }
+}
+
+function renderContactSelectLists() {
+  const groupList = document.getElementById('select-group-list');
+  const contactList = document.getElementById('select-contact-list');
+  
+  groupList.innerHTML = '';
+  contactGroups.forEach(g => {
+    const isChecked = tempVisibilityData.groups.includes(g);
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex; align-items:center; padding:12px; background:#fff; border-radius:12px; margin-bottom:8px;';
+    div.innerHTML = `
+      <input type="checkbox" id="sel-g-${g}" ${isChecked ? 'checked' : ''} onchange="toggleSelectGroup('${g}')" style="width:18px; height:18px; margin-right:12px;">
+      <label for="sel-g-${g}" style="flex:1; font-size:15px; color:var(--text-dark);">${g}</label>
+    `;
+    groupList.appendChild(div);
+  });
+  
+  contactList.innerHTML = '';
+  contacts.forEach(c => {
+    const isChecked = tempVisibilityData.contacts.includes(c.id);
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex; align-items:center; padding:12px; background:#fff; border-radius:12px; margin-bottom:8px;';
+    div.innerHTML = `
+      <input type="checkbox" id="sel-c-${c.id}" ${isChecked ? 'checked' : ''} onchange="toggleSelectContact('${c.id}')" style="width:18px; height:18px; margin-right:12px;">
+      <img src="${c.avatar}" style="width:36px; height:36px; border-radius:50%; margin-right:10px; object-fit:cover;">
+      <label for="sel-c-${c.id}" style="flex:1; font-size:15px; color:var(--text-dark);">${c.name}</label>
+    `;
+    contactList.appendChild(div);
+  });
+}
+
+function toggleSelectGroup(g) {
+  const idx = tempVisibilityData.groups.indexOf(g);
+  if (idx > -1) tempVisibilityData.groups.splice(idx, 1);
+  else tempVisibilityData.groups.push(g);
+}
+
+function toggleSelectContact(id) {
+  const idx = tempVisibilityData.contacts.indexOf(id);
+  if (idx > -1) tempVisibilityData.contacts.splice(idx, 1);
+  else tempVisibilityData.contacts.push(id);
+}
+
+function confirmContactSelect() {
+  if (tempVisibilityData.groups.length === 0 && tempVisibilityData.contacts.length === 0) {
+    showToast('请至少选择一项');
+    return;
+  }
+  currentVisibilityType = selectingVisibilityType;
+  currentVisibilityData = { contacts: [...tempVisibilityData.contacts], groups: [...tempVisibilityData.groups] };
+  
+  document.querySelectorAll('.visibility-check').forEach(el => el.style.display = 'none');
+  document.getElementById('vis-check-' + currentVisibilityType).style.display = 'inline';
+  
+  document.getElementById('vis-desc-visible_to').style.display = 'none';
+  document.getElementById('vis-desc-invisible_to').style.display = 'none';
+  updateVisDesc(currentVisibilityType, currentVisibilityData);
+  
+  closeSub('moment-contact-select-page');
+}
+
+function confirmVisibility() {
+  let text = '公开';
+  if (currentVisibilityType === 'private') text = '私密';
+  else if (currentVisibilityType === 'visible_to') text = '部分可见';
+  else if (currentVisibilityType === 'invisible_to') text = '不给谁看';
+  
+  document.getElementById('post-moment-visibility-text').innerText = text;
+  closeSub('moment-visibility-page');
+}
 
 // 发布朋友圈相关功能
 function handlePostMomentLocalUpload(input) {
@@ -5694,7 +6279,12 @@ async function publishUserMoment() {
     content: fullContent,
     time: Date.now(),
     comments: [],
-    likes: []
+    likes: [],
+    visibility: {
+      type: currentVisibilityType,
+      contacts: [...currentVisibilityData.contacts],
+      groups: [...currentVisibilityData.groups]
+    }
   };
   
   // 插入到最前面
@@ -5710,6 +6300,10 @@ async function publishUserMoment() {
   document.getElementById('postMomentContent').value = '';
   postMomentImages = [];
   renderPostMomentImages();
+  currentVisibilityType = 'public';
+  currentVisibilityData = { contacts: [], groups: [] };
+  const visTextEl = document.getElementById('post-moment-visibility-text');
+  if (visTextEl) visTextEl.innerText = '公开';
   
   closeSub('post-moment-page');
   
@@ -5719,6 +6313,87 @@ async function publishUserMoment() {
   }
   
   showToast('✅ 发布成功！');
+  
+  // 触发AI自动回复
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  if (cfg.key && cfg.url && cfg.model) {
+    let eligibleContacts = [];
+    if (newMoment.visibility.type === 'public') {
+      eligibleContacts = [...contacts];
+    } else if (newMoment.visibility.type === 'visible_to') {
+      eligibleContacts = contacts.filter(c => 
+        newMoment.visibility.contacts.includes(c.id) || 
+        newMoment.visibility.groups.includes(c.group || '默认')
+      );
+    } else if (newMoment.visibility.type === 'invisible_to') {
+      eligibleContacts = contacts.filter(c => 
+        !newMoment.visibility.contacts.includes(c.id) && 
+        !newMoment.visibility.groups.includes(c.group || '默认')
+      );
+    }
+    
+    if (eligibleContacts.length > 0) {
+      generateCommentsForUserMoment(newMoment, eligibleContacts, cfg);
+    }
+  }
+}
+
+// 为用户发布的朋友圈生成AI评论
+async function generateCommentsForUserMoment(moment, eligibleContacts, cfg) {
+  if (!eligibleContacts || eligibleContacts.length === 0) return;
+  
+  const count = Math.min(Math.floor(Math.random() * 3) + 1, eligibleContacts.length);
+  const selectedContacts = [...eligibleContacts].sort(() => Math.random() - 0.5).slice(0, count);
+  
+  // 提取纯文本内容，去掉图片HTML
+  const plainContent = moment.content.replace(/<[^>]*>?/gm, '').trim();
+  const contentText = plainContent ? `"${plainContent}"` : "[图片]";
+  
+  for (let i = 0; i < selectedContacts.length; i++) {
+    const contact = selectedContacts[i];
+    try {
+      const prompt = `你是${contact.name}。你的好友（用户）发了一条朋友圈。
+【朋友圈内容】${contentText}
+【你的人设设定】
+${contact.persona}
+
+请**严格扮演**上述人设，给这条朋友圈写一条评论。要求：
+1. **必须完全符合你的人设设定**（包括性格、说话方式、口癖等），绝对不能偏离人设。
+2. 语气要自然真实，像真人在评论，不要像AI。
+3. 字数在15字以内。
+4. 只需要返回评论内容，不要带引号或你的名字等前缀。`;
+
+      const res = await fetch(`${cfg.url}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+        body: JSON.stringify({
+          model: cfg.model,
+          temperature: 0.8,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      
+      const data = await res.json();
+      const reply = data.choices?.[0]?.message?.content || '👍';
+      
+      moment.comments.push({
+        author: contact.name,
+        content: reply.trim().replace(/^"|"$/g, ''),
+        replyTo: null,
+        time: Date.now() + (i + 1) * 1000,
+        isAI: true
+      });
+      
+      await saveMomentsToDB();
+      updateMomentComments(moment.id);
+      
+      // 等待一下避免并发问题
+      await new Promise(r => setTimeout(r, 800));
+    } catch (e) {
+      console.error('AI回复用户朋友圈失败:', e);
+    }
+  }
 }
 
 
@@ -5865,11 +6540,14 @@ async function refreshMoments() {
   for (const contact of selectedContacts) {
     try {
       const prompt = `你是${contact.name}。请根据你的人设，发一条符合你性格、生活化、充满“活人感”的朋友圈动态。
-内容要求：诙谐幽默或有明显情绪起伏，字数50字以内。
-【你的人设】
+【你的人设设定】
 ${contact.persona}
 
-只需要返回朋友圈文字内容，不要带引号或其他说明。`;
+【任务要求】
+1. **必须完全符合你的人设设定**（包括性格、身份、说话方式、口癖等），绝对不能偏离人设。
+2. 动态内容要生活化、诙谐幽默或有明显情绪起伏，展现出强烈的“活人感”。
+3. 字数50字以内。
+4. 只需要返回朋友圈文字内容，不要带引号或其他说明。`;
       
       const res = await fetch(`${cfg.url}/chat/completions`, {
         method: 'POST',
@@ -5951,13 +6629,15 @@ async function generateAIComments(moment, cfg) {
       const commentPrompt = `你现在是朋友圈里的NPC。请阅读以下朋友圈并发表一条评论。
 【发帖人】${moment.contactName}
 【朋友圈内容】"${moment.content}"
-【发帖人人设参考】${moment.contactPersona}
+【发帖人人设参考】
+${moment.contactPersona}
 
 【任务要求】
-1. 确定你的身份：如果是发帖人人设中提到的角色（如好友、死党、亲戚等）请直接使用；如果没有提到，请随机生成一个有趣的身份（如：毒舌学长、楼下保安、路过的社恐、暗恋者等）。
-2. 发表评论：内容要诙谐幽默，活人感强，不要像机器人。可以使用表情包、网络梗、调侃吐槽。
-3. 长度：15字以内。
-4. 内容不得与已有评论重复。
+1. 确定你的身份：如果是发帖人人设中提到的角色（如好友、死党、亲戚等）请直接使用；如果没有提到，请随机生成一个符合发帖人设定的有趣身份（如：毒舌学长、楼下保安、路过的社恐等）。
+2. **严格扮演你选择的身份**，语气必须完全符合该身份的特点。
+3. 发表评论：内容要诙谐幽默，活人感强，绝对不要像AI机器人。可以使用表情包、网络梗、调侃吐槽。
+4. 长度：15字以内。
+5. 内容不得与已有评论重复。
 
 请严格按此格式返回：身份:评论内容
 例如：毒舌学长:哟，又在凡尔赛呢？`;
@@ -6056,17 +6736,44 @@ function generateCreativeName(persona) {
   return generateRandomName();
 }
 
+function checkVisibility(moment) {
+  // 如果没有可见性设置或者设置为公开，则所有人都可见
+  if (!moment.visibility || moment.visibility.type === 'public') return true;
+  
+  // 如果是自己发的朋友圈，自己始终可见
+  if (moment.contactId === 'user_self') return true;
+  
+  const type = moment.visibility.type;
+  const groups = moment.visibility.groups || [];
+  const contactsList = moment.visibility.contacts || [];
+  
+  // 假设当前查看的人是某个特定联系人，或者只是用户查看
+  // 由于目前只有用户自己能设置朋友圈可见性，所以当渲染用户的朋友圈时：
+  // 实际上这里不需要过滤用户自己发的朋友圈（因为用户自己始终能看到自己发的所有朋友圈）。
+  // 这里的过滤逻辑其实是给"未来如果AI能查看朋友圈"准备的。
+  // 但为了模拟真实效果，如果用户设置了不可见，可能在某些场景下需要隐藏？
+  // 不，用户自己发的朋友圈，在自己的时间线上应该是全部可见的。
+  // 只有当"以某个联系人的视角"查看时，才需要过滤。
+  // 目前应用是"用户主视角"，所以用户自己发的朋友圈理应全部显示。
+  // 但为了UI上能体现出"可见性"，我们在renderMoments里加了可见性标识（已实现）。
+  
+  return true;
+}
+
 function renderMoments() {
   const container = document.getElementById('momentsContainer');
   
-  if (moments.length === 0) {
+  // 过滤可见的朋友圈
+  const visibleMoments = moments.filter(m => checkVisibility(m));
+  
+  if (visibleMoments.length === 0) {
     container.innerHTML = '<div class="empty-tip">点击右上角刷新按钮查看朋友圈</div>';
     return;
   }
   
   container.innerHTML = '';
   
-  moments.forEach((moment, mIdx) => {
+  visibleMoments.forEach((moment, mIdx) => {
     const div = document.createElement('div');
     div.className = 'moment-item';
     div.id = 'moment-' + moment.id;
@@ -6077,17 +6784,24 @@ function renderMoments() {
     if (moment.comments && moment.comments.length > 0) {
       commentsHtml = '<div class="moment-comments">';
       moment.comments.forEach((comment, cIdx) => {
-        const replyInfo = comment.replyTo ? ` <span class="comment-reply-to">回复</span> <span class="comment-author">${comment.replyTo}</span>` : '';
-        commentsHtml += `<div class="moment-comment-item"><div class="moment-comment-text"><span class="comment-author">${comment.author}</span>${replyInfo}：${comment.content}</div><span class="comment-delete-btn" onclick="deleteComment('${moment.id}',${cIdx})">删除</span></div>`;
+        const replyInfo = comment.replyTo ? ` <span class="comment-reply-to">回复</span> <span class="comment-author" onclick="replyToComment(event, '${moment.id}', '${comment.replyTo}')">${comment.replyTo}</span>` : '';
+        commentsHtml += `<div class="moment-comment-item"><div class="moment-comment-text" onclick="replyToComment(event, '${moment.id}', '${comment.author}')"><span class="comment-author">${comment.author}</span>${replyInfo}：${comment.content}</div><span class="comment-delete-btn" onclick="deleteComment('${moment.id}',${cIdx})">删除</span></div>`;
       });
       commentsHtml += '</div>';
     }
     
+    let visibilityTag = '';
+    if (moment.contactId === 'user_self' && moment.visibility) {
+      if (moment.visibility.type === 'private') visibilityTag = '<span style="font-size:10px; color:#999; border:1px solid #ddd; padding:0 4px; border-radius:4px; margin-left:6px; vertical-align:middle;">私密</span>';
+      else if (moment.visibility.type === 'visible_to') visibilityTag = '<span style="font-size:10px; color:#999; border:1px solid #ddd; padding:0 4px; border-radius:4px; margin-left:6px; vertical-align:middle;">部分可见</span>';
+      else if (moment.visibility.type === 'invisible_to') visibilityTag = '<span style="font-size:10px; color:#999; border:1px solid #ddd; padding:0 4px; border-radius:4px; margin-left:6px; vertical-align:middle;">不给谁看</span>';
+    }
+
     div.innerHTML = `
       <div class="moment-header">
         <div class="moment-avatar"><img src="${moment.contactAvatar}"></div>
         <div style="flex:1;">
-          <div class="moment-name">${moment.contactName}</div>
+          <div class="moment-name">${moment.contactName}${visibilityTag}</div>
           <div class="moment-time">${timeStr}</div>
         </div>
       </div>
@@ -6183,12 +6897,25 @@ function updateMomentLikes(momentId) {
 
 function commentMoment(momentId) {
   currentMomentId = momentId;
+  currentReplyTo = null;
   const inputArea = document.getElementById('momentInputArea');
   const input = document.getElementById('momentInput');
   inputArea.style.display = 'block';
   input.focus();
   const moment = moments.find(m => m.id == momentId);
-  input.placeholder = '回复 ' + (moment?.contactName || '') + '...';
+  input.placeholder = '评论 ' + (moment?.contactName || '') + '...';
+}
+
+function replyToComment(event, momentId, author) {
+  if (event) event.stopPropagation();
+  if (author === '我') return;
+  currentMomentId = momentId;
+  currentReplyTo = author;
+  const inputArea = document.getElementById('momentInputArea');
+  const input = document.getElementById('momentInput');
+  inputArea.style.display = 'block';
+  input.focus();
+  input.placeholder = '回复 ' + author + '...';
 }
 
 async function submitComment() {
@@ -6202,11 +6929,13 @@ async function submitComment() {
   
   if (!moment.comments) moment.comments = [];
   
+  const replyTo = currentReplyTo;
+  
   // 添加用户评论
   moment.comments.push({
     author: '我',
     content: content,
-    replyTo: null,
+    replyTo: replyTo,
     time: Date.now()
   });
   
@@ -6217,6 +6946,7 @@ async function submitComment() {
   document.getElementById('momentInputArea').style.display = 'none';
   const savedMomentId = currentMomentId;
   currentMomentId = null;
+  currentReplyTo = null;
   
   // 仅局部更新该条朋友圈的评论区
   updateMomentComments(savedMomentId);
@@ -6225,39 +6955,66 @@ async function submitComment() {
   const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
   const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
   if (cfg.key && cfg.url && cfg.model) {
-    try {
-      const prompt = `你是${moment.contactName}。你刚发了朋友圈内容为：“${moment.content}”。
+    let aiToReply = null;
+    let prompt = '';
+    
+    if (replyTo && replyTo !== '我') {
+      aiToReply = contacts.find(c => c.name === replyTo);
+      if (aiToReply) {
+        prompt = `你是${aiToReply.name}。在朋友圈里，发帖人是${moment.contactName}，内容是：“${moment.content}”。
+你的好友（用户）回复了你的评论，对你说：“${content}”。
+请**严格扮演**你的人设进行回复。
+【你的人设设定】
+${aiToReply.persona}
+
+要求：
+1. **必须完全符合你的人设设定**（包括性格、说话方式、口癖等），绝对不能偏离人设。
+2. 回复简短自然（20字以内），像真人在聊天。
+3. 只返回回复内容，不要带引号。`;
+      }
+    } else if (!replyTo && moment.contactId !== 'user_self') {
+      aiToReply = contacts.find(c => c.id === moment.contactId);
+      if (aiToReply) {
+        prompt = `你是${moment.contactName}。你刚发了朋友圈内容为：“${moment.content}”。
 你的好友（用户）评论说：“${content}”。
-请根据你的人设进行回复。
-【你的人设】
+请**严格扮演**你的人设进行回复。
+【你的人设设定】
 ${moment.contactPersona}
 
-要求：回复简短自然（20字以内），符合人设。只返回回复内容，不要带引号。`;
-      
-      const res = await fetch(`${cfg.url}/chat/completions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
-        body: JSON.stringify({
-          model: cfg.model,
-          temperature: 0.8,
-          messages: [{ role: 'user', content: prompt }]
-        })
-      });
-      
-      const data = await res.json();
-      const reply = data.choices?.[0]?.message?.content || '😊';
-      
-      moment.comments.push({
-        author: moment.contactName,
-        content: reply.trim().replace(/^"|"$/g, ''),
-        replyTo: '我',
-        time: Date.now()
-      });
-      
-      await saveMomentsToDB();
-      updateMomentComments(savedMomentId);
-    } catch (e) {
-      console.error('AI回复评论失败:', e);
+要求：
+1. **必须完全符合你的人设设定**（包括性格、说话方式、口癖等），绝对不能偏离人设。
+2. 回复简短自然（20字以内），像真人在聊天。
+3. 只返回回复内容，不要带引号。`;
+      }
+    }
+    
+    if (aiToReply && prompt) {
+      try {
+        const res = await fetch(`${cfg.url}/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+          body: JSON.stringify({
+            model: cfg.model,
+            temperature: 0.8,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+        
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || '😊';
+        
+        moment.comments.push({
+          author: aiToReply.name,
+          content: reply.trim().replace(/^"|"$/g, ''),
+          replyTo: '我',
+          time: Date.now()
+        });
+        
+        await saveMomentsToDB();
+        updateMomentComments(savedMomentId);
+      } catch (e) {
+        console.error('AI回复评论失败:', e);
+      }
     }
   }
 }
@@ -6280,10 +7037,10 @@ function updateMomentComments(momentId) {
     commentsDiv.className = 'moment-comments';
     
     moment.comments.forEach((comment, cIdx) => {
-      const replyInfo = comment.replyTo ? ` <span class="comment-reply-to">回复</span> <span class="comment-author">${comment.replyTo}</span>` : '';
+      const replyInfo = comment.replyTo ? ` <span class="comment-reply-to">回复</span> <span class="comment-author" onclick="replyToComment(event, '${momentId}', '${comment.replyTo}')">${comment.replyTo}</span>` : '';
       const itemDiv = document.createElement('div');
       itemDiv.className = 'moment-comment-item';
-      itemDiv.innerHTML = `<div class="moment-comment-text"><span class="comment-author">${comment.author}</span>${replyInfo}：${comment.content}</div><span class="comment-delete-btn" onclick="deleteComment('${momentId}',${cIdx})">删除</span>`;
+      itemDiv.innerHTML = `<div class="moment-comment-text" onclick="replyToComment(event, '${momentId}', '${comment.author}')"><span class="comment-author">${comment.author}</span>${replyInfo}：${comment.content}</div><span class="comment-delete-btn" onclick="deleteComment('${momentId}',${cIdx})">删除</span>`;
       commentsDiv.appendChild(itemDiv);
     });
     
@@ -6845,6 +7602,147 @@ async function archiveStmToWorldBook(contactId, stm) {
     }
   } catch (e) { console.error('归档失败:', e); }
 }
+
+// ========== 美化设置专属导出/导入 ==========
+async function exportThemeSettings() {
+  showToast('⏳ 正在打包美化数据...');
+  const data = { _type: 'oho_theme_backup', exportTime: new Date().toISOString() };
+
+  // 1. 主题颜色
+  const themeColors = await getFromStorage('THEME_COLORS');
+  if (themeColors) data.themeColors = typeof themeColors === 'string' ? JSON.parse(themeColors) : themeColors;
+
+  // 2. 昵称 & 签名
+  data.userNickname = await getFromStorage('USER_NICKNAME') || document.getElementById('user-nickname')?.innerText || '';
+  data.userSignature = await getFromStorage('USER_SIGNATURE') || document.getElementById('userSignature')?.value || '';
+
+  // 3. dock 图标（来自 IndexedDB images 表）
+  data.dockIcons = {};
+  for (let i = 1; i <= 4; i++) {
+    try { const v = await IndexedDBManager.getImage(`dock${i}`); if (v) data.dockIcons[`dock${i}`] = v; } catch(e) {}
+  }
+
+  // 4. 图片资源（背景图、头像、p1、p2）
+  data.images = {};
+  for (const id of ['user-bg', 'user-avatar', 'p1', 'p2']) {
+    try { const v = await IndexedDBManager.getImage(`SVD_${id}`); if (v) data.images[id] = v; } catch(e) {}
+  }
+
+  // 5. 备注标签
+  data.memoTags = {};
+  document.querySelectorAll('.memo-tag').forEach((tag, idx) => {
+    if (tag.value) data.memoTags[`MEMO_TAG_${idx}`] = tag.value;
+  });
+
+  // 6. 播放器副标题
+  const playerSub = document.querySelector('.player-sub');
+  if (playerSub) data.playerSub = playerSub.innerText;
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `oho_theme_${Date.now()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✅ 美化设置已导出！');
+}
+
+function importThemeSettings(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data._type !== 'oho_theme_backup') { showToast('❌ 不是有效的美化备份文件！'); input.value = ''; return; }
+
+      // 1. 主题颜色
+      if (data.themeColors) {
+        const { main, light, bg } = data.themeColors;
+        applyThemeColor(main, light, bg);
+      }
+
+      // 2. 昵称 & 签名
+      if (data.userNickname) {
+        await saveToStorage('USER_NICKNAME', data.userNickname);
+        const nicknameEl = document.getElementById('user-nickname');
+        if (nicknameEl) nicknameEl.innerText = data.userNickname;
+        const themeNicknameEl = document.getElementById('themeNickname');
+        if (themeNicknameEl) themeNicknameEl.value = data.userNickname;
+        updatePlayerName(data.userNickname);
+      }
+      if (data.userSignature) {
+        await saveToStorage('USER_SIGNATURE', data.userSignature);
+        const sigEl = document.getElementById('userSignature');
+        if (sigEl) sigEl.value = data.userSignature;
+        const themeSigEl = document.getElementById('themeSignature');
+        if (themeSigEl) themeSigEl.value = data.userSignature;
+      }
+
+      // 3. dock 图标
+      if (data.dockIcons) {
+        for (const key of Object.keys(data.dockIcons)) {
+          const idx = key.replace('dock', '');
+          const src = data.dockIcons[key];
+          await IndexedDBManager.saveImage(key, src, 'image');
+          const dock = document.getElementById(key);
+          const prev = document.getElementById(`prev${idx}`);
+          if (dock) { dock.style.backgroundImage = `url(${src})`; dock.style.backgroundSize = 'cover'; dock.style.backgroundPosition = 'center'; dock.classList.add('has-custom-icon'); }
+          if (prev) { prev.style.backgroundImage = `url(${src})`; prev.style.backgroundSize = 'cover'; prev.style.backgroundPosition = 'center'; prev.dataset.src = src; }
+        }
+      }
+
+      // 4. 图片资源
+      if (data.images) {
+        for (const id of Object.keys(data.images)) {
+          const src = data.images[id];
+          await IndexedDBManager.saveImage(`SVD_${id}`, src, 'image');
+          const el = document.getElementById(id === 'user-avatar' ? 'user-avatar' : id);
+          if (el) {
+            if (el.tagName === 'IMG') { el.src = src; if (id === 'user-avatar') { userAvatar = src; } }
+            else { el.style.backgroundImage = `url(${src})`; el.style.backgroundSize = 'cover'; el.style.backgroundPosition = 'center'; }
+          }
+          if (id === 'user-bg') {
+            const preview = document.getElementById('me-bg-preview-img');
+            if (preview) preview.src = src;
+            syncBgToAllPages(src);
+          }
+        }
+      }
+
+      // 5. 备注标签
+      if (data.memoTags) {
+        const tags = document.querySelectorAll('.memo-tag');
+        for (const key of Object.keys(data.memoTags)) {
+          const idx = parseInt(key.replace('MEMO_TAG_', ''));
+          await saveToStorage(key, data.memoTags[key]);
+          if (tags[idx]) tags[idx].value = data.memoTags[key];
+        }
+      }
+
+      // 6. 播放器副标题
+      if (data.playerSub) {
+        await saveToStorage('PLAYER_SUB', data.playerSub);
+        const playerSub = document.querySelector('.player-sub');
+        if (playerSub) playerSub.innerText = data.playerSub;
+      }
+
+      setTimeout(updateMePageTextColor, 300);
+      showToast('✅ 美化设置已恢复！');
+    } catch (err) {
+      showToast('❌ 导入失败：' + err.message);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
 </script>
 </body>
 </html>
+
+
+
+

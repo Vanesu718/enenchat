@@ -1,0 +1,25 @@
+# 临时文件和调试文档（不需要上传）
+数据持久化检查报告.md
+为什么别人没问题.md
+问题分析.md
+修复说明.md
+localStorage限制说明.md
+moments_fix.txt
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编辑器配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日志文件
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
