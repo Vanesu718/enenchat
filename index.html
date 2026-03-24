@@ -6,12 +6,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>oho</title>
-<link rel="apple-touch-icon" href="haibaologo.png">
-<link rel="apple-touch-icon" sizes="152x152" href="haibaologo.png">
-<link rel="apple-touch-icon" sizes="180x180" href="haibaologo.png">
-<link rel="apple-touch-icon" sizes="167x167" href="haibaologo.png">
-<link rel="icon" href="haibaologo.png">
-<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="haibaologo.png?v=2">
+<link rel="apple-touch-icon" sizes="152x152" href="haibaologo.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="haibaologo.png?v=2">
+<link rel="apple-touch-icon" sizes="167x167" href="haibaologo.png?v=2">
+<link rel="icon" href="haibaologo.png?v=2">
+<link rel="manifest" href="manifest.json?v=2">
 <meta name="theme-color" content="#f0b8c8">
 <meta name="apple-mobile-web-app-title" content="oho">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -454,10 +454,12 @@ body {
 .msg-item.right { align-self: flex-end; flex-direction: row-reverse; }
 .msg-avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid var(--light-pink); margin: 0 8px; }
 .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.msg-bubble { padding: 10px 14px; border-radius: 18px; line-height: 1.4; font-size: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
+.msg-bubble { position: relative; padding: 10px 14px; border-radius: var(--bubble-radius, 18px); line-height: 1.4; font-size: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
 .chat-content { touch-action: manipulation; }
-.msg-item.left .msg-bubble { background: rgba(255, 255, 255, 0.6); color: #333333; border-bottom-left-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.5); }
-.msg-item.right .msg-bubble { background: rgba(240, 184, 200, 0.85); color: #fff; border-bottom-right-radius: 6px; box-shadow: 0 4px 12px rgba(240, 184, 200, 0.2); border: 1px solid rgba(255,255,255,0.3); }
+.msg-item.left .msg-bubble { background: rgba(var(--left-bubble-bg, 255, 255, 255), var(--bubble-opacity, 0.85)); color: #333333; border-bottom-left-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.5); }
+.msg-item.right .msg-bubble { background: rgba(var(--right-bubble-bg, 240, 184, 200), var(--bubble-opacity, 0.85)); color: #fff; border-bottom-right-radius: 6px; box-shadow: 0 4px 12px rgba(var(--right-bubble-bg, 240, 184, 200), 0.2); border: 1px solid rgba(255,255,255,0.3); }
+.msg-item.left .msg-bubble::after { content: ''; position: absolute; top: var(--left-dec-top, -10px); left: var(--left-dec-left, -10px); width: var(--left-dec-size, 30px); height: var(--left-dec-size, 30px); background-image: var(--left-dec-img, none); background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 10; }
+.msg-item.right .msg-bubble::after { content: ''; position: absolute; top: var(--right-dec-top, -10px); right: var(--right-dec-right, -10px); width: var(--right-dec-size, 30px); height: var(--right-dec-size, 30px); background-image: var(--right-dec-img, none); background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 10; }
 .msg-quote { padding: 6px 10px; border-radius: 8px; font-size: 12px; margin-bottom: 6px; line-height: 1.2; background: #f8f5f0; color: #777777; }
 .msg-menu { position: absolute; top: -5px; right: 10px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 99; display: none; pointer-events: none; }
 .msg-item:active .msg-menu { display: block; pointer-events: auto; }
@@ -467,6 +469,23 @@ body {
 .msg-item .check-icon { position: absolute; top: 0; left: 0; width: 20px; height: 20px; background: #ff6b81; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; display: none; }
 .msg-item.selected .check-icon { display: flex; }
 
+.text-normal { color: var(--text-normal-color, inherit); font-weight: var(--text-normal-weight, inherit); font-style: var(--text-normal-style, inherit); background-color: var(--text-normal-bg, transparent); }
+.text-brace { color: var(--text-brace-color, inherit); font-weight: var(--text-brace-weight, inherit); font-style: var(--text-brace-style, inherit); background-color: var(--text-brace-bg, transparent); }
+.text-quote { color: var(--text-quote-color, inherit); font-weight: var(--text-quote-weight, inherit); font-style: var(--text-quote-style, inherit); background-color: var(--text-quote-bg, transparent); }
+
+.tb-section { background: rgba(0,0,0,0.02); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--light-pink); }
+.tb-title { font-size: 15px; font-weight: 600; color: var(--main-pink); margin-bottom: 12px; }
+.tb-color-group { display: flex; gap: 20px; }
+.tb-color-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.tb-color-label { font-size: 12px; color: var(--text-dark); font-weight: 500; }
+.tb-color-picker-wrap { position: relative; width: 32px; height: 32px; border-radius: 50%; overflow: hidden; border: 2px solid #e0e0e0; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.tb-color-picker { position: absolute; top: -10px; left: -10px; width: 60px; height: 60px; border: none; cursor: pointer; padding: 0; background: none; }
+.tb-clear-btn { font-size: 11px; color: #777; background: #f0f0f0; border: none; padding: 3px 10px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+.tb-clear-btn:active { background: #e0e0e0; }
+.tb-format-group { display: flex; gap: 10px; }
+.tb-format-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid #e0e0e0; background: #fff; color: #555; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+.tb-format-btn.active { background: var(--light-pink); color: var(--main-pink); border-color: var(--main-pink); }
+
 .chat-input-area { display: flex; align-items: center; padding: 10px 15px; border-top: 1px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.5); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); gap: 8px; }
 .chat-func-btn-group { display: flex; flex-direction: row; gap: 6px; align-items: center; }
 .chat-func-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.5); color: var(--text-dark); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
@@ -474,7 +493,8 @@ body {
 .chat-input-container { flex: 1; position: relative; }
 .reply-tip { padding: 4px 10px; background: rgba(248, 215, 224, 0.8); backdrop-filter: blur(10px); color: var(--text-dark); font-size: 12px; border-radius: 12px 12px 0 0; display: none; }
 .reply-tip-close { cursor: pointer; font-size: 14px; }
-.chat-input { width: 100%; height: 40px; padding: 0 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.5); outline: none; font-size: 16px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
+.chat-input { width: 100%; height: 40px; padding: 10px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.5); outline: none; font-size: 16px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); resize: none; line-height: 20px; font-family: inherit; overflow-y: auto; box-sizing: border-box; -ms-overflow-style: none; scrollbar-width: none; }
+.chat-input::-webkit-scrollbar { display: none; }
 .chat-btn-group { display: flex; gap: 8px; }
 .chat-send-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(240, 184, 200, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(240, 184, 200, 0.3); }
 .chat-ai-reply-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(106, 184, 212, 0.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.5); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(80, 160, 200, 0.35); display: flex; align-items: center; justify-content: center; }
@@ -530,6 +550,7 @@ body {
   align-items: center;
   padding: 42px 20px 90px;
   justify-content: flex-start;
+  overflow-y: auto;
 }
 
 .me-time {
@@ -538,6 +559,7 @@ body {
   color: #333;
   transition: color 0.3s;
   margin-bottom: 46px;
+  flex-shrink: 0;
 }
 
 .me-avatar-card {
@@ -549,6 +571,7 @@ body {
   border: 1px solid rgba(255,255,255,0.3);
   text-align: center;
   margin-bottom: 14px;
+  flex-shrink: 0;
 }
 .me-avatar-img {
   width: 70px;
@@ -566,6 +589,7 @@ body {
   gap: 12px;
   width: 100%;
   margin-bottom: 10px;
+  flex-shrink: 0;
 }
 .photo-item {
   background: rgba(255, 255, 255, 0.3);
@@ -910,12 +934,68 @@ body {
   100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
 }
 
-/* 状态卡片半透明磨砂质感 */
-.status-card-theme {
-  background: rgba(255, 255, 255, 0.25) !important;
-  backdrop-filter: blur(30px) !important;
-  -webkit-backdrop-filter: blur(30px) !important;
+/* 钻戒头像框 */
+.ring-avatar-frame {
+  overflow: visible !important;
+  position: relative;
 }
+.ring-avatar-frame img {
+  border-radius: 50% !important;
+}
+.ring-avatar-frame::after {
+  content: '💍';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 16px;
+  z-index: 10;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  background: rgba(255,255,255,0.8);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* 状态卡片半透明磨砂质感 */
+  .status-card-theme {
+    background: rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(30px) !important;
+    -webkit-backdrop-filter: blur(30px) !important;
+  }
+
+  /* 自定义滑块样式：白底黑条 */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    height: 6px;
+    border-radius: 3px;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 3px;
+    background: transparent;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #333333;
+    margin-top: -5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  input[type="range"]:focus {
+    outline: none;
+  }
 </style>
 </head>
 <body>
@@ -923,7 +1003,7 @@ body {
 <div class="phone-case">
   <div class="island" id="dynamic-island"></div>
   <div class="screen">
-    <div class="page active" id="page-chat">
+    <div class="page" id="page-chat">
       <div class="status-bar">
         <span id="status-time">09:41</span>
         <span>📶 🔋</span>
@@ -972,7 +1052,7 @@ body {
       </div>
     </div>
 
-    <div class="page" id="page-me">
+    <div class="page active" id="page-me">
       <div class="me-bg-container">
         <div id="user-bg"></div>
         <div class="me-blur-mask"></div>
@@ -1015,7 +1095,7 @@ body {
     </div>
 
     <div class="dock">
-      <div class="dock-btn active" onclick="navTo('page-chat', this)">
+      <div class="dock-btn" onclick="navTo('page-chat', this)">
         <div id="dock1" class="dock-icon"></div>
       </div>
       <div class="dock-btn" onclick="navTo('page-contacts', this)">
@@ -1024,7 +1104,7 @@ body {
       <div class="dock-btn" onclick="navTo('page-discover', this)">
         <div id="dock3" class="dock-icon"></div>
       </div>
-      <div class="dock-btn" onclick="navTo('page-me', this)">
+      <div class="dock-btn active" onclick="navTo('page-me', this)">
         <div id="dock4" class="dock-icon"></div>
       </div>
     </div>
@@ -1032,21 +1112,20 @@ body {
     <div class="sub-page" id="theme-setting">
       <div class="page-header">
         <div class="page-back" onclick="closeSub('theme-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="page-title">🎨 美化设置</div>
+        <div class="page-title">美化设置</div>
       </div>
       <div class="page-body">
-        <div class="form-label">🎨 主题调色盘</div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;">
-          <div onclick="applyThemeColor('#f0b8c8','#f8d7e0','#fffbf9')" style="width:36px;height:36px;border-radius:50%;background:#f0b8c8;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
-          <div onclick="applyThemeColor('#a8d8ea','#c9e8f3','#f5fbff')" style="width:36px;height:36px;border-radius:50%;background:#a8d8ea;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
-          <div onclick="applyThemeColor('#b5e8c3','#d4f0dc','#f5fff8')" style="width:36px;height:36px;border-radius:50%;background:#b5e8c3;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
-          <div onclick="applyThemeColor('#d4b8f0','#e4d3f5','#fbf7ff')" style="width:36px;height:36px;border-radius:50%;background:#d4b8f0;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
-          <div onclick="applyThemeColor('#f0d8a8','#f5e8c9','#fffdf5')" style="width:36px;height:36px;border-radius:50%;background:#f0d8a8;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
-          <div onclick="applyThemeColor('#f0a8a8','#f5c9c9','#fff5f5')" style="width:36px;height:36px;border-radius:50%;background:#f0a8a8;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
+        <div class="menu-item" onclick="openSub('theme-bubble-setting')" style="padding:16px; margin-bottom:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:500;">主题/气泡调色盘</span>
+            <span style="color:var(--text-light);">></span>
+          </div>
         </div>
-        <div style="margin-top:10px;">
-          <div class="form-label" style="margin-bottom:4px;">自定义颜色</div>
-          <input type="color" id="customThemeColor" value="#f0b8c8" onchange="applyCustomColor(this.value)" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;">
+        <div class="menu-item" onclick="openSub('theme-text-setting')" style="padding:16px; margin-top:12px; margin-bottom:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:500;">叙事美化</span>
+            <span style="color:var(--text-light);">></span>
+          </div>
         </div>
         <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
         <div class="form-section">
@@ -1079,12 +1158,12 @@ body {
         </div>
         <button class="save-btn" onclick="saveDockIcons()">保存全部图标</button>
         <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
-        <div class="form-label">🎨 美化备份与恢复</div>
+        <div class="form-label">美化备份与恢复</div>
         <div class="setting-desc" style="margin-top:6px;">仅备份/恢复美化相关设置：主题色、昵称、签名、dock图标、背景图、头像、照片及备注。</div>
         <div style="display:flex; gap:8px; margin-top:10px;">
-          <button class="upload-btn" style="flex:1; margin:0;" onclick="exportThemeSettings()">📤 导出美化</button>
+          <button class="upload-btn" style="flex:1; margin:0;" onclick="exportThemeSettings()">导出美化</button>
           <label class="upload-btn" style="flex:1; margin:0; text-align:center; cursor:pointer;">
-            📥 导入美化
+            导入美化
             <input type="file" id="import-theme-file" accept=".json" onchange="importThemeSettings(this)" style="display:none;">
           </label>
         </div>
@@ -1097,6 +1176,209 @@ body {
           <div style="display:flex; gap:8px;">
             <label class="upload-btn" style="flex:1; text-align:center;">本地上传<input type="file" id="me-bg-file" accept="image/*" onchange="previewMeBgFile(this)" style="display:none;"></label>
             <button class="upload-btn" style="flex:1;" onclick="uploadMeBgByUrl()">链接上传</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-page" id="theme-text-setting">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('theme-text-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">叙事美化</div>
+      </div>
+      <div class="page-body">
+        <div class="setting-desc" style="margin-bottom:15px;">支持针对普通正文以及被 {}、“” 或 "" 包裹的文字分别设置样式。</div>
+        <div id="text-beautify-container">
+          <!-- 普通正文 -->
+          <div class="tb-section">
+            <div class="tb-title">普通正文</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+              <div class="tb-color-group">
+                <div class="tb-color-item">
+                  <div class="tb-color-label">文字颜色</div>
+                  <div class="tb-color-picker-wrap">
+                    <input type="color" class="tb-color-picker" id="tb-normal-color" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                  </div>
+                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-normal-color')">清除</button>
+                </div>
+                <div class="tb-color-item">
+                  <div class="tb-color-label">文字底色</div>
+                  <div class="tb-color-picker-wrap">
+                    <input type="color" class="tb-color-picker" id="tb-normal-bg" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                  </div>
+                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-normal-bg')">清除</button>
+                </div>
+              </div>
+              <div class="tb-format-group">
+                <button class="tb-format-btn" id="tb-normal-weight" onclick="toggleTextFormat(this, 'weight')" style="font-weight: bold;" title="加粗">B</button>
+                <button class="tb-format-btn" id="tb-normal-style" onclick="toggleTextFormat(this, 'style')" style="font-style: italic; font-family: serif;" title="斜体">I</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- {} 包裹文字 -->
+          <div class="tb-section">
+            <div class="tb-title">{} 包裹文字 (动作/心理)</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+              <div class="tb-color-group">
+                <div class="tb-color-item">
+                  <div class="tb-color-label">文字颜色</div>
+                  <div class="tb-color-picker-wrap">
+                    <input type="color" class="tb-color-picker" id="tb-brace-color" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                  </div>
+                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-brace-color')">清除</button>
+                </div>
+                <div class="tb-color-item">
+                  <div class="tb-color-label">文字底色</div>
+                  <div class="tb-color-picker-wrap">
+                    <input type="color" class="tb-color-picker" id="tb-brace-bg" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                  </div>
+                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-brace-bg')">清除</button>
+                </div>
+              </div>
+              <div class="tb-format-group">
+                <button class="tb-format-btn" id="tb-brace-weight" onclick="toggleTextFormat(this, 'weight')" style="font-weight: bold;" title="加粗">B</button>
+                <button class="tb-format-btn" id="tb-brace-style" onclick="toggleTextFormat(this, 'style')" style="font-style: italic; font-family: serif;" title="斜体">I</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- “” / "" 包裹文字 -->
+          <div class="tb-section">
+            <div class="tb-title">“ ” 或 " " 包裹文字 (对话)</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+              <div class="tb-color-group">
+                <div class="tb-color-item">
+                  <div class="tb-color-label">文字颜色</div>
+                  <div class="tb-color-picker-wrap">
+                    <input type="color" class="tb-color-picker" id="tb-quote-color" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                  </div>
+                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-quote-color')">清除</button>
+                </div>
+                <div class="tb-color-item">
+                  <div class="tb-color-label">文字底色</div>
+                  <div class="tb-color-picker-wrap">
+                    <input type="color" class="tb-color-picker" id="tb-quote-bg" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                  </div>
+                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-quote-bg')">清除</button>
+                </div>
+              </div>
+              <div class="tb-format-group">
+                <button class="tb-format-btn" id="tb-quote-weight" onclick="toggleTextFormat(this, 'weight')" style="font-weight: bold;" title="加粗">B</button>
+                <button class="tb-format-btn" id="tb-quote-style" onclick="toggleTextFormat(this, 'style')" style="font-style: italic; font-family: serif;" title="斜体">I</button>
+              </div>
+            </div>
+          </div>
+          
+          <button class="save-btn" onclick="saveTextBeautifySettings()">保存叙事美化设置</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-page" id="theme-bubble-setting">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('theme-bubble-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">主题/气泡调色盘</div>
+      </div>
+      <div class="page-body">
+        <div class="form-label">主题调色盘</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;">
+          <div onclick="applyThemeColor('#f0b8c8','#f8d7e0','#fffbf9')" style="width:36px;height:36px;border-radius:50%;background:#f0b8c8;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
+          <div onclick="applyThemeColor('#a8d8ea','#c9e8f3','#f5fbff')" style="width:36px;height:36px;border-radius:50%;background:#a8d8ea;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
+          <div onclick="applyThemeColor('#b5e8c3','#d4f0dc','#f5fff8')" style="width:36px;height:36px;border-radius:50%;background:#b5e8c3;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
+          <div onclick="applyThemeColor('#d4b8f0','#e4d3f5','#fbf7ff')" style="width:36px;height:36px;border-radius:50%;background:#d4b8f0;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
+          <div onclick="applyThemeColor('#f0d8a8','#f5e8c9','#fffdf5')" style="width:36px;height:36px;border-radius:50%;background:#f0d8a8;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
+          <div onclick="applyThemeColor('#f0a8a8','#f5c9c9','#fff5f5')" style="width:36px;height:36px;border-radius:50%;background:#f0a8a8;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="form-label" style="margin-bottom:4px;">自定义颜色</div>
+          <input type="color" id="customThemeColor" value="#f0b8c8" onchange="applyCustomColor(this.value)" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;">
+        </div>
+        
+        <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
+        
+        <div class="form-label">气泡调色盘</div>
+        <div class="setting-desc" style="margin-top:6px;margin-bottom:12px;">调整聊天气泡的颜色、透明度和圆角。</div>
+        
+        <div class="form-section">
+          <div class="form-label" style="font-size:13px;">对方气泡颜色</div>
+          <input type="color" id="leftBubbleColor" value="#ffffff" onchange="applyBubbleSettings()" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;">
+        </div>
+        
+        <div class="form-section">
+          <div class="form-label" style="font-size:13px;">我的气泡颜色</div>
+          <input type="color" id="rightBubbleColor" value="#f0b8c8" onchange="applyBubbleSettings()" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;">
+        </div>
+        
+        <div class="form-section">
+          <div class="form-label" style="font-size:13px;">气泡透明度 <span id="bubbleOpacityValue">0.85</span></div>
+          <input type="range" id="bubbleOpacity" min="0" max="1" step="0.05" value="0.85" oninput="applyBubbleSettings()" style="width:100%;">
+        </div>
+        
+        <div class="form-section">
+          <div class="form-label" style="font-size:13px;">气泡圆角 <span id="bubbleRadiusValue">18</span>px</div>
+          <input type="range" id="bubbleRadius" min="0" max="30" step="1" value="18" oninput="applyBubbleSettings()" style="width:100%;">
+        </div>
+        
+        <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
+        
+        <div class="form-label">气泡装饰</div>
+        <div class="setting-desc" style="margin-top:6px;margin-bottom:12px;">上传PNG透明图片，装饰在气泡的角落，支持自定义大小和偏移位置。</div>
+        
+        <div style="padding: 25px 15px; background: rgba(0,0,0,0.03); border-radius: 12px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 20px; border: 1px dashed var(--light-pink); overflow: hidden;">
+          <div class="msg-item left" style="align-self: flex-start; max-width: 80%;">
+            <div class="msg-avatar" style="border:none;"><img src="haibaologo.png" style="border-radius:50%;"></div>
+            <div class="msg-bubble" style="pointer-events: none;">对方气泡预览</div>
+          </div>
+          <div class="msg-item right" style="align-self: flex-end; max-width: 80%;">
+            <div class="msg-avatar" style="border:none;"><img src="haibaologo.png" style="border-radius:50%;"></div>
+            <div class="msg-bubble" style="pointer-events: none;">我的气泡预览</div>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <div class="form-label" style="font-size:13px;">对方气泡装饰</div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div id="leftDecPreview" style="width:40px; height:40px; border:1px dashed #ccc; border-radius:8px; background-size:contain; background-repeat:no-repeat; background-position:center;"></div>
+            <label class="upload-btn" style="margin:0;">上传<input type="file" accept="image/png" onchange="uploadBubbleDec(this, 'left')" style="display:none;"></label>
+            <button class="upload-btn" style="margin:0;" onclick="clearBubbleDec('left')">清除</button>
+          </div>
+          <div style="margin-top:10px;">
+            <div style="font-size:12px; color:var(--text-light);">大小 <span id="leftDecSizeValue">30</span>px</div>
+            <input type="range" id="leftDecSize" min="10" max="100" step="1" value="30" oninput="applyBubbleDecSettings()" style="width:100%;">
+          </div>
+          <div style="margin-top:5px; display:flex; gap:10px;">
+            <div style="flex:1;">
+              <div style="font-size:12px; color:var(--text-light);">上下偏移 <span id="leftDecYValue">-10</span>px</div>
+              <input type="range" id="leftDecY" min="-150" max="150" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px; color:var(--text-light);">左右偏移 <span id="leftDecXValue">-5</span>px</div>
+              <input type="range" id="leftDecX" min="-150" max="150" step="1" value="-5" oninput="applyBubbleDecSettings()" style="width:100%;">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-label" style="font-size:13px;">我的气泡装饰</div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div id="rightDecPreview" style="width:40px; height:40px; border:1px dashed #ccc; border-radius:8px; background-size:contain; background-repeat:no-repeat; background-position:center;"></div>
+            <label class="upload-btn" style="margin:0;">上传<input type="file" accept="image/png" onchange="uploadBubbleDec(this, 'right')" style="display:none;"></label>
+            <button class="upload-btn" style="margin:0;" onclick="clearBubbleDec('right')">清除</button>
+          </div>
+          <div style="margin-top:10px;">
+            <div style="font-size:12px; color:var(--text-light);">大小 <span id="rightDecSizeValue">30</span>px</div>
+            <input type="range" id="rightDecSize" min="10" max="100" step="1" value="30" oninput="applyBubbleDecSettings()" style="width:100%;">
+          </div>
+          <div style="margin-top:5px; display:flex; gap:10px;">
+            <div style="flex:1;">
+              <div style="font-size:12px; color:var(--text-light);">上下偏移 <span id="rightDecYValue">-10</span>px</div>
+              <input type="range" id="rightDecY" min="-150" max="150" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px; color:var(--text-light);">左右偏移 <span id="rightDecXValue">-10</span>px</div>
+              <input type="range" id="rightDecX" min="-150" max="150" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
+            </div>
           </div>
         </div>
       </div>
@@ -1482,7 +1764,7 @@ body {
             <span>回复：<span id="replyContent"></span></span>
             <span class="reply-tip-close" onclick="cancelReply()">×</span>
           </div>
-          <input type="text" class="chat-input" id="chatInput" placeholder="输入消息..." autocomplete="off" onkeypress="if(event.key==='Enter')sendMsg()">
+          <textarea class="chat-input" id="chatInput" placeholder="输入消息..." autocomplete="off" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendMsg();}" rows="1"></textarea>
           <div class="attach-panel" id="attachPanel">
             <div class="attach-grid">
               <div class="attach-item" onclick="selectFile('image')"><div class="attach-icon">🖼️</div><span>图片</span></div>
@@ -1649,7 +1931,49 @@ body {
       </div>
       <div class="page-body">
         <div class="menu-item" onclick="openCoupleAlbum()">💑 情侣相册</div>
+        <div class="menu-item" id="coupleMarriageBtn" onclick="openProposalPage()">💍 浪漫关系</div>
         <div style="text-align:center; margin-top:40px; color:var(--text-light); font-size:12px;">更多甜蜜功能敬请期待...</div>
+      </div>
+    </div>
+
+    <!-- 浪漫关系/求婚页面 (三级页面) -->
+    <div class="sub-page" id="proposal-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('proposal-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">浪漫关系</div>
+      </div>
+      <div class="page-body">
+        <div id="unmarriedSettings" style="display:none; text-align:center; padding-top: 40px;">
+          <div style="font-size: 60px; margin-bottom: 20px;">💍</div>
+          <div style="font-size: 16px; color: var(--text-dark); margin-bottom: 10px; font-weight: 500;">向TA求婚</div>
+          <div style="font-size: 13px; color: var(--text-light); margin-bottom: 30px;">好感度达到90%即可向TA求婚，步入婚姻殿堂</div>
+          <button class="save-btn" id="proposeBtn" onclick="proposeToContact()">💍 发起求婚</button>
+        </div>
+
+        <div id="marriedSettings" style="display:none;">
+          <div class="setting-section" style="background: rgba(255,255,255,0.6); border: 1px dashed var(--main-pink);">
+            <div style="text-align:center; margin-bottom: 20px;">
+              <div style="font-size: 40px; margin-bottom: 10px;">💒</div>
+              <div style="font-size: 18px; color: var(--main-pink); font-weight: 600;">你们已经结婚啦</div>
+            </div>
+            
+            <div class="form-section">
+              <div class="form-label">专属爱称</div>
+              <div class="setting-desc">TA对你的专属称呼</div>
+              <input class="form-input" id="petNameInput" placeholder="例如：宝宝、亲爱的">
+            </div>
+            <div class="form-section">
+              <div class="form-label">纪念日</div>
+              <input class="form-input" id="anniversaryInput" type="date">
+            </div>
+            <button class="save-btn" onclick="saveMarriedSettings()" style="margin-top:10px;">保存甜蜜设置</button>
+          </div>
+          
+          <div style="margin:30px 0 10px; text-align:center;">
+            <div style="font-size: 12px; color: var(--text-light); margin-bottom: 10px;">危险区域</div>
+            <button class="save-btn" onclick="divorceContact()" style="background:#ff4757; margin-top:0; padding: 12px; border-radius: 12px;">💔 解除关系</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1865,21 +2189,6 @@ function setVh() {
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 
-function autoHeight(el) {
-  const scrollTop = el.scrollTop;
-  const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 20;
-  
-  el.style.height = '40px';
-  el.style.height = el.scrollHeight + 'px';
-  
-  if (el.scrollHeight > el.clientHeight) {
-    if (isAtBottom) {
-      el.scrollTop = el.scrollHeight;
-    } else {
-      el.scrollTop = scrollTop;
-    }
-  }
-}
 setVh();
 window.addEventListener('resize', setVh);
 window.addEventListener('orientationchange', setVh);
@@ -1896,8 +2205,11 @@ document.addEventListener('focusin', function(e) {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
     setTimeout(() => {
       document.body.scrollTop = document.body.scrollTop;
-      // 处理键盘遮挡问题，让输入框滚动到可视区域
-      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // 优化：仅在元素确实被遮挡时才滚动，且取消平滑滚动避免与系统键盘弹出动画冲突
+      const rect = e.target.getBoundingClientRect();
+      if (rect.bottom > window.innerHeight || rect.top < 0) {
+        e.target.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+      }
     }, 300); // 稍微增加延迟，等待键盘完全弹出
   }
 });
@@ -2417,7 +2729,7 @@ let chatSettings = {
     useWorldBook: true
 };
 let isOfflineMode = false;
-let aiRequestInProgress = false;
+let activeAIRequests = new Set();
 
 // 异步加载全局变量
 async function loadGlobalData() {
@@ -2456,14 +2768,7 @@ async function loadGlobalData() {
 function navTo(id, el) {
     // 关闭所有sub-page
     document.querySelectorAll('.sub-page').forEach(p => {
-        // 如果AI正在请求中，不真正关闭chat-win，而是移到屏幕外
-        if (p.id === 'chat-win' && p.classList.contains('show') && aiRequestInProgress) {
-            p.style.position = 'fixed';
-            p.style.left = '-9999px';
-            p.dataset.hiddenByNav = 'true';
-        } else {
-            p.classList.remove('show');
-        }
+        p.classList.remove('show');
     });
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
@@ -2508,12 +2813,6 @@ function openSub(id) {
         subPageZIndex++;
         el.style.zIndex = subPageZIndex;
         el.classList.add('show'); 
-        // 如果chat-win之前被移到屏幕外，恢复它
-        if(id === 'chat-win' && el.dataset.hiddenByNav === 'true') {
-            el.style.position = '';
-            el.style.left = '';
-            el.dataset.hiddenByNav = '';
-        }
         el.style.visibility = 'visible';
         if(id === 'chat-win') {
             document.querySelector('.dock').style.display = 'none';
@@ -2531,9 +2830,6 @@ function closeSub(id) {
     el.classList.remove('show');
     // 重置所有可能的定位样式
     el.style.visibility = '';
-    el.style.position = '';
-    el.style.left = '';
-    el.dataset.hiddenByNav = '';
     if(id === 'chat-win') {
         document.querySelector('.dock').style.display = 'flex';
         if (document.getElementById('page-chat').classList.contains('active')) {
@@ -2589,11 +2885,8 @@ async function cleanupOldDataAsync() {
             await saveMomentsToDB();
         }
         
-        // 3. 清理超过15条的世界书条目
-        if (worldBookEntries.length > 15) {
-            worldBookEntries = worldBookEntries.slice(0, 15);
-            await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
-        }
+          // 3. 不再清理世界书条目，因为它们是用户永久保存的记忆
+          // 取消清理限制，让世界书可以无限保存
         
         showToast('🧹 已自动清理旧数据');
         return true;
@@ -2888,8 +3181,9 @@ function renderContactList() {
       }
       const div = document.createElement('div');
       div.className = 'contact-item';
+      const ringClass = c.isMarried ? ' ring-avatar-frame' : '';
       div.innerHTML = `
-        <div class="contact-avatar"><img src="${c.avatar}"></div>
+        <div class="contact-avatar${ringClass}"><img src="${c.avatar}"></div>
         <div class="contact-info" style="flex:1; overflow:hidden;">
           <div class="contact-name">${c.name}</div>
           <div class="contact-desc" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${lastMsg}</div>
@@ -3123,7 +3417,8 @@ async function openChatPage(contact) {
   currentContactId = contact.id;
   // 立即更新标题，提升响应感
   document.getElementById('chatHeaderTitle').innerText = contact.name;
-  document.getElementById('chatHeaderAvatar').innerHTML = `<img src="${contact.avatar}">`;
+  const ringClass = contact.isMarried ? 'class="ring-avatar-frame"' : '';
+  document.getElementById('chatHeaderAvatar').innerHTML = `<div ${ringClass}><img src="${contact.avatar}"></div>`;
   
   // 清空旧内容，防止切换瞬间看到别人的消息
   document.getElementById('chatContent').innerHTML = '';
@@ -3141,6 +3436,14 @@ async function openChatPage(contact) {
   // 异步加载设置和渲染，不阻塞跳转动画
   await loadChatSettings();
   renderChat();
+  
+  if (activeAIRequests.has(currentContactId)) {
+    document.getElementById('typingStatus').style.display = 'inline';
+    showLoading();
+  } else {
+    document.getElementById('typingStatus').style.display = 'none';
+    hideLoading();
+  }
   
   // ✅ 每个联系人独立加载线上/线下模式
   const rawContactOffline = await getFromStorage(`isOfflineMode_${contact.id}`);
@@ -3225,6 +3528,22 @@ function applyHideAvatarSetting() {
   }
 }
 
+function parseTextBeautify(text) {
+  // 保护换行符
+  let html = text.replace(/\n/g, '<br>');
+  
+  // 使用单引号包裹 class 属性，避免被后续的 "" 匹配到
+  html = html.replace(/\{([^{}]+)\}/g, "<span class='text-brace'>{$1}</span>");
+  
+  // 匹配 “” 和 "" 对话
+  html = html.replace(/“([^“”]+)”/g, "<span class='text-quote'>“$1”</span>");
+  html = html.replace(/"([^"]+)"/g, "<span class='text-quote'>\"$1\"</span>");
+  
+  // 将没有被 span 包裹的普通文本用 text-normal 包裹
+  // 为了不破坏现有的HTML标签，我们只在最外层包裹 text-normal
+  return `<span class='text-normal'>${html}</span>`;
+}
+
 function addMsgToUI(content, side, avatar, quote, idx, type) {
   const el = document.getElementById('chatContent');
   const div = document.createElement('div');
@@ -3235,8 +3554,16 @@ function addMsgToUI(content, side, avatar, quote, idx, type) {
   // 用于回复菜单的文本（图片显示占位符）
   const replyText = (type === 'image' ? '[图片]' : content).replace(/'/g, "\\'").replace(/\n/g, "<br>");
 
+  let ringClass = '';
+  if (side === 'left' && currentContactId) {
+    const c = contacts.find(x => x.id === currentContactId);
+    if (c && c.isMarried) {
+      ringClass = ' ring-avatar-frame';
+    }
+  }
+
   // 始终生成头像HTML，通过CSS控制显示/隐藏
-  let avatarHtml = `<div class="msg-avatar"><img src="${avatar}"></div>`;
+  let avatarHtml = `<div class="msg-avatar${ringClass}"><img src="${avatar}"></div>`;
 
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
@@ -3252,8 +3579,9 @@ function addMsgToUI(content, side, avatar, quote, idx, type) {
     imgEl.onclick = (e) => { e.stopPropagation(); viewFullImage(content); };
     bubble.appendChild(imgEl);
   } else {
-    const displayContent = content.replace(/\n/g, "<br>");
-    bubble.innerHTML = `${qhtml}${displayContent}`;
+    // 解析文字美化
+    const parsedContent = parseTextBeautify(content);
+    bubble.innerHTML = `${qhtml}${parsedContent}`;
   }
 
   div.innerHTML = `
@@ -3324,6 +3652,7 @@ async function sendMsg() {
   chatRecords[currentContactId].push({ side: 'right', content: t, quote: q, time: Date.now() });
   await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
   ipt.value = '';
+  ipt.style.height = '40px';
   cancelReply();
   renderContactList();
 }
@@ -3414,6 +3743,7 @@ ${contact.persona}
 
 async function triggerAIReply() {
   if (!currentContactId) { alert('请先选联系人'); return; }
+  if (activeAIRequests.has(currentContactId)) { return; }
   const c = contacts.find(x => x.id === currentContactId);
   const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
   const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
@@ -3507,6 +3837,17 @@ async function triggerAIReply() {
   }
   if (chatSettings.contactMask) {
     systemPrompt += `【联系人面具】${chatSettings.contactMask}\n`;
+  }
+  
+  if (c.isMarried) {
+    let marriedPrompt = `【系统提示：你们已经结婚了，请在后续的对话中使用更亲密的称呼（如老公/老婆等），表现出已婚的甜蜜状态。】\n`;
+    if (c.petName) {
+      marriedPrompt += `【系统提示：你对用户的专属爱称是“${c.petName}”，请在对话中自然地使用它。】\n`;
+    }
+    if (c.anniversary) {
+      marriedPrompt += `【系统提示：你们的纪念日是 ${c.anniversary}。】\n`;
+    }
+    systemPrompt += marriedPrompt;
   }
   
   // 获取当前好感度
@@ -3610,6 +3951,7 @@ ${statusRules}
 
   // 记录请求发起时的联系人ID
   const requestContactId = currentContactId;
+  activeAIRequests.add(requestContactId);
 
   // 检查是否在聊天中提醒了看朋友圈
   const rawRecs = chatRecords[currentContactId] || [];
@@ -3624,9 +3966,11 @@ ${statusRules}
     }
   }
 
-  showLoading();
-  aiRequestInProgress = true;
-  document.getElementById('typingStatus').style.display = 'inline';
+  const isCurrentContactInitially = (requestContactId === currentContactId);
+  if (isCurrentContactInitially) {
+    showLoading();
+    document.getElementById('typingStatus').style.display = 'inline';
+  }
   try {
     const res = await fetch(`${cfg.url}/chat/completions`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
@@ -3639,21 +3983,13 @@ ${statusRules}
     }
     let txt = data.choices?.[0]?.message?.content || '回复失败';
     
-    // 如果当前联系人已经改变，只保存到记录，不更新UI
+    activeAIRequests.delete(requestContactId);
     const isCurrentContact = (requestContactId === currentContactId);
     
-      // 无论是否在当前窗口，都重置请求状态
-      aiRequestInProgress = false;
-      
-      // 只有在当前窗口才隐藏loading和typing状态
-      if (isCurrentContact) {
-        document.getElementById('typingStatus').style.display = 'none';
-        hideLoading();
-      } else {
-        // 如果已经切换到其他窗口，隐藏之前可能显示的loading
-        document.querySelectorAll('.loading').forEach(x => x.remove());
-        document.getElementById('typingStatus').style.display = 'none';
-      }
+    if (isCurrentContact) {
+      document.getElementById('typingStatus').style.display = 'none';
+      hideLoading();
+    }
     
     // 解析并提取状态信息 (增强正则兼容性)
     const statusMatch = txt.match(/<STATUS>([\s\S]*?)<\/STATUS>/i);
@@ -3765,25 +4101,18 @@ ${statusRules}
       // 检查是否需要触发短期记忆总结 (传入正确的联系人ID)
       checkAndTriggerStmForContact(requestContactId);
       
-      // AI回复完成后，如果chat-win被导航隐藏了，显示红点提醒
-      if (document.getElementById('chat-win').dataset.hiddenByNav === 'true' && isCurrentContact) {
-        showChatRedDot();
-      }
-      if (isCurrentContact) cleanupHiddenChatWin();
     } catch (e) { 
-      aiRequestInProgress = false;
-      document.getElementById('typingStatus').style.display = 'none';
-      hideLoading(); 
+      activeAIRequests.delete(requestContactId);
       const isCurrentContact = (requestContactId === currentContactId);
       if (isCurrentContact) {
+        document.getElementById('typingStatus').style.display = 'none';
+        hideLoading(); 
         addMsgToUI('请求失败：' + e.message, 'left', c.avatar);
-        cleanupHiddenChatWin();
-      } else {
-        if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
-        chatRecords[requestContactId].push({ side: 'left', content: '请求失败：' + e.message, time: Date.now() });
-        await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
-        renderContactList();
       }
+      if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
+      chatRecords[requestContactId].push({ side: 'left', content: '请求失败：' + e.message, time: Date.now() });
+      await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+      renderContactList();
     }
 }
 
@@ -3819,18 +4148,6 @@ async function checkAndTriggerStmForContact(contactId) {
 // ========== 输入状态提醒（已替代红点） ==========
 function showChatRedDot() {} // 保留空函数避免报错
 function hideChatRedDot() {} // 保留空函数避免报错
-
-// 清理被导航隐藏的chat-win
-function cleanupHiddenChatWin() {
-  const chatWin = document.getElementById('chat-win');
-  if (chatWin.dataset.hiddenByNav === 'true') {
-    chatWin.classList.remove('show');
-    chatWin.style.position = '';
-    chatWin.style.left = '';
-    chatWin.style.visibility = '';
-    chatWin.dataset.hiddenByNav = '';
-  }
-}
 
 function showLoading() {
   const el = document.getElementById('chatContent');
@@ -3924,9 +4241,236 @@ function openCoupleSpace() {
   openSub('couple-space-page');
 }
 
+function openProposalPage() {
+  if (!currentContactId) return;
+  const contact = contacts.find(c => c.id === currentContactId);
+  if (!contact) return;
+  
+  if (contact.isMarried) {
+    document.getElementById('unmarriedSettings').style.display = 'none';
+    document.getElementById('marriedSettings').style.display = 'block';
+    document.getElementById('petNameInput').value = contact.petName || '';
+    document.getElementById('anniversaryInput').value = contact.anniversary || '';
+  } else {
+    document.getElementById('unmarriedSettings').style.display = 'block';
+    document.getElementById('marriedSettings').style.display = 'none';
+  }
+  openSub('proposal-page');
+}
+
+async function saveMarriedSettings() {
+  if (!currentContactId) return;
+  const contact = contacts.find(c => c.id === currentContactId);
+  if (!contact) return;
+  
+  const petName = document.getElementById('petNameInput').value.trim();
+  const anniversary = document.getElementById('anniversaryInput').value;
+  
+  contact.petName = petName;
+  contact.anniversary = anniversary;
+  
+  await saveToStorage('CHAT_CONTACTS', JSON.stringify(contacts));
+  showToast('✅ 甜蜜设置已保存');
+}
+
+async function divorceContact() {
+  if (!currentContactId) return;
+  const contact = contacts.find(c => c.id === currentContactId);
+  if (!contact) return;
+
+  if (!confirm(`确定要和 ${contact.name} 解除关系吗？这是一个不可逆的操作。`)) return;
+
+  // 触发分手/离婚逻辑
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  
+  // 发送系统提示到聊天记录
+  if (!chatRecords[currentContactId]) chatRecords[currentContactId] = [];
+  chatRecords[currentContactId].push({ side: 'right', content: '💔 我们还是分开吧...', time: Date.now() });
+
+  contact.isMarried = false;
+  delete contact.petName;
+  delete contact.anniversary;
+  await saveToStorage('CHAT_CONTACTS', JSON.stringify(contacts));
+
+  if (cfg.key && cfg.url && cfg.model) {
+    showToast('💔 正在告诉TA这个决定...', 3000);
+    const prompt = `你是${contact.name}。
+【系统提示：玩家刚刚向你提出了分手/离婚！】
+请用你特有的性格和语气给出回应（可以是不舍、愤怒、平静接受等，符合人设即可）。`;
+
+    try {
+      const res = await fetch(`${cfg.url}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+        body: JSON.stringify({
+          model: cfg.model,
+          temperature: 0.8,
+          messages: [
+            { role: 'system', content: `【人设】${contact.persona || '无'}\n请严格扮演人设。` },
+            { role: 'user', content: prompt }
+          ]
+        })
+      });
+      
+      const data = await res.json();
+      let reply = data.choices?.[0]?.message?.content || '好吧，如果这是你的决定。';
+      
+      chatRecords[currentContactId].push({ side: 'left', content: reply, time: Date.now() });
+      await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+    } catch (e) {
+      console.error('分手回复失败:', e);
+    }
+  } else {
+    await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+  }
+
+  showToast('💔 已解除关系', 3000);
+  closeSub('proposal-page');
+  renderChat();
+  renderContactList();
+  
+  // 更新状态卡片UI
+  const savedStatus = await getFromStorage(`STATUS_${currentContactId}`);
+  if (savedStatus) {
+    const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
+    status.favor = Math.max(0, (status.favor || 0) - 50); // 好感度大幅下降
+    await saveToStorage(`STATUS_${currentContactId}`, JSON.stringify(status));
+    
+    const favorBar = document.getElementById('status-favor');
+    const favorText = document.getElementById('status-favor-text');
+    if (favorBar) favorBar.style.width = status.favor + '%';
+    if (favorText) favorText.textContent = status.favor + '%';
+  }
+}
+
 async function openCoupleAlbum() {
   openSub('couple-album-page');
   renderCoupleAlbum();
+}
+
+async function proposeToContact() {
+  if (!currentContactId) return;
+  const contact = contacts.find(c => c.id === currentContactId);
+  if (!contact) return;
+
+  if (contact.isMarried) {
+    showToast('你们已经结婚啦！');
+    return;
+  }
+
+  const savedStatus = await getFromStorage(`STATUS_${currentContactId}`);
+  let favor = 0;
+  if (savedStatus) {
+    const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
+    favor = status.favor || 0;
+  }
+
+  if (favor < 90) {
+    showToast('好感度不足90%，TA还不想考虑这件事哦~');
+    return;
+  }
+
+  if (!confirm(`确定要向 ${contact.name} 求婚吗？`)) return;
+
+  // 触发求婚逻辑
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  if (!cfg.key || !cfg.url || !cfg.model) { alert('请先配置API设置'); return; }
+
+  showToast('💍 正在精心准备求婚，等待TA的回应...', 3000);
+  
+  // 发送求婚系统指令
+  const prompt = `你是${contact.name}。
+【系统提示：玩家刚刚向你求婚了！当前好感度已达90%以上。】
+请用你特有的性格和语气给出回应（接受求婚），并且在回复的末尾必须加上 [求婚成功] 这四个字。`;
+
+  try {
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({
+        model: cfg.model,
+        temperature: 0.8,
+        messages: [
+          { role: 'system', content: `【人设】${contact.persona || '无'}\n请严格扮演人设。` },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+    
+    const data = await res.json();
+    if (data.error) {
+      throw new Error(`API错误: ${data.error.message || data.error.type || JSON.stringify(data.error)}`);
+    }
+    
+    let reply = data.choices?.[0]?.message?.content || '';
+    
+    if (reply.includes('[求婚成功]')) {
+      // 求婚成功！
+      contact.isMarried = true;
+      await saveToStorage('CHAT_CONTACTS', JSON.stringify(contacts));
+      
+      // 去掉标记，显示在聊天记录里
+      reply = reply.replace(/\[求婚成功\]/g, '').trim();
+      
+      // 添加一条用户发出的系统提示到聊天记录
+      if (!chatRecords[currentContactId]) chatRecords[currentContactId] = [];
+      chatRecords[currentContactId].push({ side: 'right', content: '💍 我向你求婚了！', time: Date.now() });
+      chatRecords[currentContactId].push({ side: 'left', content: reply, time: Date.now() });
+      await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+      
+      // 撒花特效
+      showConfetti();
+      showToast('🎉 求婚成功！你们结婚啦！', 4000);
+      
+      closeSub('proposal-page');
+      renderChat();
+      renderContactList();
+    } else {
+      showToast('TA似乎还在犹豫...');
+      
+      if (!chatRecords[currentContactId]) chatRecords[currentContactId] = [];
+      chatRecords[currentContactId].push({ side: 'right', content: '💍 我向你求婚了！', time: Date.now() });
+      chatRecords[currentContactId].push({ side: 'left', content: reply, time: Date.now() });
+      await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+      renderChat();
+    }
+  } catch (e) {
+    console.error('求婚失败:', e);
+    showToast('❌ 求婚失败：' + e.message);
+  }
+}
+
+function showConfetti() {
+  const colors = ['#ff6b81', '#f0b8c8', '#ffd700', '#ffb6c1', '#ffffff'];
+  for (let i = 0; i < 100; i++) {
+    const confetti = document.createElement('div');
+    confetti.style.position = 'fixed';
+    confetti.style.width = '10px';
+    confetti.style.height = '10px';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.left = Math.random() * 100 + 'vw';
+    confetti.style.top = '-10px';
+    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+    confetti.style.zIndex = '99999';
+    confetti.style.pointerEvents = 'none';
+    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+    
+    document.body.appendChild(confetti);
+    
+    const duration = Math.random() * 3 + 2;
+    confetti.animate([
+      { transform: `translate3d(0, 0, 0) rotate(0deg)`, opacity: 1 },
+      { transform: `translate3d(${Math.random()*200 - 100}px, 100vh, 0) rotate(${Math.random()*720}deg)`, opacity: 0 }
+    ], {
+      duration: duration * 1000,
+      easing: 'cubic-bezier(.37,0,.63,1)',
+      fill: 'forwards'
+    });
+    
+    setTimeout(() => confetti.remove(), duration * 1000);
+  }
 }
 
 async function renderCoupleAlbum() {
@@ -4145,36 +4689,37 @@ function uploadContactAvatarByUrl() {
   }
 }
 
-// 渲染世界书多选框列表
-function renderWorldBookCheckboxList() {
-  const container = document.getElementById('worldbook-checkbox-list');
-  
-  if (worldBookEntries.length === 0) {
-    container.innerHTML = '<div style="padding:10px; text-align:center; color:var(--text-light); font-size:12px;">暂无世界书条目<br>请先在"世界书管理"中添加</div>';
-    return;
+  // 渲染世界书多选框列表
+  function renderWorldBookCheckboxList() {
+    const container = document.getElementById('worldbook-checkbox-list');
+
+    if (worldBookEntries.length === 0) {
+      container.innerHTML = '<div style="padding:10px; text-align:center; color:var(--text-light); font-size:12px;">暂无世界书条目<br>请先在"世界书管理"中添加</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+
+    // 确保 chatSettings.selectedWorldBooks 存在
+    if (!chatSettings.selectedWorldBooks) {
+      chatSettings.selectedWorldBooks = [];
+    }
+
+    // 这里不过滤任何类别，直接展示所有世界书，以供用户选择
+    worldBookEntries.forEach((entry, idx) => {
+      const isChecked = chatSettings.selectedWorldBooks.includes(entry.id);
+      const checkboxItem = document.createElement('div');
+      checkboxItem.style.cssText = 'display:flex; align-items:center; padding:8px 0; border-bottom:1px solid #f0e8df;';
+      checkboxItem.innerHTML = `
+        <input type="checkbox" id="wb-${entry.id}" ${isChecked ? 'checked' : ''} onchange="toggleWorldBookSelection('${entry.id}')" style="width:18px; height:18px; margin-right:10px; cursor:pointer;">
+        <label for="wb-${entry.id}" style="flex:1; cursor:pointer; font-size:14px; color:var(--text-dark);">
+          <div style="font-weight:500;">${entry.name}</div>
+          <div style="font-size:11px; color:var(--text-light); margin-top:2px;">分类：${entry.category}</div>
+        </label>
+      `;
+      container.appendChild(checkboxItem);
+    });
   }
-  
-  container.innerHTML = '';
-  
-  // 确保 chatSettings.selectedWorldBooks 存在
-  if (!chatSettings.selectedWorldBooks) {
-    chatSettings.selectedWorldBooks = [];
-  }
-  
-  worldBookEntries.forEach((entry, idx) => {
-    const isChecked = chatSettings.selectedWorldBooks.includes(entry.id);
-    const checkboxItem = document.createElement('div');
-    checkboxItem.style.cssText = 'display:flex; align-items:center; padding:8px 0; border-bottom:1px solid #f0e8df;';
-    checkboxItem.innerHTML = `
-      <input type="checkbox" id="wb-${entry.id}" ${isChecked ? 'checked' : ''} onchange="toggleWorldBookSelection('${entry.id}')" style="width:18px; height:18px; margin-right:10px; cursor:pointer;">
-      <label for="wb-${entry.id}" style="flex:1; cursor:pointer; font-size:14px; color:var(--text-dark);">
-        <div style="font-weight:500;">${entry.name}</div>
-        <div style="font-size:11px; color:var(--text-light); margin-top:2px;">分类：${entry.category}</div>
-      </label>
-    `;
-    container.appendChild(checkboxItem);
-  });
-}
 
 // 切换世界书选择
 function toggleWorldBookSelection(entryId) {
@@ -4420,11 +4965,34 @@ async function confirmDeleteSelected() {
 }
 async function clearChatRecord() {
   toggleChatMenu();
-  if (!confirm('确定清空所有聊天记录？')) return;
+  if (!confirm('确定清空所有聊天记录及短期记忆？（长期记忆将保留在世界书中）')) return;
+  
+  // 1. 清空聊天记录
   chatRecords[currentContactId] = [];
   await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+  
+  // 2. 清空短期记忆 (STM)
+  await window.storage.removeItem(`STM_${currentContactId}`);
+  
+  // 3. 重置状态(好感度等)
+  const status = { location: '未知', mood: '平静', thoughts: '暂无数据', favor: 0 };
+  await saveToStorage(`STATUS_${currentContactId}`, JSON.stringify(status));
+  
+  // 如果状态卡片打开，更新UI
+  const favorBar = document.getElementById('status-favor');
+  const favorText = document.getElementById('status-favor-text');
+  if (favorBar) favorBar.style.width = '0%';
+  if (favorText) favorText.textContent = '0%';
+  const locEl = document.getElementById('status-location');
+  if (locEl) locEl.textContent = '未知';
+  const moodEl = document.getElementById('status-mood');
+  if (moodEl) moodEl.textContent = '平静';
+  const thoughtsEl = document.getElementById('status-thoughts');
+  if (thoughtsEl) thoughtsEl.textContent = '暂无数据';
+  
   renderChat();
   renderContactList();
+  showToast('✅ 聊天记录及记忆已清空');
 }
 
 let apiPresets = [];
@@ -4864,7 +5432,6 @@ function applyMeTextColor(isDark) {
   if (timeEl) timeEl.style.color = textColor;
   
   // 昵称
-  const nicknameEl = document.getElementById('user-nickname');
   if (nicknameEl) nicknameEl.style.color = textColor;
   
   // 签名
@@ -5261,11 +5828,44 @@ async function exportBackup(mode = 'full') {
     }
   }
 
+  // 保存短期记忆(STM)
+  backupData.stmData = {};
+  for (const c of contacts) {
+    const stm = await getFromStorage(`STM_${c.id}`);
+    if (stm) {
+      backupData.stmData[c.id] = typeof stm === 'string' ? JSON.parse(stm) : stm;
+    }
+  }
+
   // ===== 仅全局备份才包含的额外数据 =====
   if (!isChatOnly) {
     // API配置
     const apiConfigStr = await getFromStorage('AI_CHAT_CONFIG');
     backupData.apiConfig = apiConfigStr ? (typeof apiConfigStr === 'string' ? JSON.parse(apiConfigStr) : apiConfigStr) : {};
+
+    // API预设
+    const apiPresetsStr = await getFromStorage('AI_API_PRESETS');
+    backupData.apiPresets = apiPresetsStr ? (typeof apiPresetsStr === 'string' ? JSON.parse(apiPresetsStr) : apiPresetsStr) : [];
+
+    // 模型列表
+    const modelListStr = await getFromStorage('AI_MODEL_LIST');
+    backupData.aiModelList = modelListStr ? (typeof modelListStr === 'string' ? JSON.parse(modelListStr) : modelListStr) : [];
+
+    // 记忆设置
+    const memSettingsStr = await getFromStorage('MEMORY_SETTINGS');
+    backupData.memorySettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
+
+    // 分组
+    const groupsStr = await getFromStorage('CONTACT_GROUPS');
+    backupData.contactGroups = groupsStr ? (typeof groupsStr === 'string' ? JSON.parse(groupsStr) : groupsStr) : ['默认'];
+
+    // 朋友圈
+    try {
+      const momentsData = await IndexedDBManager.getData('MOMENTS');
+      backupData.moments = momentsData || moments;
+    } catch(e) {
+      backupData.moments = moments;
+    }
 
     // 世界书
     backupData.worldBookEntries = worldBookEntries;
@@ -5301,9 +5901,28 @@ async function exportBackup(mode = 'full') {
       if (val) backupData.memoTags[`MEMO_TAG_${idx}`] = val;
     }
 
-    // 主题颜色
-    const themeColors = await getFromStorage('THEME_COLORS');
-    if (themeColors) backupData.themeColors = typeof themeColors === 'string' ? JSON.parse(themeColors) : themeColors;
+      // 主题颜色
+      const themeColors = await getFromStorage('THEME_COLORS');
+      if (themeColors) backupData.themeColors = typeof themeColors === 'string' ? JSON.parse(themeColors) : themeColors;
+
+      // 气泡设置
+      const bubbleSettings = await getFromStorage('BUBBLE_SETTINGS');
+      if (bubbleSettings) backupData.bubbleSettings = typeof bubbleSettings === 'string' ? JSON.parse(bubbleSettings) : bubbleSettings;
+
+      // 气泡装饰设置
+      const bubbleDecSettings = await getFromStorage('BUBBLE_DEC_SETTINGS');
+      if (bubbleDecSettings) backupData.bubbleDecSettings = typeof bubbleDecSettings === 'string' ? JSON.parse(bubbleDecSettings) : bubbleDecSettings;
+
+      // 气泡装饰图片
+      backupData.bubbleDecImages = {};
+      for (const side of ['LEFT', 'RIGHT']) {
+        const img = await getFromStorage(`BUBBLE_DEC_IMG_${side}`);
+        if (img) backupData.bubbleDecImages[side] = img;
+      }
+
+      // 文字美化设置
+      const textSettings = await getFromStorage('TEXT_BEAUTIFY_SETTINGS');
+      if (textSettings) backupData.textSettings = typeof textSettings === 'string' ? JSON.parse(textSettings) : textSettings;
 
     // 播放器副标题
     const playerSub = await getFromStorage('PLAYER_SUB');
@@ -5412,6 +6031,47 @@ function importBackup(input) {
       await saveToStorage('AI_CHAT_CONFIG', JSON.stringify(apiConfig));
     } catch(e) { console.error('解析API配置失败:', e); }
   }
+
+  // 恢复API预设
+  if (backupData.apiPresets) {
+    try {
+      const apiPresets = typeof backupData.apiPresets === 'string' ? JSON.parse(backupData.apiPresets) : backupData.apiPresets;
+      await saveToStorage('AI_API_PRESETS', JSON.stringify(apiPresets));
+    } catch(e) { console.error('解析API预设失败:', e); }
+  }
+
+  // 恢复模型列表
+  if (backupData.aiModelList) {
+    try {
+      const aiModelList = typeof backupData.aiModelList === 'string' ? JSON.parse(backupData.aiModelList) : backupData.aiModelList;
+      await saveToStorage('AI_MODEL_LIST', JSON.stringify(aiModelList));
+    } catch(e) { console.error('解析模型列表失败:', e); }
+  }
+
+  // 恢复记忆设置
+  if (backupData.memorySettings) {
+    try {
+      const memorySettings = typeof backupData.memorySettings === 'string' ? JSON.parse(backupData.memorySettings) : backupData.memorySettings;
+      await saveToStorage('MEMORY_SETTINGS', JSON.stringify(memorySettings));
+    } catch(e) { console.error('解析记忆设置失败:', e); }
+  }
+
+  // 恢复分组
+  if (backupData.contactGroups) {
+    try {
+      const contactGroups = typeof backupData.contactGroups === 'string' ? JSON.parse(backupData.contactGroups) : backupData.contactGroups;
+      await saveToStorage('CONTACT_GROUPS', JSON.stringify(contactGroups));
+    } catch(e) { console.error('解析分组失败:', e); }
+  }
+
+  // 恢复朋友圈
+  if (backupData.moments) {
+    try {
+      const momentsData = typeof backupData.moments === 'string' ? JSON.parse(backupData.moments) : backupData.moments;
+      await IndexedDBManager.saveData('MOMENTS', momentsData);
+      try { localStorage.setItem('MOMENTS', JSON.stringify(momentsData)); } catch(e) {}
+    } catch(e) { console.error('解析朋友圈失败:', e); }
+  }
       
       // 恢复用户头像
       if (backupData.userAvatar) {
@@ -5466,6 +6126,16 @@ function importBackup(input) {
       } catch(e) { console.error(`解析情侣相册失败 ${contactId}:`, e); }
     }
   }
+
+  // 恢复短期记忆(STM)
+  if (backupData.stmData) {
+    for (const contactId of Object.keys(backupData.stmData)) {
+      try {
+        const stm = typeof backupData.stmData[contactId] === 'string' ? JSON.parse(backupData.stmData[contactId]) : backupData.stmData[contactId];
+        await saveToStorage(`STM_${contactId}`, JSON.stringify(stm));
+      } catch(e) { console.error(`解析STM失败 ${contactId}:`, e); }
+    }
+  }
       
       // 恢复底部图标
       if (backupData.dockIcons) {
@@ -5498,6 +6168,14 @@ function importBackup(input) {
       const theme = typeof backupData.themeColors === 'string' ? JSON.parse(backupData.themeColors) : backupData.themeColors;
       await saveToStorage('THEME_COLORS', JSON.stringify(theme));
     } catch(e) { console.error('解析主题颜色失败:', e); }
+  }
+  
+  // 恢复文字美化设置
+  if (backupData.textSettings) {
+    try {
+      const textSettings = typeof backupData.textSettings === 'string' ? JSON.parse(backupData.textSettings) : backupData.textSettings;
+      await saveToStorage('TEXT_BEAUTIFY_SETTINGS', JSON.stringify(textSettings));
+    } catch(e) { console.error('解析文字美化设置失败:', e); }
   }
       
       // 恢复播放器副标题
@@ -5624,6 +6302,258 @@ async function loadSavedTheme() {
       console.error('解析主题颜色失败:', e);
     }
   }
+}
+
+// ========== 文字美化功能 ==========
+function clearTextBeautifyColor(id) {
+  const el = document.getElementById(id);
+  el.dataset.cleared = 'true';
+  applyTextBeautify();
+}
+
+function toggleTextFormat(btn, prop) {
+  btn.classList.toggle('active');
+  btn.dataset.val = btn.classList.contains('active') ? (prop === 'weight' ? 'bold' : 'italic') : 'inherit';
+  applyTextBeautify();
+}
+
+function applyTextBeautify() {
+  const types = ['normal', 'brace', 'quote'];
+  const props = ['color', 'bg', 'weight', 'style'];
+  
+  types.forEach(type => {
+    props.forEach(prop => {
+      const id = `tb-${type}-${prop}`;
+      const el = document.getElementById(id);
+      if (el) {
+        let val;
+        if (prop === 'color' || prop === 'bg') {
+          val = el.dataset.cleared === 'true' ? (prop === 'bg' ? 'transparent' : 'inherit') : el.value;
+        } else {
+          val = el.dataset.val || 'inherit';
+        }
+        const cssVar = `--text-${type}-${prop}`;
+        document.documentElement.style.setProperty(cssVar, val);
+      }
+    });
+  });
+}
+
+async function saveTextBeautifySettings() {
+  const settings = {};
+  const types = ['normal', 'brace', 'quote'];
+  const props = ['color', 'bg', 'weight', 'style'];
+  
+  types.forEach(type => {
+    settings[type] = {};
+    props.forEach(prop => {
+      const id = `tb-${type}-${prop}`;
+      const el = document.getElementById(id);
+      if (el) {
+        if (prop === 'color' || prop === 'bg') {
+          if (el.dataset.cleared === 'true') {
+            settings[type][prop] = prop === 'bg' ? 'transparent' : 'inherit';
+          } else {
+            settings[type][prop] = el.value;
+          }
+        } else {
+          settings[type][prop] = el.dataset.val || 'inherit';
+        }
+      }
+    });
+  });
+  
+  await saveToStorage('TEXT_BEAUTIFY_SETTINGS', JSON.stringify(settings));
+  showToast('✅ 叙事美化设置已保存！');
+}
+
+async function loadTextBeautifySettings() {
+  const saved = await getFromStorage('TEXT_BEAUTIFY_SETTINGS');
+  if (saved) {
+    try {
+      const settings = typeof saved === 'string' ? JSON.parse(saved) : saved;
+      const types = ['normal', 'brace', 'quote'];
+      const props = ['color', 'bg', 'weight', 'style'];
+      
+      types.forEach(type => {
+        let typeData = settings[type];
+        if (type === 'quote' && !typeData && settings['quote-cn']) {
+            typeData = settings['quote-cn'];
+        }
+        
+        if (typeData) {
+          props.forEach(prop => {
+            const val = typeData[prop];
+            const id = `tb-${type}-${prop}`;
+            const el = document.getElementById(id);
+            const cssVar = `--text-${type}-${prop}`;
+            
+            if (val && val !== 'inherit' && val !== 'normal') {
+              if (el) {
+                if (prop === 'color' || prop === 'bg') {
+                  if (val === 'transparent') {
+                      el.dataset.cleared = 'true';
+                      el.value = '#ffffff';
+                  } else {
+                      el.value = val;
+                      delete el.dataset.cleared;
+                  }
+                } else {
+                  el.dataset.val = val;
+                  if (val === 'bold' || val === 'italic') {
+                    el.classList.add('active');
+                  }
+                }
+              }
+              document.documentElement.style.setProperty(cssVar, val);
+            } else if (val === 'inherit' || val === 'normal') {
+              if (el) {
+                if (prop === 'color' || prop === 'bg') {
+                  el.dataset.cleared = 'true';
+                  el.value = prop === 'bg' ? '#ffffff' : '#000000';
+                } else {
+                  el.dataset.val = 'inherit';
+                  el.classList.remove('active');
+                }
+              }
+              document.documentElement.style.setProperty(cssVar, prop === 'bg' ? 'transparent' : 'inherit');
+            }
+          });
+        }
+      });
+    } catch(e) {
+      console.error('加载叙事美化设置失败:', e);
+    }
+  }
+}
+
+// ========== 气泡调色盘功能 ==========
+function applyBubbleSettings() {
+  const leftColor = document.getElementById('leftBubbleColor').value;
+  const rightColor = document.getElementById('rightBubbleColor').value;
+  const opacity = document.getElementById('bubbleOpacity').value;
+  const radius = document.getElementById('bubbleRadius').value;
+  
+  document.getElementById('bubbleOpacityValue').innerText = opacity;
+  document.getElementById('bubbleRadiusValue').innerText = radius;
+  
+  document.documentElement.style.setProperty('--left-bubble-bg', hexToRgb(leftColor));
+  document.documentElement.style.setProperty('--right-bubble-bg', hexToRgb(rightColor));
+  document.documentElement.style.setProperty('--bubble-opacity', opacity);
+  document.documentElement.style.setProperty('--bubble-radius', radius + 'px');
+  
+  const bubbleSettings = { leftColor, rightColor, opacity, radius };
+  saveToStorage('BUBBLE_SETTINGS', JSON.stringify(bubbleSettings));
+}
+
+async function loadBubbleSettings() {
+  const saved = await getFromStorage('BUBBLE_SETTINGS');
+  if (saved) {
+    try {
+      const { leftColor, rightColor, opacity, radius } = typeof saved === 'string' ? JSON.parse(saved) : saved;
+      if (leftColor) document.getElementById('leftBubbleColor').value = leftColor;
+      if (rightColor) document.getElementById('rightBubbleColor').value = rightColor;
+      if (opacity !== undefined) document.getElementById('bubbleOpacity').value = opacity;
+      if (radius !== undefined) document.getElementById('bubbleRadius').value = radius;
+      
+      if (opacity !== undefined) document.getElementById('bubbleOpacityValue').innerText = opacity;
+      if (radius !== undefined) document.getElementById('bubbleRadiusValue').innerText = radius;
+      
+      if (leftColor) document.documentElement.style.setProperty('--left-bubble-bg', hexToRgb(leftColor));
+      if (rightColor) document.documentElement.style.setProperty('--right-bubble-bg', hexToRgb(rightColor));
+      if (opacity !== undefined) document.documentElement.style.setProperty('--bubble-opacity', opacity);
+      if (radius !== undefined) document.documentElement.style.setProperty('--bubble-radius', radius + 'px');
+    } catch(e) {}
+  }
+}
+
+// ========== 气泡装饰功能 ==========
+function uploadBubbleDec(input, side) {
+  const file = input.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxSize = 200;
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = h * maxSize / w; w = maxSize; }
+        else { w = w * maxSize / h; h = maxSize; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/png');
+      
+      document.getElementById(`${side}DecPreview`).style.backgroundImage = `url(${compressed})`;
+      document.documentElement.style.setProperty(`--${side}-dec-img`, `url(${compressed})`);
+      
+      safeSaveAsync(`BUBBLE_DEC_IMG_${side.toUpperCase()}`, compressed);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function clearBubbleDec(side) {
+  document.getElementById(`${side}DecPreview`).style.backgroundImage = 'none';
+  document.documentElement.style.setProperty(`--${side}-dec-img`, 'none');
+  window.storage.removeItem(`BUBBLE_DEC_IMG_${side.toUpperCase()}`);
+}
+
+function applyBubbleDecSettings() {
+  const settings = ['left', 'right'].map(side => {
+    const size = document.getElementById(`${side}DecSize`).value;
+    const y = document.getElementById(`${side}DecY`).value;
+    const x = document.getElementById(`${side}DecX`).value;
+    
+    document.getElementById(`${side}DecSizeValue`).innerText = size;
+    document.getElementById(`${side}DecYValue`).innerText = y;
+    document.getElementById(`${side}DecXValue`).innerText = x;
+    
+    document.documentElement.style.setProperty(`--${side}-dec-size`, size + 'px');
+    document.documentElement.style.setProperty(`--${side}-dec-top`, y + 'px');
+    if (side === 'left') {
+      document.documentElement.style.setProperty(`--${side}-dec-left`, x + 'px');
+    } else {
+      document.documentElement.style.setProperty(`--${side}-dec-right`, x + 'px');
+    }
+    
+    return { size, y, x };
+  });
+  
+  saveToStorage('BUBBLE_DEC_SETTINGS', JSON.stringify({ left: settings[0], right: settings[1] }));
+}
+
+async function loadBubbleDecSettings() {
+  const saved = await getFromStorage('BUBBLE_DEC_SETTINGS');
+  if (saved) {
+    try {
+      const data = typeof saved === 'string' ? JSON.parse(saved) : saved;
+      ['left', 'right'].forEach(side => {
+        if (data[side]) {
+          const { size, y, x } = data[side];
+          if (size) { document.getElementById(`${side}DecSize`).value = size; document.getElementById(`${side}DecSizeValue`).innerText = size; document.documentElement.style.setProperty(`--${side}-dec-size`, size + 'px'); }
+          if (y) { document.getElementById(`${side}DecY`).value = y; document.getElementById(`${side}DecYValue`).innerText = y; document.documentElement.style.setProperty(`--${side}-dec-top`, y + 'px'); }
+          if (x) { document.getElementById(`${side}DecX`).value = x; document.getElementById(`${side}DecXValue`).innerText = x; 
+            if (side === 'left') document.documentElement.style.setProperty(`--${side}-dec-left`, x + 'px');
+            else document.documentElement.style.setProperty(`--${side}-dec-right`, x + 'px');
+          }
+        }
+      });
+    } catch(e) {}
+  }
+  
+  ['left', 'right'].forEach(async side => {
+    const img = await getFromStorage(`BUBBLE_DEC_IMG_${side.toUpperCase()}`);
+    if (img) {
+      document.getElementById(`${side}DecPreview`).style.backgroundImage = `url(${img})`;
+      document.documentElement.style.setProperty(`--${side}-dec-img`, `url(${img})`);
+    }
+  });
 }
 
 // ========== 昵称/签名同步功能 ==========
@@ -5765,6 +6695,9 @@ window.onload = async () => {
   restoreDockIconsOnLoad();
   await loadSavedTheme();
   await loadThemeSettings();
+  await loadBubbleSettings();
+  await loadBubbleDecSettings();
+  await loadTextBeautifySettings();
   loadMemorySettings();
   loadMomentsCover();
   
@@ -5831,7 +6764,8 @@ window.onload = async () => {
   renderContactList();
   renderWorldBookList();
   
-  document.getElementById('dynamic-island').classList.remove('hidden');
+  document.getElementById('dynamic-island').classList.add('hidden');
+  setTimeout(updateMePageTextColor, 100);
   
   // 事件委托：双击气泡触发编辑 (兼容 iOS Safari、Android Chrome、桌面端)
   // iOS Safari 核心问题：
@@ -6626,21 +7560,29 @@ async function generateAIComments(moment, cfg) {
   
   for (let i = 0; i < commentCount; i++) {
     try {
-      const commentPrompt = `你现在是朋友圈里的NPC。请阅读以下朋友圈并发表一条评论。
+      const existingComments = moment.comments && moment.comments.length > 0 
+        ? moment.comments.map(c => c.content).join(' | ') 
+        : '无';
+
+      const commentPrompt = `你现在是朋友圈里的真实微信好友。请阅读以下朋友圈并发表一条评论。
 【发帖人】${moment.contactName}
 【朋友圈内容】"${moment.content}"
 【发帖人人设参考】
 ${moment.contactPersona}
+【已有评论】${existingComments}
 
 【任务要求】
-1. 确定你的身份：如果是发帖人人设中提到的角色（如好友、死党、亲戚等）请直接使用；如果没有提到，请随机生成一个符合发帖人设定的有趣身份（如：毒舌学长、楼下保安、路过的社恐等）。
-2. **严格扮演你选择的身份**，语气必须完全符合该身份的特点。
-3. 发表评论：内容要诙谐幽默，活人感强，绝对不要像AI机器人。可以使用表情包、网络梗、调侃吐槽。
+1. 你的微信昵称：请生成一个极其普通的真实微信昵称（如：真实姓名、英文名、Momo、A-工作相关、或者普通网名如"星空"、"小李"等）。绝对不要用"毒舌学长"、"路过的社恐"这种描述性标签！
+2. 评论内容：极具生活气息，像真人随手打的字。可以简短、敷衍、调侃、发问或共鸣。绝对不要像AI机器人，不要长篇大论。
+3. 多样性：必须与【已有评论】完全不同！不要重复相似的句式或观点。
 4. 长度：15字以内。
-5. 内容不得与已有评论重复。
 
-请严格按此格式返回：身份:评论内容
-例如：毒舌学长:哟，又在凡尔赛呢？`;
+请严格按此格式返回：微信昵称:评论内容
+例如：
+Momo:这也太绝了吧
+张伟:下次带我一个
+A-李总:工作做完了吗就在这发朋友圈
+快乐小狗:哈哈哈哈哈哈笑死我了`;
       
       const res = await fetch(`${cfg.url}/chat/completions`, {
         method: 'POST',
@@ -6780,6 +7722,14 @@ function renderMoments() {
     
     const timeStr = formatTime(moment.time);
     
+    let ringClass = '';
+    if (moment.contactId !== 'user_self') {
+      const c = contacts.find(x => x.id === moment.contactId);
+      if (c && c.isMarried) {
+        ringClass = ' ring-avatar-frame';
+      }
+    }
+
     let commentsHtml = '';
     if (moment.comments && moment.comments.length > 0) {
       commentsHtml = '<div class="moment-comments">';
@@ -6799,7 +7749,7 @@ function renderMoments() {
 
     div.innerHTML = `
       <div class="moment-header">
-        <div class="moment-avatar"><img src="${moment.contactAvatar}"></div>
+        <div class="moment-avatar${ringClass}"><img src="${moment.contactAvatar}"></div>
         <div style="flex:1;">
           <div class="moment-name">${moment.contactName}${visibilityTag}</div>
           <div class="moment-time">${timeStr}</div>
@@ -7239,11 +8189,14 @@ async function memorySummary() {
     // 检查是否超过上限，超过则删除最早的记忆总结
     const memorySummaries = worldBookEntries.filter(e => e.category === '记忆总结' && e.name.includes(c.name));
     if (memorySummaries.length >= ltmMaxEntries) {
-      // 删除最早的记忆总结
-      const oldest = memorySummaries[0];
-      const oldIdx = worldBookEntries.findIndex(e => e.id === oldest.id);
-      if (oldIdx > -1) worldBookEntries.splice(oldIdx, 1);
-    }
+        // 删除最早的记忆总结
+        const oldest = memorySummaries[0];
+        const oldIdx = worldBookEntries.findIndex(e => e.id === oldest.id);
+        if (oldIdx > -1) {
+            worldBookEntries.splice(oldIdx, 1);
+            await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+        }
+      }
     
     // 添加新的世界书条目
     worldBookEntries.push({
@@ -7608,9 +8561,18 @@ async function exportThemeSettings() {
   showToast('⏳ 正在打包美化数据...');
   const data = { _type: 'oho_theme_backup', exportTime: new Date().toISOString() };
 
-  // 1. 主题颜色
+  // 1. 主题颜色与气泡设置
   const themeColors = await getFromStorage('THEME_COLORS');
   if (themeColors) data.themeColors = typeof themeColors === 'string' ? JSON.parse(themeColors) : themeColors;
+  const bubbleSettings = await getFromStorage('BUBBLE_SETTINGS');
+  if (bubbleSettings) data.bubbleSettings = typeof bubbleSettings === 'string' ? JSON.parse(bubbleSettings) : bubbleSettings;
+  const bubbleDecSettings = await getFromStorage('BUBBLE_DEC_SETTINGS');
+  if (bubbleDecSettings) data.bubbleDecSettings = typeof bubbleDecSettings === 'string' ? JSON.parse(bubbleDecSettings) : bubbleDecSettings;
+  data.bubbleDecImages = {};
+  for (const side of ['LEFT', 'RIGHT']) {
+    const img = await getFromStorage(`BUBBLE_DEC_IMG_${side}`);
+    if (img) data.bubbleDecImages[side] = img;
+  }
 
   // 2. 昵称 & 签名
   data.userNickname = await getFromStorage('USER_NICKNAME') || document.getElementById('user-nickname')?.innerText || '';
@@ -7659,11 +8621,24 @@ function importThemeSettings(input) {
       const data = JSON.parse(e.target.result);
       if (data._type !== 'oho_theme_backup') { showToast('❌ 不是有效的美化备份文件！'); input.value = ''; return; }
 
-      // 1. 主题颜色
+      // 1. 主题颜色与气泡设置
       if (data.themeColors) {
         const { main, light, bg } = data.themeColors;
         applyThemeColor(main, light, bg);
       }
+      if (data.bubbleSettings) {
+        await saveToStorage('BUBBLE_SETTINGS', JSON.stringify(data.bubbleSettings));
+        await loadBubbleSettings();
+      }
+      if (data.bubbleDecSettings) {
+        await saveToStorage('BUBBLE_DEC_SETTINGS', JSON.stringify(data.bubbleDecSettings));
+      }
+      if (data.bubbleDecImages) {
+        for (const side of Object.keys(data.bubbleDecImages)) {
+          await saveToStorage(`BUBBLE_DEC_IMG_${side}`, data.bubbleDecImages[side]);
+        }
+      }
+      await loadBubbleDecSettings();
 
       // 2. 昵称 & 签名
       if (data.userNickname) {
