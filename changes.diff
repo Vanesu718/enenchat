@@ -1,5 +1,5 @@
 diff --git a/index.html b/index.html
-index d95fe71..5569675 100644
+index d95fe71..bb496cc 100644
 --- a/index.html
 +++ b/index.html
 @@ -6,12 +6,12 @@
@@ -575,7 +575,23 @@ index d95fe71..5569675 100644
            <div class="attach-panel" id="attachPanel">
              <div class="attach-grid">
                <div class="attach-item" onclick="selectFile('image')"><div class="attach-icon">🖼️</div><span>图片</span></div>
-@@ -1649,10 +2011,52 @@ body {
+@@ -1560,6 +1922,15 @@ body {
+           </div>
+         </div>
+ 
++        <!-- 用户面具选择 -->
++        <div class="setting-section">
++          <div class="setting-section-title">用户面具选择</div>
++          <div class="setting-desc">快速应用已保存的用户面具，自动替换头像、昵称和人设。</div>
++          <select class="form-select" id="chatUserMaskSelect" onchange="applySelectedUserMask()" style="margin-top:10px;">
++            <option value="">--选择用户面具--</option>
++          </select>
++        </div>
++
+         <!-- 我的聊天昵称 -->
+         <div class="setting-section">
+           <div class="setting-section-title">我的聊天昵称</div>
+@@ -1649,10 +2020,52 @@ body {
        </div>
        <div class="page-body">
          <div class="menu-item" onclick="openCoupleAlbum()">💑 情侣相册</div>
@@ -628,7 +644,7 @@ index d95fe71..5569675 100644
      <!-- 情侣相册页面 -->
      <div class="sub-page" id="couple-album-page">
        <div class="page-header">
-@@ -1865,21 +2269,6 @@ function setVh() {
+@@ -1865,21 +2278,6 @@ function setVh() {
    document.documentElement.style.setProperty('--vh', `${vh}px`);
  }
  
@@ -650,7 +666,7 @@ index d95fe71..5569675 100644
  setVh();
  window.addEventListener('resize', setVh);
  window.addEventListener('orientationchange', setVh);
-@@ -1896,8 +2285,11 @@ document.addEventListener('focusin', function(e) {
+@@ -1896,8 +2294,11 @@ document.addEventListener('focusin', function(e) {
    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
      setTimeout(() => {
        document.body.scrollTop = document.body.scrollTop;
@@ -664,7 +680,7 @@ index d95fe71..5569675 100644
      }, 300); // 稍微增加延迟，等待键盘完全弹出
    }
  });
-@@ -2402,6 +2794,8 @@ let contactGroups = ['默认'];
+@@ -2402,6 +2803,8 @@ let contactGroups = ['默认'];
  let currentContactId = '';
  let worldBook = '';
  let worldBookEntries = [];
@@ -673,7 +689,7 @@ index d95fe71..5569675 100644
  let userAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><circle cx='18' cy='18' r='17' fill='%23f0b8c8'/><text x='18' y='22' text-anchor='middle' font-size='12' fill='white'>我</text></svg>";
  let replyMsg = null;
  let isBatchDeleteMode = false;
-@@ -2417,7 +2811,7 @@ let chatSettings = {
+@@ -2417,7 +2820,7 @@ let chatSettings = {
      useWorldBook: true
  };
  let isOfflineMode = false;
@@ -682,7 +698,7 @@ index d95fe71..5569675 100644
  
  // 异步加载全局变量
  async function loadGlobalData() {
-@@ -2442,6 +2836,12 @@ async function loadGlobalData() {
+@@ -2442,6 +2845,12 @@ async function loadGlobalData() {
        worldBookEntries = rawWbEntries ? (typeof rawWbEntries === 'string' ? JSON.parse(rawWbEntries) : rawWbEntries) : [];
        if (!Array.isArray(worldBookEntries)) worldBookEntries = [];
      } catch(e) { console.error('解析世界书失败:', e); worldBookEntries = []; }
@@ -695,7 +711,7 @@ index d95fe71..5569675 100644
      
      const rawAvatar = await getFromStorage('USER_AVATAR');
      if (rawAvatar) userAvatar = rawAvatar;
-@@ -2456,14 +2856,7 @@ async function loadGlobalData() {
+@@ -2456,14 +2865,7 @@ async function loadGlobalData() {
  function navTo(id, el) {
      // 关闭所有sub-page
      document.querySelectorAll('.sub-page').forEach(p => {
@@ -711,7 +727,7 @@ index d95fe71..5569675 100644
      });
      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
      document.getElementById(id).classList.add('active');
-@@ -2481,12 +2874,29 @@ function navTo(id, el) {
+@@ -2481,12 +2883,29 @@ function navTo(id, el) {
      if (id === 'page-me') {
          setTimeout(updateMePageTextColor, 100);
      }
@@ -741,7 +757,7 @@ index d95fe71..5569675 100644
      // 如果打开的是添加世界书页面，重置一下表单状态
      if (id === 'add-worldbook' && !window._isEditingWb) {
          const nameEl = document.getElementById('worldbook-name');
-@@ -2508,12 +2918,6 @@ function openSub(id) {
+@@ -2508,12 +2927,6 @@ function openSub(id) {
          subPageZIndex++;
          el.style.zIndex = subPageZIndex;
          el.classList.add('show'); 
@@ -754,7 +770,7 @@ index d95fe71..5569675 100644
          el.style.visibility = 'visible';
          if(id === 'chat-win') {
              document.querySelector('.dock').style.display = 'none';
-@@ -2531,9 +2935,6 @@ function closeSub(id) {
+@@ -2531,9 +2944,6 @@ function closeSub(id) {
      el.classList.remove('show');
      // 重置所有可能的定位样式
      el.style.visibility = '';
@@ -764,7 +780,7 @@ index d95fe71..5569675 100644
      if(id === 'chat-win') {
          document.querySelector('.dock').style.display = 'flex';
          if (document.getElementById('page-chat').classList.contains('active')) {
-@@ -2589,11 +2990,8 @@ async function cleanupOldDataAsync() {
+@@ -2589,11 +2999,8 @@ async function cleanupOldDataAsync() {
              await saveMomentsToDB();
          }
          
@@ -778,7 +794,7 @@ index d95fe71..5569675 100644
          
          showToast('🧹 已自动清理旧数据');
          return true;
-@@ -2888,8 +3286,9 @@ function renderContactList() {
+@@ -2888,8 +3295,9 @@ function renderContactList() {
        }
        const div = document.createElement('div');
        div.className = 'contact-item';
@@ -789,7 +805,7 @@ index d95fe71..5569675 100644
          <div class="contact-info" style="flex:1; overflow:hidden;">
            <div class="contact-name">${c.name}</div>
            <div class="contact-desc" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${lastMsg}</div>
-@@ -3123,7 +3522,8 @@ async function openChatPage(contact) {
+@@ -3123,7 +3531,8 @@ async function openChatPage(contact) {
    currentContactId = contact.id;
    // 立即更新标题，提升响应感
    document.getElementById('chatHeaderTitle').innerText = contact.name;
@@ -799,7 +815,7 @@ index d95fe71..5569675 100644
    
    // 清空旧内容，防止切换瞬间看到别人的消息
    document.getElementById('chatContent').innerHTML = '';
-@@ -3142,6 +3542,14 @@ async function openChatPage(contact) {
+@@ -3142,6 +3551,14 @@ async function openChatPage(contact) {
    await loadChatSettings();
    renderChat();
    
@@ -814,7 +830,7 @@ index d95fe71..5569675 100644
    // ✅ 每个联系人独立加载线上/线下模式
    const rawContactOffline = await getFromStorage(`isOfflineMode_${contact.id}`);
    if (rawContactOffline !== null) {
-@@ -3225,6 +3633,22 @@ function applyHideAvatarSetting() {
+@@ -3225,6 +3642,22 @@ function applyHideAvatarSetting() {
    }
  }
  
@@ -837,7 +853,7 @@ index d95fe71..5569675 100644
  function addMsgToUI(content, side, avatar, quote, idx, type) {
    const el = document.getElementById('chatContent');
    const div = document.createElement('div');
-@@ -3235,8 +3659,16 @@ function addMsgToUI(content, side, avatar, quote, idx, type) {
+@@ -3235,8 +3668,16 @@ function addMsgToUI(content, side, avatar, quote, idx, type) {
    // 用于回复菜单的文本（图片显示占位符）
    const replyText = (type === 'image' ? '[图片]' : content).replace(/'/g, "\\'").replace(/\n/g, "<br>");
  
@@ -855,7 +871,7 @@ index d95fe71..5569675 100644
  
    const bubble = document.createElement('div');
    bubble.className = 'msg-bubble';
-@@ -3252,8 +3684,9 @@ function addMsgToUI(content, side, avatar, quote, idx, type) {
+@@ -3252,8 +3693,9 @@ function addMsgToUI(content, side, avatar, quote, idx, type) {
      imgEl.onclick = (e) => { e.stopPropagation(); viewFullImage(content); };
      bubble.appendChild(imgEl);
    } else {
@@ -867,7 +883,7 @@ index d95fe71..5569675 100644
    }
  
    div.innerHTML = `
-@@ -3324,6 +3757,7 @@ async function sendMsg() {
+@@ -3324,6 +3766,7 @@ async function sendMsg() {
    chatRecords[currentContactId].push({ side: 'right', content: t, quote: q, time: Date.now() });
    await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
    ipt.value = '';
@@ -875,7 +891,7 @@ index d95fe71..5569675 100644
    cancelReply();
    renderContactList();
  }
-@@ -3414,6 +3848,7 @@ ${contact.persona}
+@@ -3414,6 +3857,7 @@ ${contact.persona}
  
  async function triggerAIReply() {
    if (!currentContactId) { alert('请先选联系人'); return; }
@@ -883,7 +899,7 @@ index d95fe71..5569675 100644
    const c = contacts.find(x => x.id === currentContactId);
    const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
    const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
-@@ -3509,6 +3944,17 @@ async function triggerAIReply() {
+@@ -3509,6 +3953,17 @@ async function triggerAIReply() {
      systemPrompt += `【联系人面具】${chatSettings.contactMask}\n`;
    }
    
@@ -901,7 +917,7 @@ index d95fe71..5569675 100644
    // 获取当前好感度
    let currentFavor = 0;
    try {
-@@ -3552,6 +3998,16 @@ async function triggerAIReply() {
+@@ -3552,6 +4007,16 @@ async function triggerAIReply() {
  - 对话用 "双引号" 包裹，如："你好啊"
  - 动作和神态直接描写，不加任何符号，如：他笑着挠了挠头
  请自然流畅地组合这些元素，不要使用【】或其他多余符号。
@@ -918,7 +934,7 @@ index d95fe71..5569675 100644
  ${favorRules}
  ${statusRules}
  
-@@ -3610,6 +4066,7 @@ ${statusRules}
+@@ -3610,6 +4075,7 @@ ${statusRules}
  
    // 记录请求发起时的联系人ID
    const requestContactId = currentContactId;
@@ -926,7 +942,7 @@ index d95fe71..5569675 100644
  
    // 检查是否在聊天中提醒了看朋友圈
    const rawRecs = chatRecords[currentContactId] || [];
-@@ -3624,9 +4081,11 @@ ${statusRules}
+@@ -3624,9 +4090,11 @@ ${statusRules}
      }
    }
  
@@ -941,7 +957,7 @@ index d95fe71..5569675 100644
    try {
      const res = await fetch(`${cfg.url}/chat/completions`, {
        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
-@@ -3639,21 +4098,13 @@ ${statusRules}
+@@ -3639,21 +4107,13 @@ ${statusRules}
      }
      let txt = data.choices?.[0]?.message?.content || '回复失败';
      
@@ -968,7 +984,7 @@ index d95fe71..5569675 100644
      
      // 解析并提取状态信息 (增强正则兼容性)
      const statusMatch = txt.match(/<STATUS>([\s\S]*?)<\/STATUS>/i);
-@@ -3765,25 +4216,18 @@ ${statusRules}
+@@ -3765,25 +4225,18 @@ ${statusRules}
        // 检查是否需要触发短期记忆总结 (传入正确的联系人ID)
        checkAndTriggerStmForContact(requestContactId);
        
@@ -1001,7 +1017,7 @@ index d95fe71..5569675 100644
      }
  }
  
-@@ -3793,50 +4237,117 @@ async function checkAndTriggerStmForContact(contactId) {
+@@ -3793,46 +4246,113 @@ async function checkAndTriggerStmForContact(contactId) {
    const memSettingsStr = await window.storage.getItem('MEMORY_SETTINGS');
    const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
    if (!memSettings.stmAutoEnabled) return;
@@ -1090,10 +1106,6 @@ index d95fe71..5569675 100644
  }
  
 -function showLoading() {
--  const el = document.getElementById('chatContent');
--  const d = document.createElement('div');
--  d.className = 'msg-item left loading';
--  d.innerHTML = `<div class="msg-avatar"><img src="${contacts.find(x=>x.id===currentContactId)?.avatar}"></div><div class="msg-bubble">思考中...</div>`;
 +// 为指定批次的消息生成短期记忆
 +async function generateStmEntryForBatch(contactId, stm, batchRecs) {
 +  const cfgStr = await window.storage.getItem('AI_CHAT_CONFIG');
@@ -1144,14 +1156,10 @@ index d95fe71..5569675 100644
 +function hideChatRedDot() {} // 保留空函数避免报错
 +
 +function showLoading() {
-+  const el = document.getElementById('chatContent');
-+  const d = document.createElement('div');
-+  d.className = 'msg-item left loading';
-+  d.innerHTML = `<div class="msg-avatar"><img src="${contacts.find(x=>x.id===currentContactId)?.avatar}"></div><div class="msg-bubble">思考中...</div>`;
-   el.appendChild(d); 
-   el.scrollTop = el.scrollHeight;
-   
-@@ -3924,11 +4435,238 @@ function openCoupleSpace() {
+   const el = document.getElementById('chatContent');
+   const d = document.createElement('div');
+   d.className = 'msg-item left loading';
+@@ -3924,11 +4444,238 @@ function openCoupleSpace() {
    openSub('couple-space-page');
  }
  
@@ -1390,7 +1398,26 @@ index d95fe71..5569675 100644
  async function renderCoupleAlbum() {
    const container = document.getElementById('coupleAlbumGrid');
    if (!currentContactId) return;
-@@ -4145,36 +4883,37 @@ function uploadContactAvatarByUrl() {
+@@ -4057,6 +4804,18 @@ async function viewFullPhoto(src, idx) {
+ 
+ // 初始化聊天设置页面
+ function initChatSettingsPage() {
++  // 填充用户面具下拉菜单
++  const maskSelect = document.getElementById('chatUserMaskSelect');
++  if (maskSelect) {
++    maskSelect.innerHTML = '<option value="">--选择用户面具--</option>';
++    userMasks.forEach(mask => {
++      const opt = document.createElement('option');
++      opt.value = mask.id;
++      opt.textContent = mask.idName;
++      maskSelect.appendChild(opt);
++    });
++  }
++
+   // 加载隐藏头像开关状态
+   const toggle = document.getElementById('hide-avatar-toggle');
+   if (chatSettings.hideAvatar) {
+@@ -4145,36 +4904,37 @@ function uploadContactAvatarByUrl() {
    }
  }
  
@@ -1457,7 +1484,37 @@ index d95fe71..5569675 100644
  
  // 切换世界书选择
  function toggleWorldBookSelection(entryId) {
-@@ -4420,11 +5159,34 @@ async function confirmDeleteSelected() {
+@@ -4251,6 +5011,29 @@ function applyChatBackground() {
+   }
+ }
+ 
++// 应用选择的用户面具
++function applySelectedUserMask() {
++  const select = document.getElementById('chatUserMaskSelect');
++  const maskId = select.value;
++  if (!maskId) return;
++  
++  const mask = userMasks.find(m => m.id === maskId);
++  if (!mask) return;
++  
++  if (mask.avatar) {
++    chatSettings.chatUserAvatar = mask.avatar;
++    document.getElementById('chatUserAvatarPreview').innerHTML = `<img src="${mask.avatar}">`;
++  } else {
++    chatSettings.chatUserAvatar = '';
++    document.getElementById('chatUserAvatarPreview').innerHTML = `<img src="${userAvatar}">`;
++  }
++  
++  document.getElementById('chatNicknameInput').value = mask.idName || '';
++  document.getElementById('userMaskTextarea').value = mask.persona || '';
++  
++  showToast('✅ 已应用用户面具，请点击底部保存');
++}
++
+ // 预览聊天用户头像文件
+ function previewChatUserAvatarFile(input) {
+   const file = input.files?.[0];
+@@ -4420,11 +5203,34 @@ async function confirmDeleteSelected() {
  }
  async function clearChatRecord() {
    toggleChatMenu();
@@ -1493,7 +1550,7 @@ index d95fe71..5569675 100644
  }
  
  let apiPresets = [];
-@@ -4626,6 +5388,119 @@ async function pullModels() {
+@@ -4626,6 +5432,119 @@ async function pullModels() {
    }
  }
  
@@ -1613,7 +1670,7 @@ index d95fe71..5569675 100644
  // ========== 世界书条目管理功能 ==========
  let currentWbFilter = 'all';
  
-@@ -4698,27 +5573,53 @@ function toggleWbKeywordInput() {
+@@ -4698,27 +5617,53 @@ function toggleWbKeywordInput() {
    }
  }
  
@@ -1688,7 +1745,7 @@ index d95fe71..5569675 100644
    
    // 清空表单
    document.getElementById('worldbook-name').value = '';
-@@ -4864,7 +5765,6 @@ function applyMeTextColor(isDark) {
+@@ -4864,7 +5809,6 @@ function applyMeTextColor(isDark) {
    if (timeEl) timeEl.style.color = textColor;
    
    // 昵称
@@ -1696,7 +1753,7 @@ index d95fe71..5569675 100644
    if (nicknameEl) nicknameEl.style.color = textColor;
    
    // 签名
-@@ -5122,9 +6022,13 @@ function syncBgToAllPages(dataOrUrl) {
+@@ -5122,9 +6066,13 @@ function syncBgToAllPages(dataOrUrl) {
          page.style.backgroundSize = 'cover';
          page.style.backgroundPosition = 'center';
          page.style.backgroundRepeat = 'no-repeat';
@@ -1711,7 +1768,7 @@ index d95fe71..5569675 100644
        }
      }
    });
-@@ -5261,12 +6165,45 @@ async function exportBackup(mode = 'full') {
+@@ -5261,12 +6209,45 @@ async function exportBackup(mode = 'full') {
      }
    }
  
@@ -1757,7 +1814,7 @@ index d95fe71..5569675 100644
      // 世界书
      backupData.worldBookEntries = worldBookEntries;
      backupData.worldBook = worldBook;
-@@ -5301,9 +6238,28 @@ async function exportBackup(mode = 'full') {
+@@ -5301,9 +6282,28 @@ async function exportBackup(mode = 'full') {
        if (val) backupData.memoTags[`MEMO_TAG_${idx}`] = val;
      }
  
@@ -1789,7 +1846,7 @@ index d95fe71..5569675 100644
  
      // 播放器副标题
      const playerSub = await getFromStorage('PLAYER_SUB');
-@@ -5391,90 +6347,102 @@ function importBackup(input) {
+@@ -5391,90 +6391,102 @@ function importBackup(input) {
          return;
        }
        
@@ -1956,7 +2013,7 @@ index d95fe71..5569675 100644
        if (backupData.savedImages) {
          for (const id of Object.keys(backupData.savedImages)) {
            if (id === 'moments-cover') {
-@@ -5484,27 +6452,87 @@ function importBackup(input) {
+@@ -5484,27 +6496,87 @@ function importBackup(input) {
            }
          }
        }
@@ -2053,7 +2110,7 @@ index d95fe71..5569675 100644
        alert('✅ 备份已成功导入！页面将刷新以应用更改。');
        location.reload();
      } catch (err) {
-@@ -5626,6 +6654,338 @@ async function loadSavedTheme() {
+@@ -5626,6 +6698,338 @@ async function loadSavedTheme() {
    }
  }
  
@@ -2392,7 +2449,7 @@ index d95fe71..5569675 100644
  // ========== 昵称/签名同步功能 ==========
  let saveTimer = null;
  function debouncedSave(key, value) {
-@@ -5765,6 +7125,9 @@ window.onload = async () => {
+@@ -5765,6 +7169,9 @@ window.onload = async () => {
    restoreDockIconsOnLoad();
    await loadSavedTheme();
    await loadThemeSettings();
@@ -2402,7 +2459,7 @@ index d95fe71..5569675 100644
    loadMemorySettings();
    loadMomentsCover();
    
-@@ -5821,17 +7184,29 @@ window.onload = async () => {
+@@ -5821,17 +7228,29 @@ window.onload = async () => {
      if (bgUrl && bgUrl[1]) {
        syncBgToAllPages(bgUrl[1]);
      } else {
@@ -2435,7 +2492,7 @@ index d95fe71..5569675 100644
    
    // 事件委托：双击气泡触发编辑 (兼容 iOS Safari、Android Chrome、桌面端)
    // iOS Safari 核心问题：
-@@ -6626,21 +8001,29 @@ async function generateAIComments(moment, cfg) {
+@@ -6626,21 +8045,29 @@ async function generateAIComments(moment, cfg) {
    
    for (let i = 0; i < commentCount; i++) {
      try {
@@ -2472,7 +2529,7 @@ index d95fe71..5569675 100644
        
        const res = await fetch(`${cfg.url}/chat/completions`, {
          method: 'POST',
-@@ -6780,6 +8163,14 @@ function renderMoments() {
+@@ -6780,6 +8207,14 @@ function renderMoments() {
      
      const timeStr = formatTime(moment.time);
      
@@ -2487,7 +2544,7 @@ index d95fe71..5569675 100644
      let commentsHtml = '';
      if (moment.comments && moment.comments.length > 0) {
        commentsHtml = '<div class="moment-comments">';
-@@ -6799,7 +8190,7 @@ function renderMoments() {
+@@ -6799,7 +8234,7 @@ function renderMoments() {
  
      div.innerHTML = `
        <div class="moment-header">
@@ -2496,7 +2553,7 @@ index d95fe71..5569675 100644
          <div style="flex:1;">
            <div class="moment-name">${moment.contactName}${visibilityTag}</div>
            <div class="moment-time">${timeStr}</div>
-@@ -7140,20 +8531,29 @@ async function saveMemorySettings() {
+@@ -7140,20 +8575,29 @@ async function saveMemorySettings() {
    alert('✅ 记忆设置已保存！');
  }
  
@@ -2540,7 +2597,7 @@ index d95fe71..5569675 100644
    
    // 如果用户自定义了提示词，则覆盖默认值
    if (settings.ltmPrompt && settings.ltmPrompt !== DEFAULT_LTM_PROMPT) {
-@@ -7239,11 +8639,14 @@ async function memorySummary() {
+@@ -7239,11 +8683,14 @@ async function memorySummary() {
      // 检查是否超过上限，超过则删除最早的记忆总结
      const memorySummaries = worldBookEntries.filter(e => e.category === '记忆总结' && e.name.includes(c.name));
      if (memorySummaries.length >= ltmMaxEntries) {
@@ -2560,7 +2617,7 @@ index d95fe71..5569675 100644
      
      // 添加新的世界书条目
      worldBookEntries.push({
-@@ -7312,7 +8715,12 @@ async function confirmEditMsg() {
+@@ -7312,7 +8759,12 @@ async function confirmEditMsg() {
  // 获取某联系人的STM数据 (异步)
  async function getStmData(contactId) {
    const data = await window.storage.getItem(`STM_${contactId}`);
@@ -2574,7 +2631,7 @@ index d95fe71..5569675 100644
  }
  // 保存STM数据 (异步)
  async function saveStmData(contactId, data) {
-@@ -7420,52 +8828,12 @@ async function checkAndTriggerStm() {
+@@ -7420,52 +8872,12 @@ async function checkAndTriggerStm() {
    }
  }
  
@@ -2631,7 +2688,7 @@ index d95fe71..5569675 100644
  }
  
  // STM批量删除相关变量
-@@ -7608,9 +8976,18 @@ async function exportThemeSettings() {
+@@ -7608,9 +9020,18 @@ async function exportThemeSettings() {
    showToast('⏳ 正在打包美化数据...');
    const data = { _type: 'oho_theme_backup', exportTime: new Date().toISOString() };
  
@@ -2651,7 +2708,7 @@ index d95fe71..5569675 100644
  
    // 2. 昵称 & 签名
    data.userNickname = await getFromStorage('USER_NICKNAME') || document.getElementById('user-nickname')?.innerText || '';
-@@ -7659,11 +9036,24 @@ function importThemeSettings(input) {
+@@ -7659,11 +9080,24 @@ function importThemeSettings(input) {
        const data = JSON.parse(e.target.result);
        if (data._type !== 'oho_theme_backup') { showToast('❌ 不是有效的美化备份文件！'); input.value = ''; return; }
  

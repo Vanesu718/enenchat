@@ -456,8 +456,8 @@ body {
 .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .msg-bubble { position: relative; padding: 10px 14px; border-radius: var(--bubble-radius, 18px); line-height: 1.4; font-size: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
 .chat-content { touch-action: manipulation; }
-.msg-item.left .msg-bubble { background: rgba(var(--left-bubble-bg, 255, 255, 255), var(--bubble-opacity, 0.85)); color: #333333; border-bottom-left-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.5); }
-.msg-item.right .msg-bubble { background: rgba(var(--right-bubble-bg, 240, 184, 200), var(--bubble-opacity, 0.85)); color: #fff; border-bottom-right-radius: 6px; box-shadow: 0 4px 12px rgba(var(--right-bubble-bg, 240, 184, 200), 0.2); border: 1px solid rgba(255,255,255,0.3); }
+.msg-item.left .msg-bubble { background: rgba(var(--left-bubble-bg, 255, 255, 255), var(--bubble-opacity, 0.85)); color: #333333; border-bottom-left-radius: var(--bubble-bottom-radius, 6px); box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.5); }
+.msg-item.right .msg-bubble { background: rgba(var(--right-bubble-bg, 240, 184, 200), var(--bubble-opacity, 0.85)); color: #fff; border-bottom-right-radius: var(--bubble-bottom-radius, 6px); box-shadow: 0 4px 12px rgba(var(--right-bubble-bg, 240, 184, 200), 0.2); border: 1px solid rgba(255,255,255,0.3); }
 .msg-item.left .msg-bubble::after { content: ''; position: absolute; top: var(--left-dec-top, -10px); left: var(--left-dec-left, -10px); width: var(--left-dec-size, 30px); height: var(--left-dec-size, 30px); background-image: var(--left-dec-img, none); background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 10; }
 .msg-item.right .msg-bubble::after { content: ''; position: absolute; top: var(--right-dec-top, -10px); right: var(--right-dec-right, -10px); width: var(--right-dec-size, 30px); height: var(--right-dec-size, 30px); background-image: var(--right-dec-img, none); background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 10; }
 .msg-quote { padding: 6px 10px; border-radius: 8px; font-size: 12px; margin-bottom: 6px; line-height: 1.2; background: #f8f5f0; color: #777777; }
@@ -997,12 +997,34 @@ body {
     outline: none;
   }
 </style>
+<script>
+  // 尽早恢复主题色，防止启动屏和页面颜色闪烁
+  try {
+    const savedTheme = localStorage.getItem('THEME_COLORS');
+    if (savedTheme) {
+      let themeObj = savedTheme;
+      if (typeof savedTheme === 'string' && savedTheme.startsWith('{')) {
+        themeObj = JSON.parse(savedTheme);
+      }
+      if (themeObj && themeObj.main) {
+        document.documentElement.style.setProperty('--main-pink', themeObj.main);
+        document.documentElement.style.setProperty('--light-pink', themeObj.light);
+        document.documentElement.style.setProperty('--bg-cream', themeObj.bg);
+      }
+    }
+  } catch(e) {}
+</script>
 </head>
 <body>
 
 <div class="phone-case">
   <div class="island" id="dynamic-island"></div>
   <div class="screen">
+    <!-- 启动屏遮罩 -->
+    <div id="app-splash" style="position:absolute; inset:0; background:var(--bg-cream, #fffbf9); z-index:9999999; display:flex; align-items:center; justify-content:center; transition:opacity 0.4s ease;">
+      <img src="haibaologo.png?v=2" alt="OHO Logo" style="width:100px; height:100px; object-fit:contain; border-radius:24px;">
+    </div>
+
     <div class="page" id="page-chat">
       <div class="status-bar">
         <span id="status-time">09:41</span>
@@ -1032,6 +1054,7 @@ body {
       <div class="page-body">
         <div class="menu-item" onclick="openSub('api-win')">聊天API设置</div>
         <div class="menu-item" onclick="openSub('world-win')">世界书管理</div>
+        <div class="menu-item" onclick="openSub('user-mask-setting')">用户面具设置</div>
         <div class="menu-item" onclick="openSub('userSetting')">记忆设置</div>
         <div class="menu-item" onclick="openSub('theme-setting')">美化设置</div>
         <div class="menu-item" onclick="openSub('personal-setting')">个人设置</div>
@@ -1188,6 +1211,27 @@ body {
       </div>
       <div class="page-body">
         <div class="setting-desc" style="margin-bottom:15px;">支持针对普通正文以及被 {}、“” 或 "" 包裹的文字分别设置样式。</div>
+        
+        <div class="form-section">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div class="form-label" style="font-size:14px; color:var(--main-pink); margin-bottom:0;">自定义全局字体</div>
+            <div style="display:flex; gap:8px;">
+              <button class="tb-clear-btn" style="background:var(--light-pink); color:var(--main-pink);" onclick="applyCustomFont()">应用</button>
+              <button class="tb-clear-btn" onclick="clearCustomFont()">清除</button>
+            </div>
+          </div>
+          <input class="form-input" id="customFontUrl" placeholder="输入字体文件链接 (如 .ttf, .woff)" onchange="applyCustomFont()">
+          <div class="setting-desc" style="margin-top:6px;">输入字体链接后点击应用，全局字体将替换为该字体。</div>
+        </div>
+
+        <div style="padding: 15px; background: rgba(0,0,0,0.03); border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--light-pink);">
+          <div style="font-size: 14px; line-height: 1.6;">
+            <span class="text-normal">这是一段普通正文的预览，展示最基础的文本样式。</span><br>
+            <span class="text-brace">{这是动作或心理描写的预览}</span><br>
+            <span class="text-quote">“这是对话内容的预览”</span>
+          </div>
+        </div>
+
         <div id="text-beautify-container">
           <!-- 普通正文 -->
           <div class="tb-section">
@@ -1197,15 +1241,17 @@ body {
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字颜色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-normal-color" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-normal-color" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-normal-color-hex').value=this.value; applyTextBeautify()">
                   </div>
+                  <input type="text" id="tb-normal-color-hex" value="#000000" onchange="document.getElementById('tb-normal-color').value=this.value; document.getElementById('tb-normal-color').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-normal-color')">清除</button>
                 </div>
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字底色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-normal-bg" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-normal-bg" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-normal-bg-hex').value=this.value; applyTextBeautify()">
                   </div>
+                  <input type="text" id="tb-normal-bg-hex" value="#ffffff" onchange="document.getElementById('tb-normal-bg').value=this.value; document.getElementById('tb-normal-bg').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-normal-bg')">清除</button>
                 </div>
               </div>
@@ -1224,15 +1270,17 @@ body {
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字颜色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-brace-color" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-brace-color" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-brace-color-hex').value=this.value; applyTextBeautify()">
                   </div>
+                  <input type="text" id="tb-brace-color-hex" value="#000000" onchange="document.getElementById('tb-brace-color').value=this.value; document.getElementById('tb-brace-color').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-brace-color')">清除</button>
                 </div>
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字底色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-brace-bg" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-brace-bg" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-brace-bg-hex').value=this.value; applyTextBeautify()">
                   </div>
+                  <input type="text" id="tb-brace-bg-hex" value="#ffffff" onchange="document.getElementById('tb-brace-bg').value=this.value; document.getElementById('tb-brace-bg').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-brace-bg')">清除</button>
                 </div>
               </div>
@@ -1251,15 +1299,17 @@ body {
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字颜色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-quote-color" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-quote-color" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-quote-color-hex').value=this.value; applyTextBeautify()">
                   </div>
+                  <input type="text" id="tb-quote-color-hex" value="#000000" onchange="document.getElementById('tb-quote-color').value=this.value; document.getElementById('tb-quote-color').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-quote-color')">清除</button>
                 </div>
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字底色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-quote-bg" onchange="this.removeAttribute('data-cleared'); applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-quote-bg" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-quote-bg-hex').value=this.value; applyTextBeautify()">
                   </div>
+                  <input type="text" id="tb-quote-bg-hex" value="#ffffff" onchange="document.getElementById('tb-quote-bg').value=this.value; document.getElementById('tb-quote-bg').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-quote-bg')">清除</button>
                 </div>
               </div>
@@ -1292,38 +1342,16 @@ body {
         </div>
         <div style="margin-top:10px;">
           <div class="form-label" style="margin-bottom:4px;">自定义颜色</div>
-          <input type="color" id="customThemeColor" value="#f0b8c8" onchange="applyCustomColor(this.value)" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="color" id="customThemeColor" value="#f0b8c8" onchange="document.getElementById('customThemeColorHex').value=this.value; applyCustomColor(this.value)" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;padding:0;">
+            <input type="text" id="customThemeColorHex" value="#f0b8c8" onchange="document.getElementById('customThemeColor').value=this.value; applyCustomColor(this.value)" style="width:80px;height:36px;border:1px solid var(--light-pink);border-radius:8px;padding:0 10px;font-size:14px;outline:none;" placeholder="#HEX">
+          </div>
         </div>
         
         <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
         
         <div class="form-label">气泡调色盘</div>
         <div class="setting-desc" style="margin-top:6px;margin-bottom:12px;">调整聊天气泡的颜色、透明度和圆角。</div>
-        
-        <div class="form-section">
-          <div class="form-label" style="font-size:13px;">对方气泡颜色</div>
-          <input type="color" id="leftBubbleColor" value="#ffffff" onchange="applyBubbleSettings()" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;">
-        </div>
-        
-        <div class="form-section">
-          <div class="form-label" style="font-size:13px;">我的气泡颜色</div>
-          <input type="color" id="rightBubbleColor" value="#f0b8c8" onchange="applyBubbleSettings()" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;">
-        </div>
-        
-        <div class="form-section">
-          <div class="form-label" style="font-size:13px;">气泡透明度 <span id="bubbleOpacityValue">0.85</span></div>
-          <input type="range" id="bubbleOpacity" min="0" max="1" step="0.05" value="0.85" oninput="applyBubbleSettings()" style="width:100%;">
-        </div>
-        
-        <div class="form-section">
-          <div class="form-label" style="font-size:13px;">气泡圆角 <span id="bubbleRadiusValue">18</span>px</div>
-          <input type="range" id="bubbleRadius" min="0" max="30" step="1" value="18" oninput="applyBubbleSettings()" style="width:100%;">
-        </div>
-        
-        <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
-        
-        <div class="form-label">气泡装饰</div>
-        <div class="setting-desc" style="margin-top:6px;margin-bottom:12px;">上传PNG透明图片，装饰在气泡的角落，支持自定义大小和偏移位置。</div>
         
         <div style="padding: 25px 15px; background: rgba(0,0,0,0.03); border-radius: 12px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 20px; border: 1px dashed var(--light-pink); overflow: hidden;">
           <div class="msg-item left" style="align-self: flex-start; max-width: 80%;">
@@ -1335,6 +1363,37 @@ body {
             <div class="msg-bubble" style="pointer-events: none;">我的气泡预览</div>
           </div>
         </div>
+        
+        <div class="form-section">
+          <div class="form-label" style="font-size:13px;">对方气泡颜色</div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="color" id="leftBubbleColor" value="#ffffff" onchange="document.getElementById('leftBubbleColorHex').value=this.value; applyBubbleSettings(); updateBubblePreview();" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;padding:0;">
+            <input type="text" id="leftBubbleColorHex" value="#ffffff" onchange="document.getElementById('leftBubbleColor').value=this.value; applyBubbleSettings(); updateBubblePreview();" style="width:80px;height:36px;border:1px solid var(--light-pink);border-radius:8px;padding:0 10px;font-size:14px;outline:none;" placeholder="#HEX">
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <div class="form-label" style="font-size:13px;">我的气泡颜色</div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="color" id="rightBubbleColor" value="#f0b8c8" onchange="document.getElementById('rightBubbleColorHex').value=this.value; applyBubbleSettings(); updateBubblePreview();" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;padding:0;">
+            <input type="text" id="rightBubbleColorHex" value="#f0b8c8" onchange="document.getElementById('rightBubbleColor').value=this.value; applyBubbleSettings(); updateBubblePreview();" style="width:80px;height:36px;border:1px solid var(--light-pink);border-radius:8px;padding:0 10px;font-size:14px;outline:none;" placeholder="#HEX">
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <div class="form-label" style="font-size:13px;">气泡透明度 <span id="bubbleOpacityValue">0.85</span></div>
+          <input type="range" id="bubbleOpacity" min="0" max="1" step="0.05" value="0.85" oninput="applyBubbleSettings(); updateBubblePreview();" style="width:100%;">
+        </div>
+        
+        <div class="form-section">
+          <div class="form-label" style="font-size:13px;">气泡圆角 <span id="bubbleRadiusValue">18</span>px</div>
+          <input type="range" id="bubbleRadius" min="0" max="30" step="1" value="18" oninput="applyBubbleSettings(); updateBubblePreview();" style="width:100%;">
+        </div>
+        
+        <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
+        
+        <div class="form-label">气泡装饰</div>
+        <div class="setting-desc" style="margin-top:6px;margin-bottom:12px;">上传PNG透明图片，装饰在气泡的角落，支持自定义大小和偏移位置。</div>
         
         <div class="form-section">
           <div class="form-label" style="font-size:13px;">对方气泡装饰</div>
@@ -1440,6 +1499,49 @@ body {
       </div>
       <div class="page-body" id="worldBookList">
         <div class="empty-tip">暂无世界书条目<br>点击右上角 + 添加</div>
+      </div>
+    </div>
+
+    <!-- 用户面具设置二级页面 -->
+    <div class="sub-page" id="user-mask-setting">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('user-mask-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">用户面具设置</div>
+        <div style="margin-left:auto; font-size:16px; color:var(--main-pink); cursor:pointer; font-weight:500;" onclick="openSub('add-user-mask')">新建</div>
+      </div>
+      <div class="page-body" id="userMaskList">
+        <div class="empty-tip">暂无用户面具<br>点击右上角 新建 添加</div>
+      </div>
+    </div>
+
+    <!-- 新建/编辑用户面具页面 -->
+    <div class="sub-page" id="add-user-mask">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('add-user-mask')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title" id="add-user-mask-title">新建用户面具</div>
+      </div>
+      <div class="page-body">
+        <div class="form-section">
+          <div class="form-label">面具头像</div>
+          <div class="avatar-upload">
+            <div class="avatar-preview" id="userMaskAvatarPreview">
+              <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><circle cx='40' cy='40' r='38' fill='%23f8d7e0'/><text x='40' y='45' text-anchor='middle' font-size='20' fill='%23886677'>面具</text></svg>">
+            </div>
+            <div class="upload-options">
+              <label class="upload-btn">本地上传<input type="file" accept="image/*" onchange="previewUserMaskAvatar(this)" class="hidden-file"></label>
+              <button class="upload-btn" onclick="uploadUserMaskAvatarByUrl()">链接上传</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-label">面具ID (名称)</div>
+          <input class="form-input" id="userMaskId" placeholder="输入面具ID/名称">
+        </div>
+        <div class="form-section">
+          <div class="form-label">人物设定</div>
+          <textarea class="form-textarea" id="userMaskPersona" placeholder="输入面具的详细人物设定..."></textarea>
+        </div>
+        <button class="save-btn" onclick="saveUserMask()">保存面具</button>
       </div>
     </div>
 
@@ -1840,6 +1942,15 @@ body {
               <span>♻️</span> 恢复默认
             </button>
           </div>
+        </div>
+
+        <!-- 用户面具选择 -->
+        <div class="setting-section">
+          <div class="setting-section-title">用户面具选择</div>
+          <div class="setting-desc">快速应用已保存的用户面具，自动替换头像、昵称和人设。</div>
+          <select class="form-select" id="chatUserMaskSelect" onchange="applySelectedUserMask()" style="margin-top:10px;">
+            <option value="">--选择用户面具--</option>
+          </select>
         </div>
 
         <!-- 我的聊天昵称 -->
@@ -2714,6 +2825,8 @@ let contactGroups = ['默认'];
 let currentContactId = '';
 let worldBook = '';
 let worldBookEntries = [];
+let userMasks = []; // 存储用户面具数据
+let _editingUserMaskId = null; // 当前正在编辑的面具ID
 let userAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><circle cx='18' cy='18' r='17' fill='%23f0b8c8'/><text x='18' y='22' text-anchor='middle' font-size='12' fill='white'>我</text></svg>";
 let replyMsg = null;
 let isBatchDeleteMode = false;
@@ -2754,6 +2867,12 @@ async function loadGlobalData() {
       worldBookEntries = rawWbEntries ? (typeof rawWbEntries === 'string' ? JSON.parse(rawWbEntries) : rawWbEntries) : [];
       if (!Array.isArray(worldBookEntries)) worldBookEntries = [];
     } catch(e) { console.error('解析世界书失败:', e); worldBookEntries = []; }
+
+    const rawUserMasks = await getFromStorage('USER_MASKS');
+    try {
+      userMasks = rawUserMasks ? (typeof rawUserMasks === 'string' ? JSON.parse(rawUserMasks) : rawUserMasks) : [];
+      if (!Array.isArray(userMasks)) userMasks = [];
+    } catch(e) { console.error('解析用户面具失败:', e); userMasks = []; }
     
     const rawAvatar = await getFromStorage('USER_AVATAR');
     if (rawAvatar) userAvatar = rawAvatar;
@@ -2786,12 +2905,29 @@ function navTo(id, el) {
     if (id === 'page-me') {
         setTimeout(updateMePageTextColor, 100);
     }
+    
+    // 切换页面时，确保背景设置正确
+    const userBgEl = document.getElementById('user-bg');
+    if (userBgEl && userBgEl.style.backgroundImage && userBgEl.style.backgroundImage !== 'none') {
+        const bgUrl = userBgEl.style.backgroundImage.match(/url\(["']?([^"')]+)["']?\)/);
+        if (bgUrl && bgUrl[1]) {
+            syncBgToAllPages(bgUrl[1]);
+        }
+    }
 }
 
 let subPageZIndex = 6000;
 function openSub(id) { 
     const el = document.getElementById(id);
     
+    // 如果打开的是添加用户面具页面且不是编辑状态，重置表单
+    if (id === 'add-user-mask' && !_editingUserMaskId) {
+        document.getElementById('add-user-mask-title').innerText = '新建用户面具';
+        document.getElementById('userMaskId').value = '';
+        document.getElementById('userMaskPersona').value = '';
+        document.getElementById('userMaskAvatarPreview').innerHTML = `<img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><circle cx='40' cy='40' r='38' fill='%23f8d7e0'/><text x='40' y='45' text-anchor='middle' font-size='20' fill='%23886677'>面具</text></svg>">`;
+    }
+
     // 如果打开的是添加世界书页面，重置一下表单状态
     if (id === 'add-worldbook' && !window._isEditingWb) {
         const nameEl = document.getElementById('worldbook-name');
@@ -3893,6 +4029,16 @@ async function triggerAIReply() {
 - 对话用 "双引号" 包裹，如："你好啊"
 - 动作和神态直接描写，不加任何符号，如：他笑着挠了挠头
 请自然流畅地组合这些元素，不要使用【】或其他多余符号。
+
+【文学性叙事文风要求】
+1. 环境与心理同步：在情节关键点用光影/物品/时间等环境细节外化人物内心，让环境成为情感延伸。
+2. 物品作情感载体：用具体普通的物品承载情感意义，避免直白抒情。
+3. 心理层进：内心状态需有转折层次（如雀跃→分析→释然），不可单一平铺。
+4. 行动重于言语：情感优先通过行动体现，对话极度克制。
+5. 留白：关键情感回应可以用沉默、未言明的默契呈现。
+6. 句式节奏：适时用"并非……而是……""也就是说……"等分析句推进心理，但每10段内不超过2次。
+7. 结尾有情感沉淀或留白，不追求明确结局。
+8. 严禁在短篇幅内重复相同比喻、相同心理转折链条或相同句式。
 ${favorRules}
 ${statusRules}
 
@@ -4122,27 +4268,106 @@ async function checkAndTriggerStmForContact(contactId) {
   const memSettingsStr = await window.storage.getItem('MEMORY_SETTINGS');
   const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
   if (!memSettings.stmAutoEnabled) return;
-  
+
   const stm = await getStmData(contactId);
   stm.roundCount = (stm.roundCount || 0) + 1;
-  
+
   const interval = memSettings.stmWindowSize || 10;
-  
-  if (stm.roundCount >= interval) {
-    stm.roundCount = 0;
-    await saveStmData(contactId, stm);
+
+  const rec = chatRecords[contactId] || [];
+  let unsummarizedCount = rec.length - (stm.lastSummarizedIndex || 0);
+
+  // 如果积累的未总结消息超过了 interval，说明可能之前关闭了自动总结，现在开启了。我们需要追溯总结。
+  if (unsummarizedCount >= interval) {
+    console.log(`[STM自检] 发现未总结消息 ${unsummarizedCount} 条，开始追溯总结...`);
     
-    // 如果已有10条STM，先归档到世界书
-    if (stm.entries.length >= 10) {
-      await archiveStmToWorldBook(contactId, stm);
-      stm.entries = [];
+    // 循环处理所有未总结的批次
+    while (unsummarizedCount >= interval) {
+      const startIndex = stm.lastSummarizedIndex || 0;
+      const batchRecs = rec.slice(startIndex, startIndex + interval);
+      
+      // 生成这批记录的总结
+      await generateStmEntryForBatch(contactId, stm, batchRecs);
+      
+      // 更新已总结的索引
+      stm.lastSummarizedIndex = startIndex + interval;
+      unsummarizedCount = rec.length - stm.lastSummarizedIndex;
+      
+      // 如果达到10条，归档
+      if (stm.entries.length >= 10) {
+        await archiveStmToWorldBook(contactId, stm);
+        stm.entries = [];
+      }
     }
     
-    // 生成新的STM条目
-    await generateStmEntry(contactId, stm);
-  } else {
+    // 剩余不足 interval 的部分，作为当前的 roundCount
+    stm.roundCount = unsummarizedCount;
     await saveStmData(contactId, stm);
+  } else {
+    // 正常流程
+    if (stm.roundCount >= interval) {
+      stm.roundCount = 0;
+      stm.lastSummarizedIndex = rec.length;
+      await saveStmData(contactId, stm);
+
+      // 如果已有10条STM，先归档到世界书
+      if (stm.entries.length >= 10) {
+        await archiveStmToWorldBook(contactId, stm);
+        stm.entries = [];
+      }
+
+      // 生成新的STM条目
+      const batchRecs = rec.slice(-interval);
+      await generateStmEntryForBatch(contactId, stm, batchRecs);
+    } else {
+      await saveStmData(contactId, stm);
+    }
   }
+}
+
+// 为指定批次的消息生成短期记忆
+async function generateStmEntryForBatch(contactId, stm, batchRecs) {
+  const cfgStr = await window.storage.getItem('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  if (!cfg.key || !cfg.url || !cfg.model) return;
+  
+  const c = contacts.find(x => x.id === contactId);
+  if (!c) return;
+  
+  if (batchRecs.length === 0) return;
+  
+  const memSettingsStr = await window.storage.getItem('MEMORY_SETTINGS');
+  const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
+  let stmPrompt = memSettings.stmPrompt || DEFAULT_STM_PROMPT;
+  const userName = await window.storage.getItem('USER_NICKNAME') || '用户';
+  
+  // 替换提示词中的变量
+  stmPrompt = stmPrompt
+    .replace(/\{charName\}/g, c.name)
+    .replace(/\{userName\}/g, userName);
+  
+  let text = '';
+  batchRecs.forEach(r => {
+    const speaker = r.side === 'right' ? userName : c.name;
+    const time = r.time ? new Date(r.time).toLocaleString('zh-CN') : '';
+    text += `[${time}] ${speaker}：${r.content}\n`;
+  });
+  
+  const prompt = stmPrompt + '\n\n以下是需要总结的对话内容：\n' + text;
+  
+  try {
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({ model: cfg.model, temperature: 0.3, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const summary = data.choices?.[0]?.message?.content || '';
+    if (summary) {
+      stm.entries.push({ content: summary.trim(), time: Date.now() });
+      await saveStmData(contactId, stm);
+    }
+  } catch (e) { console.error('STM生成失败:', e); }
 }
 
 // ========== 输入状态提醒（已替代红点） ==========
@@ -4601,6 +4826,18 @@ async function viewFullPhoto(src, idx) {
 
 // 初始化聊天设置页面
 function initChatSettingsPage() {
+  // 填充用户面具下拉菜单
+  const maskSelect = document.getElementById('chatUserMaskSelect');
+  if (maskSelect) {
+    maskSelect.innerHTML = '<option value="">--选择用户面具--</option>';
+    userMasks.forEach(mask => {
+      const opt = document.createElement('option');
+      opt.value = mask.id;
+      opt.textContent = mask.idName;
+      maskSelect.appendChild(opt);
+    });
+  }
+
   // 加载隐藏头像开关状态
   const toggle = document.getElementById('hide-avatar-toggle');
   if (chatSettings.hideAvatar) {
@@ -4794,6 +5031,29 @@ function applyChatBackground() {
       chatWin.style.background = 'var(--bg-cream)';
     }
   }
+}
+
+// 应用选择的用户面具
+function applySelectedUserMask() {
+  const select = document.getElementById('chatUserMaskSelect');
+  const maskId = select.value;
+  if (!maskId) return;
+  
+  const mask = userMasks.find(m => m.id === maskId);
+  if (!mask) return;
+  
+  if (mask.avatar) {
+    chatSettings.chatUserAvatar = mask.avatar;
+    document.getElementById('chatUserAvatarPreview').innerHTML = `<img src="${mask.avatar}">`;
+  } else {
+    chatSettings.chatUserAvatar = '';
+    document.getElementById('chatUserAvatarPreview').innerHTML = `<img src="${userAvatar}">`;
+  }
+  
+  document.getElementById('chatNicknameInput').value = mask.idName || '';
+  document.getElementById('userMaskTextarea').value = mask.persona || '';
+  
+  showToast('✅ 已应用用户面具，请点击底部保存');
 }
 
 // 预览聊天用户头像文件
@@ -5194,6 +5454,119 @@ async function pullModels() {
   }
 }
 
+// ========== 用户面具管理功能 ==========
+function renderUserMaskList() {
+  const el = document.getElementById('userMaskList');
+  if (userMasks.length === 0) {
+    el.innerHTML = '<div class="empty-tip">暂无用户面具<br>点击右上角 新建 添加</div>';
+    return;
+  }
+  el.innerHTML = '';
+  userMasks.forEach(mask => {
+    const div = document.createElement('div');
+    div.className = 'contact-item';
+    div.innerHTML = `
+      <div class="contact-avatar"><img src="${mask.avatar || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><circle cx='24' cy='24' r='23' fill='%23f8d7e0'/><text x='24' y='30' text-anchor='middle' font-size='14' fill='%23886677'>面具</text></svg>"}"></div>
+      <div style="flex:1;">
+        <div class="contact-name">${mask.idName}</div>
+        <div class="contact-desc" style="margin-top:4px; max-height: 3em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${mask.persona}</div>
+      </div>
+      <div style="display:flex; gap:8px; margin-left:10px;">
+        <button onclick="editUserMask('${mask.id}')" style="padding:6px 12px; background:var(--light-pink); border:none; border-radius:8px; cursor:pointer;">编辑</button>
+        <button onclick="deleteUserMask('${mask.id}')" style="padding:6px 12px; background:#ffcdd2; border:none; border-radius:8px; cursor:pointer; color:#c62828;">删除</button>
+      </div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function previewUserMaskAvatar(input) {
+  const f = input.files?.[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxSize = 800;
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = h * maxSize / w; w = maxSize; }
+        else { w = w * maxSize / h; h = maxSize; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.7);
+      document.getElementById('userMaskAvatarPreview').innerHTML = `<img src="${compressed}">`;
+    };
+    img.src = e.target.result;
+  };
+  r.readAsDataURL(f);
+}
+
+function uploadUserMaskAvatarByUrl() {
+  const u = prompt('图片链接：');
+  if (u) document.getElementById('userMaskAvatarPreview').innerHTML = `<img src="${u}">`;
+}
+
+async function saveUserMask() {
+  const idName = document.getElementById('userMaskId').value.trim();
+  const persona = document.getElementById('userMaskPersona').value.trim();
+  const avatarImg = document.querySelector('#userMaskAvatarPreview img');
+  const avatar = avatarImg ? avatarImg.src : '';
+
+  if (!idName) {
+    showToast('请输入面具ID');
+    return;
+  }
+
+  if (_editingUserMaskId) {
+    const idx = userMasks.findIndex(m => m.id === _editingUserMaskId);
+    if (idx > -1) {
+      userMasks[idx] = { ...userMasks[idx], idName, persona, avatar };
+    }
+  } else {
+    userMasks.push({
+      id: Date.now().toString(),
+      idName,
+      persona,
+      avatar
+    });
+  }
+
+  await saveToStorage('USER_MASKS', JSON.stringify(userMasks));
+  _editingUserMaskId = null;
+  closeSub('add-user-mask');
+  renderUserMaskList();
+  showToast('✅ 用户面具已保存');
+}
+
+function editUserMask(id) {
+  const mask = userMasks.find(m => m.id === id);
+  if (!mask) return;
+  
+  _editingUserMaskId = id;
+  document.getElementById('add-user-mask-title').innerText = '编辑用户面具';
+  document.getElementById('userMaskId').value = mask.idName;
+  document.getElementById('userMaskPersona').value = mask.persona || '';
+  if (mask.avatar) {
+    document.getElementById('userMaskAvatarPreview').innerHTML = `<img src="${mask.avatar}">`;
+  } else {
+    document.getElementById('userMaskAvatarPreview').innerHTML = `<img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><circle cx='40' cy='40' r='38' fill='%23f8d7e0'/><text x='40' y='45' text-anchor='middle' font-size='20' fill='%23886677'>面具</text></svg>">`;
+  }
+  
+  openSub('add-user-mask');
+}
+
+async function deleteUserMask(id) {
+  if (!confirm('确定删除这个用户面具吗？')) return;
+  userMasks = userMasks.filter(m => m.id !== id);
+  await saveToStorage('USER_MASKS', JSON.stringify(userMasks));
+  renderUserMaskList();
+  showToast('✅ 已删除');
+}
+
 // ========== 世界书条目管理功能 ==========
 let currentWbFilter = 'all';
 
@@ -5266,27 +5639,53 @@ function toggleWbKeywordInput() {
   }
 }
 
-async function saveWorldBookEntry() {
-  const name = document.getElementById('worldbook-name').value.trim();
-  const category = document.getElementById('worldbook-category').value.trim();
-  const content = document.getElementById('worldbook-content').value.trim();
-  const triggerType = document.querySelector('input[name="wb-trigger-type"]:checked').value;
-  const keywords = document.getElementById('worldbook-keywords').value.trim();
-  
-  if (!name) { alert('请输入名称'); return; }
-  if (!category) { alert('请输入分类'); return; }
-  if (!content) { alert('请输入世界观设定'); return; }
-  if (triggerType === 'keyword' && !keywords) { alert('请输入触发关键词'); return; }
-  
-  worldBookEntries.push({ 
-    id: Date.now().toString(), 
-    name, 
-    category, 
-    content,
-    triggerType,
-    keywords
-  });
-  await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+  async function saveWorldBookEntry() {
+    const name = document.getElementById('worldbook-name').value.trim();
+    const category = document.getElementById('worldbook-category').value.trim();
+    const content = document.getElementById('worldbook-content').value.trim();
+    const triggerType = document.querySelector('input[name="wb-trigger-type"]:checked').value;
+    const keywords = document.getElementById('worldbook-keywords').value.trim();
+    
+    if (!name) { alert('请输入名称'); return; }
+    if (!category) { alert('请输入分类'); return; }
+    if (!content) { alert('请输入世界观设定'); return; }
+    if (triggerType === 'keyword' && !keywords) { alert('请输入触发关键词'); return; }
+    
+    if (window._isEditingWb && window._editingWbId) {
+      // 更新现有条目
+      const idx = worldBookEntries.findIndex(e => e.id === window._editingWbId);
+      if (idx > -1) {
+        worldBookEntries[idx] = {
+          ...worldBookEntries[idx],
+          name,
+          category,
+          content,
+          triggerType,
+          keywords
+        };
+      } else {
+        // 如果找不到原条目，则新建
+        worldBookEntries.push({ 
+          id: window._editingWbId, 
+          name, 
+          category, 
+          content,
+          triggerType,
+          keywords
+        });
+      }
+    } else {
+      // 新建条目
+      worldBookEntries.push({ 
+        id: Date.now().toString(), 
+        name, 
+        category, 
+        content,
+        triggerType,
+        keywords
+      });
+    }
+    await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
   
   // 清空表单
   document.getElementById('worldbook-name').value = '';
@@ -5689,9 +6088,13 @@ function syncBgToAllPages(dataOrUrl) {
         page.style.backgroundSize = 'cover';
         page.style.backgroundPosition = 'center';
         page.style.backgroundRepeat = 'no-repeat';
+        page.style.backdropFilter = 'none';
+        page.style.webkitBackdropFilter = 'none';
       } else {
         page.style.backgroundImage = 'none';
-        page.style.background = 'var(--bg-cream)';
+        page.style.background = 'rgba(255, 255, 255, 0.15)';
+        page.style.backdropFilter = 'blur(18px)';
+        page.style.webkitBackdropFilter = 'blur(18px)';
       }
     }
   });
@@ -5837,15 +6240,15 @@ async function exportBackup(mode = 'full') {
     }
   }
 
-  // ===== 仅全局备份才包含的额外数据 =====
-  if (!isChatOnly) {
-    // API配置
-    const apiConfigStr = await getFromStorage('AI_CHAT_CONFIG');
-    backupData.apiConfig = apiConfigStr ? (typeof apiConfigStr === 'string' ? JSON.parse(apiConfigStr) : apiConfigStr) : {};
+    // ===== 仅全局备份才包含的额外数据 =====
+    if (!isChatOnly) {
+      // API配置
+      const apiConfigStr = await getFromStorage('AI_CHAT_CONFIG');
+      backupData.apiConfig = apiConfigStr ? (typeof apiConfigStr === 'string' ? JSON.parse(apiConfigStr) : apiConfigStr) : {};
 
-    // API预设
-    const apiPresetsStr = await getFromStorage('AI_API_PRESETS');
-    backupData.apiPresets = apiPresetsStr ? (typeof apiPresetsStr === 'string' ? JSON.parse(apiPresetsStr) : apiPresetsStr) : [];
+      // API预设
+      const apiPresetsStr = await getFromStorage('AI_API_PRESETS');
+      backupData.apiPresets = apiPresetsStr ? (typeof apiPresetsStr === 'string' ? JSON.parse(apiPresetsStr) : apiPresetsStr) : [];
 
     // 模型列表
     const modelListStr = await getFromStorage('AI_MODEL_LIST');
@@ -5889,11 +6292,15 @@ async function exportBackup(mode = 'full') {
       if (imgData) backupData.savedImages[id] = imgData;
     }
 
-    // 朋友圈封面
-    const momentsCover = await getFromStorage('MOMENTS_COVER');
-    if (momentsCover) backupData.savedImages['moments-cover'] = momentsCover;
+      // 朋友圈封面
+      const momentsCover = await getFromStorage('MOMENTS_COVER');
+      if (momentsCover) backupData.savedImages['moments-cover'] = momentsCover;
 
-    // 备注标签
+      // 恢复用户面具
+      const rawUserMasks = await getFromStorage('USER_MASKS');
+      if (rawUserMasks) backupData.userMasks = typeof rawUserMasks === 'string' ? JSON.parse(rawUserMasks) : rawUserMasks;
+
+      // 备注标签
     backupData.memoTags = {};
     const memoTags = document.querySelectorAll('.memo-tag');
     for (let idx = 0; idx < memoTags.length; idx++) {
@@ -6010,141 +6417,102 @@ function importBackup(input) {
         return;
       }
       
+      const isChatOnly = backupData.backupMode === 'chat';
+      
       // 恢复联系人
-      contacts = backupData.contacts || [];
-      await saveToStorage('CHAT_CONTACTS', JSON.stringify(contacts));
+      if (backupData.contacts !== undefined) {
+        contacts = backupData.contacts || [];
+        await saveToStorage('CHAT_CONTACTS', JSON.stringify(contacts));
+      }
       
       // 恢复聊天记录
-      chatRecords = backupData.chatRecords || {};
-      await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+      if (backupData.chatRecords !== undefined) {
+        chatRecords = backupData.chatRecords || {};
+        await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+      }
       
-      // 恢复世界书
-      worldBookEntries = backupData.worldBookEntries || [];
-      await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
-      worldBook = backupData.worldBook || '';
-      await saveToStorage('WORLD_BOOK', worldBook);
-      
-  // 恢复API配置
-  if (backupData.apiConfig) {
-    try {
-      const apiConfig = typeof backupData.apiConfig === 'string' ? JSON.parse(backupData.apiConfig) : backupData.apiConfig;
-      await saveToStorage('AI_CHAT_CONFIG', JSON.stringify(apiConfig));
-    } catch(e) { console.error('解析API配置失败:', e); }
-  }
+      // 如果不是仅聊天备份，才恢复其他全局设置
+      if (!isChatOnly) {
+        // 恢复世界书
+        if (backupData.worldBookEntries !== undefined) {
+          worldBookEntries = backupData.worldBookEntries || [];
+          await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+        }
+        if (backupData.worldBook !== undefined) {
+          worldBook = backupData.worldBook || '';
+          await saveToStorage('WORLD_BOOK', worldBook);
+        }
+        
+        // 恢复API配置
+        if (backupData.apiConfig) {
+          try {
+            const apiConfig = typeof backupData.apiConfig === 'string' ? JSON.parse(backupData.apiConfig) : backupData.apiConfig;
+            await saveToStorage('AI_CHAT_CONFIG', JSON.stringify(apiConfig));
+          } catch(e) { console.error('解析API配置失败:', e); }
+        }
 
-  // 恢复API预设
-  if (backupData.apiPresets) {
-    try {
-      const apiPresets = typeof backupData.apiPresets === 'string' ? JSON.parse(backupData.apiPresets) : backupData.apiPresets;
-      await saveToStorage('AI_API_PRESETS', JSON.stringify(apiPresets));
-    } catch(e) { console.error('解析API预设失败:', e); }
-  }
+        // 恢复API预设
+        if (backupData.apiPresets) {
+          try {
+            const apiPresets = typeof backupData.apiPresets === 'string' ? JSON.parse(backupData.apiPresets) : backupData.apiPresets;
+            await saveToStorage('AI_API_PRESETS', JSON.stringify(apiPresets));
+          } catch(e) { console.error('解析API预设失败:', e); }
+        }
 
-  // 恢复模型列表
-  if (backupData.aiModelList) {
-    try {
-      const aiModelList = typeof backupData.aiModelList === 'string' ? JSON.parse(backupData.aiModelList) : backupData.aiModelList;
-      await saveToStorage('AI_MODEL_LIST', JSON.stringify(aiModelList));
-    } catch(e) { console.error('解析模型列表失败:', e); }
-  }
+        // 恢复模型列表
+        if (backupData.aiModelList) {
+          try {
+            const aiModelList = typeof backupData.aiModelList === 'string' ? JSON.parse(backupData.aiModelList) : backupData.aiModelList;
+            await saveToStorage('AI_MODEL_LIST', JSON.stringify(aiModelList));
+          } catch(e) { console.error('解析模型列表失败:', e); }
+        }
 
-  // 恢复记忆设置
-  if (backupData.memorySettings) {
-    try {
-      const memorySettings = typeof backupData.memorySettings === 'string' ? JSON.parse(backupData.memorySettings) : backupData.memorySettings;
-      await saveToStorage('MEMORY_SETTINGS', JSON.stringify(memorySettings));
-    } catch(e) { console.error('解析记忆设置失败:', e); }
-  }
+        // 恢复记忆设置
+        if (backupData.memorySettings) {
+          try {
+            const memorySettings = typeof backupData.memorySettings === 'string' ? JSON.parse(backupData.memorySettings) : backupData.memorySettings;
+            await saveToStorage('MEMORY_SETTINGS', JSON.stringify(memorySettings));
+          } catch(e) { console.error('解析记忆设置失败:', e); }
+        }
 
-  // 恢复分组
-  if (backupData.contactGroups) {
-    try {
-      const contactGroups = typeof backupData.contactGroups === 'string' ? JSON.parse(backupData.contactGroups) : backupData.contactGroups;
-      await saveToStorage('CONTACT_GROUPS', JSON.stringify(contactGroups));
-    } catch(e) { console.error('解析分组失败:', e); }
-  }
+      // 恢复分组
+      if (backupData.contactGroups) {
+        try {
+          const contactGroups = typeof backupData.contactGroups === 'string' ? JSON.parse(backupData.contactGroups) : backupData.contactGroups;
+          await saveToStorage('CONTACT_GROUPS', JSON.stringify(contactGroups));
+        } catch(e) { console.error('解析分组失败:', e); }
+      }
 
-  // 恢复朋友圈
-  if (backupData.moments) {
-    try {
-      const momentsData = typeof backupData.moments === 'string' ? JSON.parse(backupData.moments) : backupData.moments;
-      await IndexedDBManager.saveData('MOMENTS', momentsData);
-      try { localStorage.setItem('MOMENTS', JSON.stringify(momentsData)); } catch(e) {}
-    } catch(e) { console.error('解析朋友圈失败:', e); }
-  }
-      
+      // 恢复朋友圈
+      if (backupData.moments) {
+        try {
+          const momentsData = typeof backupData.moments === 'string' ? JSON.parse(backupData.moments) : backupData.moments;
+          await IndexedDBManager.saveData('MOMENTS', momentsData);
+          try { localStorage.setItem('MOMENTS', JSON.stringify(momentsData)); } catch(e) {}
+        } catch(e) { console.error('解析朋友圈失败:', e); }
+      }
+          
       // 恢复用户头像
       if (backupData.userAvatar) {
         userAvatar = backupData.userAvatar;
         await saveToStorage('USER_AVATAR', userAvatar);
       }
-      
-      // 恢复用户昵称
-      if (backupData.userNickname) {
-        await saveToStorage('USER_NICKNAME', backupData.userNickname);
-      }
-      
+          
       // 恢复用户签名
-      if (backupData.userSignature) {
+      if (backupData.userSignature !== undefined) {
         const sigEl = document.getElementById('userSignature');
         if (sigEl) sigEl.value = backupData.userSignature;
         await saveToStorage('USER_SIGNATURE', backupData.userSignature);
       }
-      
-      // 恢复模式设置
-      if (backupData.isOfflineMode !== undefined) {
-        isOfflineMode = backupData.isOfflineMode;
-        await saveToStorage('isOfflineMode', String(isOfflineMode));
-      }
-      
-  // 恢复聊天设置
-  if (backupData.chatSettings) {
-    for (const contactId of Object.keys(backupData.chatSettings)) {
-      try {
-        const settings = typeof backupData.chatSettings[contactId] === 'string' ? JSON.parse(backupData.chatSettings[contactId]) : backupData.chatSettings[contactId];
-        await saveToStorage(`CHAT_SETTINGS_${contactId}`, JSON.stringify(settings));
-      } catch(e) { console.error(`解析聊天设置失败 ${contactId}:`, e); }
-    }
-  }
-  
-  // 恢复联系人状态
-  if (backupData.contactStatus) {
-    for (const contactId of Object.keys(backupData.contactStatus)) {
-      try {
-        const status = typeof backupData.contactStatus[contactId] === 'string' ? JSON.parse(backupData.contactStatus[contactId]) : backupData.contactStatus[contactId];
-        await saveToStorage(`STATUS_${contactId}`, JSON.stringify(status));
-      } catch(e) { console.error(`解析状态失败 ${contactId}:`, e); }
-    }
-  }
-  
-  // 恢复情侣相册
-  if (backupData.coupleAlbums) {
-    for (const contactId of Object.keys(backupData.coupleAlbums)) {
-      try {
-        const album = typeof backupData.coupleAlbums[contactId] === 'string' ? JSON.parse(backupData.coupleAlbums[contactId]) : backupData.coupleAlbums[contactId];
-        await saveToStorage(`COUPLE_ALBUM_${contactId}`, JSON.stringify(album));
-      } catch(e) { console.error(`解析情侣相册失败 ${contactId}:`, e); }
-    }
-  }
-
-  // 恢复短期记忆(STM)
-  if (backupData.stmData) {
-    for (const contactId of Object.keys(backupData.stmData)) {
-      try {
-        const stm = typeof backupData.stmData[contactId] === 'string' ? JSON.parse(backupData.stmData[contactId]) : backupData.stmData[contactId];
-        await saveToStorage(`STM_${contactId}`, JSON.stringify(stm));
-      } catch(e) { console.error(`解析STM失败 ${contactId}:`, e); }
-    }
-  }
-      
+          
       // 恢复底部图标
       if (backupData.dockIcons) {
         for (const key of Object.keys(backupData.dockIcons)) {
           await IndexedDBManager.saveImage(key, backupData.dockIcons[key], 'image');
         }
       }
-      
-  // 恢复其他图片资源
+          
+      // 恢复其他图片资源
       if (backupData.savedImages) {
         for (const id of Object.keys(backupData.savedImages)) {
           if (id === 'moments-cover') {
@@ -6154,36 +6522,113 @@ function importBackup(input) {
           }
         }
       }
-      
+          
       // 恢复备注标签
       if (backupData.memoTags) {
         for (const key of Object.keys(backupData.memoTags)) {
           await saveToStorage(key, backupData.memoTags[key]);
         }
       }
+          
+      // 恢复主题颜色
+      if (backupData.themeColors) {
+        try {
+          const theme = typeof backupData.themeColors === 'string' ? JSON.parse(backupData.themeColors) : backupData.themeColors;
+          await saveToStorage('THEME_COLORS', JSON.stringify(theme));
+        } catch(e) { console.error('解析主题颜色失败:', e); }
+      }
       
-  // 恢复主题颜色
-  if (backupData.themeColors) {
-    try {
-      const theme = typeof backupData.themeColors === 'string' ? JSON.parse(backupData.themeColors) : backupData.themeColors;
-      await saveToStorage('THEME_COLORS', JSON.stringify(theme));
-    } catch(e) { console.error('解析主题颜色失败:', e); }
-  }
-  
-  // 恢复文字美化设置
-  if (backupData.textSettings) {
-    try {
-      const textSettings = typeof backupData.textSettings === 'string' ? JSON.parse(backupData.textSettings) : backupData.textSettings;
-      await saveToStorage('TEXT_BEAUTIFY_SETTINGS', JSON.stringify(textSettings));
-    } catch(e) { console.error('解析文字美化设置失败:', e); }
-  }
-      
+      // 恢复文字美化设置
+      if (backupData.textSettings) {
+        try {
+          const textSettings = typeof backupData.textSettings === 'string' ? JSON.parse(backupData.textSettings) : backupData.textSettings;
+          await saveToStorage('TEXT_BEAUTIFY_SETTINGS', JSON.stringify(textSettings));
+        } catch(e) { console.error('解析文字美化设置失败:', e); }
+      }
+          
       // 恢复播放器副标题
       if (backupData.playerSub) {
         await saveToStorage('PLAYER_SUB', backupData.playerSub);
       }
       
-      alert('✅ 备份已成功导入！页面将刷新以应用更改。');
+      // 恢复用户昵称（仅全局备份时恢复，聊天备份不覆盖）
+      if (backupData.userNickname !== undefined) {
+        await saveToStorage('USER_NICKNAME', backupData.userNickname);
+      }
+      
+      // 恢复模式设置（仅全局备份时恢复）
+      if (backupData.isOfflineMode !== undefined) {
+        isOfflineMode = backupData.isOfflineMode;
+        await saveToStorage('isOfflineMode', String(isOfflineMode));
+      }
+    }
+    
+    // 恢复聊天设置
+    if (backupData.chatSettings) {
+      for (const contactId of Object.keys(backupData.chatSettings)) {
+        try {
+          const settings = typeof backupData.chatSettings[contactId] === 'string' ? JSON.parse(backupData.chatSettings[contactId]) : backupData.chatSettings[contactId];
+          await saveToStorage(`CHAT_SETTINGS_${contactId}`, JSON.stringify(settings));
+        } catch(e) { console.error(`解析聊天设置失败 ${contactId}:`, e); }
+      }
+    }
+    
+    // 恢复联系人状态
+    if (backupData.contactStatus) {
+      for (const contactId of Object.keys(backupData.contactStatus)) {
+        try {
+          const status = typeof backupData.contactStatus[contactId] === 'string' ? JSON.parse(backupData.contactStatus[contactId]) : backupData.contactStatus[contactId];
+          await saveToStorage(`STATUS_${contactId}`, JSON.stringify(status));
+        } catch(e) { console.error(`解析状态失败 ${contactId}:`, e); }
+      }
+    }
+    
+    // 恢复情侣相册
+    if (backupData.coupleAlbums) {
+      for (const contactId of Object.keys(backupData.coupleAlbums)) {
+        try {
+          const album = typeof backupData.coupleAlbums[contactId] === 'string' ? JSON.parse(backupData.coupleAlbums[contactId]) : backupData.coupleAlbums[contactId];
+          await saveToStorage(`COUPLE_ALBUM_${contactId}`, JSON.stringify(album));
+        } catch(e) { console.error(`解析情侣相册失败 ${contactId}:`, e); }
+      }
+    }
+
+      // 恢复短期记忆(STM)
+      if (backupData.stmData) {
+        for (const contactId of Object.keys(backupData.stmData)) {
+          try {
+            const stm = typeof backupData.stmData[contactId] === 'string' ? JSON.parse(backupData.stmData[contactId]) : backupData.stmData[contactId];
+            await saveToStorage(`STM_${contactId}`, JSON.stringify(stm));
+          } catch(e) { console.error(`解析STM失败 ${contactId}:`, e); }
+        }
+      }
+      
+      // 恢复气泡设置
+      if (backupData.bubbleSettings && !isChatOnly) {
+        try {
+          const settings = typeof backupData.bubbleSettings === 'string' ? JSON.parse(backupData.bubbleSettings) : backupData.bubbleSettings;
+          await saveToStorage('BUBBLE_SETTINGS', JSON.stringify(settings));
+        } catch(e) { console.error('解析气泡设置失败:', e); }
+      }
+      
+      // 恢复气泡装饰设置
+      if (backupData.bubbleDecSettings && !isChatOnly) {
+        try {
+          const settings = typeof backupData.bubbleDecSettings === 'string' ? JSON.parse(backupData.bubbleDecSettings) : backupData.bubbleDecSettings;
+          await saveToStorage('BUBBLE_DEC_SETTINGS', JSON.stringify(settings));
+        } catch(e) { console.error('解析气泡装饰设置失败:', e); }
+      }
+      
+      // 恢复气泡装饰图片
+      if (backupData.bubbleDecImages && !isChatOnly) {
+        for (const side of Object.keys(backupData.bubbleDecImages)) {
+          try {
+            await saveToStorage(`BUBBLE_DEC_IMG_${side}`, backupData.bubbleDecImages[side]);
+          } catch(e) { console.error(`恢复气泡装饰图片失败 ${side}:`, e); }
+        }
+      }
+        
+        alert('✅ 备份已成功导入！页面将刷新以应用更改。');
       location.reload();
     } catch (err) {
       console.error(err);
@@ -6317,6 +6762,47 @@ function toggleTextFormat(btn, prop) {
   applyTextBeautify();
 }
 
+function applyCustomFont(url) {
+  const fontInput = document.getElementById('customFontUrl');
+  const fontUrl = url !== undefined ? url : (fontInput ? fontInput.value.trim() : '');
+  
+  let styleEl = document.getElementById('custom-font-style');
+  
+  if (!fontUrl) {
+    if (styleEl) styleEl.remove();
+    if (url === undefined) saveTextBeautifySettings();
+    return;
+  }
+  
+  if (!styleEl) {
+    styleEl = document.createElement('style');
+    styleEl.id = 'custom-font-style';
+    document.head.appendChild(styleEl);
+  }
+  
+  styleEl.innerHTML = `
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url('${fontUrl}');
+    }
+    * {
+      font-family: 'MyCustomFont', -apple-system, "SF Pro Display", "PingFang SC", sans-serif !important;
+    }
+  `;
+  
+  if (url === undefined) {
+    saveTextBeautifySettings();
+  }
+}
+
+function clearCustomFont() {
+  const fontInput = document.getElementById('customFontUrl');
+  if (fontInput) fontInput.value = '';
+  const styleEl = document.getElementById('custom-font-style');
+  if (styleEl) styleEl.remove();
+  saveTextBeautifySettings();
+}
+
 function applyTextBeautify() {
   const types = ['normal', 'brace', 'quote'];
   const props = ['color', 'bg', 'weight', 'style'];
@@ -6362,6 +6848,11 @@ async function saveTextBeautifySettings() {
       }
     });
   });
+  
+  const fontInput = document.getElementById('customFontUrl');
+  if (fontInput) {
+    settings.customFontUrl = fontInput.value.trim();
+  }
   
   await saveToStorage('TEXT_BEAUTIFY_SETTINGS', JSON.stringify(settings));
   showToast('✅ 叙事美化设置已保存！');
@@ -6421,6 +6912,12 @@ async function loadTextBeautifySettings() {
           });
         }
       });
+      
+      if (settings.customFontUrl) {
+        const fontInput = document.getElementById('customFontUrl');
+        if (fontInput) fontInput.value = settings.customFontUrl;
+        applyCustomFont(settings.customFontUrl);
+      }
     } catch(e) {
       console.error('加载叙事美化设置失败:', e);
     }
@@ -6433,6 +6930,7 @@ function applyBubbleSettings() {
   const rightColor = document.getElementById('rightBubbleColor').value;
   const opacity = document.getElementById('bubbleOpacity').value;
   const radius = document.getElementById('bubbleRadius').value;
+  const bottomRadius = radius == 0 ? '0px' : '6px';
   
   document.getElementById('bubbleOpacityValue').innerText = opacity;
   document.getElementById('bubbleRadiusValue').innerText = radius;
@@ -6441,9 +6939,32 @@ function applyBubbleSettings() {
   document.documentElement.style.setProperty('--right-bubble-bg', hexToRgb(rightColor));
   document.documentElement.style.setProperty('--bubble-opacity', opacity);
   document.documentElement.style.setProperty('--bubble-radius', radius + 'px');
+  document.documentElement.style.setProperty('--bubble-bottom-radius', bottomRadius);
   
   const bubbleSettings = { leftColor, rightColor, opacity, radius };
   saveToStorage('BUBBLE_SETTINGS', JSON.stringify(bubbleSettings));
+}
+
+function updateBubblePreview() {
+    const leftColor = document.getElementById('leftBubbleColor').value;
+    const rightColor = document.getElementById('rightBubbleColor').value;
+    const opacity = document.getElementById('bubbleOpacity').value;
+    const radius = document.getElementById('bubbleRadius').value;
+    const bottomRadius = radius == 0 ? '0px' : '6px';
+
+    const leftPreview = document.querySelector('.msg-item.left .msg-bubble');
+    if (leftPreview) {
+        leftPreview.style.background = `rgba(${hexToRgb(leftColor)}, ${opacity})`;
+        leftPreview.style.borderRadius = `${radius}px`;
+        leftPreview.style.borderBottomLeftRadius = bottomRadius;
+    }
+
+    const rightPreview = document.querySelector('.msg-item.right .msg-bubble');
+    if (rightPreview) {
+        rightPreview.style.background = `rgba(${hexToRgb(rightColor)}, ${opacity})`;
+        rightPreview.style.borderRadius = `${radius}px`;
+        rightPreview.style.borderBottomRightRadius = bottomRadius;
+    }
 }
 
 async function loadBubbleSettings() {
@@ -6462,7 +6983,11 @@ async function loadBubbleSettings() {
       if (leftColor) document.documentElement.style.setProperty('--left-bubble-bg', hexToRgb(leftColor));
       if (rightColor) document.documentElement.style.setProperty('--right-bubble-bg', hexToRgb(rightColor));
       if (opacity !== undefined) document.documentElement.style.setProperty('--bubble-opacity', opacity);
-      if (radius !== undefined) document.documentElement.style.setProperty('--bubble-radius', radius + 'px');
+      if (radius !== undefined) {
+        document.documentElement.style.setProperty('--bubble-radius', radius + 'px');
+        document.documentElement.style.setProperty('--bubble-bottom-radius', radius == 0 ? '0px' : '6px');
+      }
+      updateBubblePreview();
     } catch(e) {}
   }
 }
@@ -6672,100 +7197,129 @@ async function loadThemeSettings() {
 }
 
 window.onload = async () => {
-  // 初始化存储管理器
   try {
-    const isReady = await window.storage.init();
-    if (isReady) {
-      console.log('✅ 存储管理器初始化成功');
-      // 显示存储空间信息
-      try {
-        const storageInfo = await window.storage.getStorageInfo();
-        console.log('📊 存储空间使用情况:', storageInfo);
-      } catch(e) {}
-    } else {
-      console.warn('⚠️ 存储管理器降级为 localStorage');
-    }
-  } catch (e) {
-    console.error('❌ 存储管理器初始化异常:', e);
-  }
-  
-  setInterval(updateTime, 1000); updateTime();
-  await loadGlobalData(); // 确保加载全局数据，如联系人、聊天记录等
-  loadApiConfig();
-  restoreDockIconsOnLoad();
-  await loadSavedTheme();
-  await loadThemeSettings();
-  await loadBubbleSettings();
-  await loadBubbleDecSettings();
-  await loadTextBeautifySettings();
-  loadMemorySettings();
-  loadMomentsCover();
-  
-  // 从IndexedDB加载朋友圈数据
-  await loadMomentsFromDB();
-
-  // ✅ 从 IndexedDB 加载图片
-  for (const id of ['user-bg', 'user-avatar', 'p1', 'p2']) {
+    // 初始化存储管理器
     try {
-      const data = await IndexedDBManager.getImage('SVD_'+id);
-      if (data) {
-        const el = document.getElementById(id);
-        if (el.tagName === 'IMG') {
-          el.src = data;
-          if (id === 'user-avatar') {
-            userAvatar = data;
-          }
-        } else {
-          el.style.backgroundImage = `url(${data})`;
-          el.style.backgroundSize = 'cover';
-          el.style.backgroundPosition = 'center';
-          if (id !== 'user-bg') el.innerText = '';
-        }
+      const isReady = await window.storage.init();
+      if (isReady) {
+        console.log('✅ 存储管理器初始化成功');
+        // 显示存储空间信息
+        try {
+          const storageInfo = await window.storage.getStorageInfo();
+          console.log('📊 存储空间使用情况:', storageInfo);
+        } catch(e) {}
       } else {
-        // 兼容旧数据：从 localStorage 读取
-        const localData = localStorage.getItem('SVD_'+id);
-        if (localData) {
+        console.warn('⚠️ 存储管理器降级为 localStorage');
+      }
+    } catch (e) {
+      console.error('❌ 存储管理器初始化异常:', e);
+    }
+    
+    setInterval(updateTime, 1000); updateTime();
+    await loadGlobalData(); // 确保加载全局数据，如联系人、聊天记录等
+    loadApiConfig();
+    await restoreDockIconsOnLoad();
+    await loadSavedTheme();
+    await loadThemeSettings();
+    await loadBubbleSettings();
+    await loadBubbleDecSettings();
+    await loadTextBeautifySettings();
+    loadMemorySettings();
+    loadMomentsCover();
+    
+    // 从IndexedDB加载朋友圈数据
+    await loadMomentsFromDB();
+
+    // ✅ 从 IndexedDB 加载图片
+    for (const id of ['user-bg', 'user-avatar', 'p1', 'p2']) {
+      try {
+        const data = await IndexedDBManager.getImage('SVD_'+id);
+        if (data) {
           const el = document.getElementById(id);
           if (el.tagName === 'IMG') {
-            el.src = localData;
+            el.src = data;
             if (id === 'user-avatar') {
-              userAvatar = localData;
+              userAvatar = data;
             }
           } else {
-            el.style.backgroundImage = `url(${localData})`;
+            el.style.backgroundImage = `url(${data})`;
             el.style.backgroundSize = 'cover';
             el.style.backgroundPosition = 'center';
             if (id !== 'user-bg') el.innerText = '';
           }
-          // 迁移到 IndexedDB
-          await IndexedDBManager.saveImage('SVD_'+id, localData, 'image');
-          localStorage.removeItem('SVD_'+id);
+        } else {
+          // 兼容旧数据：从 localStorage 读取
+          const localData = localStorage.getItem('SVD_'+id);
+          if (localData) {
+            const el = document.getElementById(id);
+            if (el.tagName === 'IMG') {
+              el.src = localData;
+              if (id === 'user-avatar') {
+                userAvatar = localData;
+              }
+            } else {
+              el.style.backgroundImage = `url(${localData})`;
+              el.style.backgroundSize = 'cover';
+              el.style.backgroundPosition = 'center';
+              if (id !== 'user-bg') el.innerText = '';
+            }
+            // 迁移到 IndexedDB
+            await IndexedDBManager.saveImage('SVD_'+id, localData, 'image');
+            localStorage.removeItem('SVD_'+id);
+          }
         }
+      } catch (e) {
+        console.error(`加载图片失败 ${id}:`, e);
       }
-    } catch (e) {
-      console.error(`加载图片失败 ${id}:`, e);
     }
-  }
 
-  // ✅ 页面加载时同步背景到所有页面
-  const userBgEl = document.getElementById('user-bg');
-  if (userBgEl && userBgEl.style.backgroundImage && userBgEl.style.backgroundImage !== 'none') {
-    const bgUrl = userBgEl.style.backgroundImage.match(/url\(["']?([^"')]+)["']?\)/);
-    if (bgUrl && bgUrl[1]) {
-      syncBgToAllPages(bgUrl[1]);
+    // ✅ 页面加载时同步背景到所有页面
+    const userBgEl = document.getElementById('user-bg');
+    if (userBgEl && userBgEl.style.backgroundImage && userBgEl.style.backgroundImage !== 'none') {
+      const bgUrl = userBgEl.style.backgroundImage.match(/url\(["']?([^"')]+)["']?\)/);
+      if (bgUrl && bgUrl[1]) {
+        syncBgToAllPages(bgUrl[1]);
+      } else {
+        syncBgToAllPages(null);
+      }
     } else {
-      updatePageTextColors(null);
+      // 尝试从 storage 恢复背景
+      try {
+        const data = await IndexedDBManager.getImage('SVD_user-bg');
+        if (data) {
+          userBgEl.style.backgroundImage = `url(${data})`;
+          userBgEl.style.backgroundSize = 'cover';
+          userBgEl.style.backgroundPosition = 'center';
+          syncBgToAllPages(data);
+        } else {
+          syncBgToAllPages(null);
+        }
+      } catch(e) {
+        syncBgToAllPages(null);
+      }
     }
-  } else {
-    updatePageTextColors(null);
-  }
 
-  await loadContactGroups(); // 加载分组数据并渲染分组标签
-  renderContactList();
-  renderWorldBookList();
-  
-  document.getElementById('dynamic-island').classList.add('hidden');
-  setTimeout(updateMePageTextColor, 100);
+    await loadContactGroups(); // 加载分组数据并渲染分组标签
+    renderContactList();
+    renderWorldBookList();
+    renderUserMaskList();
+    
+    document.getElementById('dynamic-island').classList.add('hidden');
+    setTimeout(updateMePageTextColor, 100);
+  } catch(e) {
+    console.error('❌ 初始化过程中发生错误:', e);
+  } finally {
+    // 隐藏启动屏
+    const splash = document.getElementById('app-splash');
+    if (splash) {
+      splash.style.opacity = '0';
+      setTimeout(() => {
+        if (splash && splash.parentNode) {
+          splash.remove();
+        }
+      }, 400);
+    }
+  }
   
   // 事件委托：双击气泡触发编辑 (兼容 iOS Safari、Android Chrome、桌面端)
   // iOS Safari 核心问题：
@@ -8090,20 +8644,29 @@ async function saveMemorySettings() {
   alert('✅ 记忆设置已保存！');
 }
 
-async function loadMemorySettings() {
-  const saved = await getFromStorage('MEMORY_SETTINGS');
-  
-  // 始终使用最新的默认提示词
-  document.getElementById('ltm-prompt').value = DEFAULT_LTM_PROMPT;
-  document.getElementById('stm-prompt').value = DEFAULT_STM_PROMPT;
-  
-  if (!saved) return;
-  const settings = JSON.parse(saved);
-  
-  if (settings.ltmAutoEnabled) document.getElementById('ltm-auto-toggle').classList.add('active');
-  if (settings.ltmInterval) document.getElementById('ltm-interval').value = settings.ltmInterval;
-  if (settings.stmAutoEnabled) document.getElementById('stm-auto-toggle').classList.add('active');
-  if (settings.stmWindowSize) document.getElementById('stm-window-size').value = settings.stmWindowSize;
+  async function loadMemorySettings() {
+    const saved = await getFromStorage('MEMORY_SETTINGS');
+
+    // 初始化使用最新的默认提示词
+    document.getElementById('ltm-prompt').value = DEFAULT_LTM_PROMPT;
+    document.getElementById('stm-prompt').value = DEFAULT_STM_PROMPT;
+
+    if (!saved) return;
+    const settings = typeof saved === 'string' ? JSON.parse(saved) : saved;
+
+    if (settings.ltmAutoEnabled) {
+      document.getElementById('ltm-auto-toggle').classList.add('active');
+    } else {
+      document.getElementById('ltm-auto-toggle').classList.remove('active');
+    }
+    if (settings.ltmInterval) document.getElementById('ltm-interval').value = settings.ltmInterval;
+    
+    if (settings.stmAutoEnabled) {
+      document.getElementById('stm-auto-toggle').classList.add('active');
+    } else {
+      document.getElementById('stm-auto-toggle').classList.remove('active');
+    }
+    if (settings.stmWindowSize) document.getElementById('stm-window-size').value = settings.stmWindowSize;
   
   // 如果用户自定义了提示词，则覆盖默认值
   if (settings.ltmPrompt && settings.ltmPrompt !== DEFAULT_LTM_PROMPT) {
@@ -8265,7 +8828,12 @@ async function confirmEditMsg() {
 // 获取某联系人的STM数据 (异步)
 async function getStmData(contactId) {
   const data = await window.storage.getItem(`STM_${contactId}`);
-  return data ? (typeof data === 'string' ? JSON.parse(data) : data) : {entries: [], roundCount: 0};
+  let stm = data ? (typeof data === 'string' ? JSON.parse(data) : data) : {entries: [], roundCount: 0};
+  if (stm.lastSummarizedIndex === undefined) {
+    const rec = chatRecords[contactId] || [];
+    stm.lastSummarizedIndex = Math.max(0, rec.length - (stm.roundCount || 0));
+  }
+  return stm;
 }
 // 保存STM数据 (异步)
 async function saveStmData(contactId, data) {
@@ -8373,52 +8941,12 @@ async function checkAndTriggerStm() {
   }
 }
 
-// 生成一条短期记忆
+// 生成一条短期记忆 (保留以防其他地方调用)
 async function generateStmEntry(contactId, stm) {
-  const cfgStr = await window.storage.getItem('AI_CHAT_CONFIG');
-  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
-  if (!cfg.key || !cfg.url || !cfg.model) return;
-  
-  const c = contacts.find(x => x.id === contactId);
-  if (!c) return;
-  
   const rec = chatRecords[contactId] || [];
-  if (rec.length === 0) return;
-  
-  const memSettingsStr = await window.storage.getItem('MEMORY_SETTINGS');
-  const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
-  let stmPrompt = memSettings.stmPrompt || DEFAULT_STM_PROMPT;
-  const userName = await window.storage.getItem('USER_NICKNAME') || '用户';
-  
-  // 替换提示词中的变量
-  stmPrompt = stmPrompt
-    .replace(/\{charName\}/g, c.name)
-    .replace(/\{userName\}/g, userName);
-  
-  // 取最近10轮对话
-  const recent = rec.slice(-10);
-  let text = '';
-  recent.forEach(r => {
-    const speaker = r.side === 'right' ? userName : c.name;
-    const time = r.time ? new Date(r.time).toLocaleString('zh-CN') : '';
-    text += `[${time}] ${speaker}：${r.content}\n`;
-  });
-  
-  const prompt = stmPrompt + '\n\n以下是需要总结的对话内容：\n' + text;
-  
-  try {
-    const res = await fetch(`${cfg.url}/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
-      body: JSON.stringify({ model: cfg.model, temperature: 0.3, messages: [{ role: 'user', content: prompt }] })
-    });
-    const data = await res.json();
-    const summary = data.choices?.[0]?.message?.content || '';
-    if (summary) {
-      stm.entries.push({ content: summary.trim(), time: Date.now() });
-      await saveStmData(contactId, stm);
-    }
-  } catch (e) { console.error('STM生成失败:', e); }
+  const interval = 10;
+  const batchRecs = rec.slice(-interval);
+  await generateStmEntryForBatch(contactId, stm, batchRecs);
 }
 
 // STM批量删除相关变量
