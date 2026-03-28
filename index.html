@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -18,6 +17,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!-- 引入mammoth.js用于解析docx文件 -->
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<!-- 引入Sortable.js用于拖拽排序 -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <style>
 :root { 
   --main-pink: #f0b8c8; 
@@ -500,10 +501,11 @@ body {
 .chat-send-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(240, 184, 200, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(240, 184, 200, 0.3); }
 .chat-ai-reply-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(106, 184, 212, 0.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.5); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(80, 160, 200, 0.35); display: flex; align-items: center; justify-content: center; }
 
-.attach-panel { position: absolute; bottom: 60px; left: 0; width: 100%; background: #fff; border-radius: 16px 16px 0 0; padding: 15px; box-shadow: 0 -2px 8px rgba(0,0,0,0.05); display: none; z-index: 99; }
-.attach-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+.attach-panel { position: absolute; bottom: 60px; left: 0; width: 100%; background: #fff; border-radius: 16px 16px 0 0; padding: 20px 15px; box-shadow: 0 -2px 8px rgba(0,0,0,0.05); display: none; z-index: 99; }
+.attach-grid { display: grid; grid-template-columns: repeat(4, 1fr); row-gap: 20px; column-gap: 15px; }
 .attach-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: var(--text-light); font-size: 12px; }
-.attach-icon { width: 40px; height: 40px; border-radius: 8px; background: var(--light-pink); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 5px; }
+.attach-item span { white-space: nowrap; }
+.attach-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--light-pink); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 8px; }
 
 .batch-delete-bar { display: none; height: 50px; background: #f5f5f5; border-top: 1px solid #e0e0e0; align-items: center; justify-content: space-between; padding: 0 20px; }
 .batch-delete-bar.show { display: flex; }
@@ -745,6 +747,53 @@ body {
   display: none;
 }
 
+/* 论坛样式 */
+.forum-post {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.forum-post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.forum-post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+  border: 2px solid var(--light-pink);
+}
+.forum-post-info {
+  flex: 1;
+}
+.forum-post-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+.forum-post-time {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+.forum-post-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+.forum-post-content {
+  font-size: 14px;
+  color: var(--text-dark);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 /* 朋友圈样式 */
 .moment-item {
   background: white;
@@ -939,26 +988,27 @@ body {
 .ring-avatar-frame {
   overflow: visible !important;
   position: relative;
+  border-color: transparent !important;
 }
 .ring-avatar-frame img {
   border-radius: 50% !important;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .ring-avatar-frame::after {
-  content: '💍';
+  content: '';
   position: absolute;
-  top: -5px;
-  right: -5px;
-  font-size: 16px;
+  top: -20%;  /* 【修改位置】向上偏移，通常是 (width - 100) / 2 的负数 */
+  left: -20%; /* 【修改位置】向左偏移，通常是 (height - 100) / 2 的负数 */
+  width: 140%; /* 【修改大小】头像框的宽度，100% 是和头像一样大，140% 是大一圈 */
+  height: 140%; /* 【修改大小】头像框的高度，和 width 保持一致 */
+  background-image: url('ring_frame.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   z-index: 10;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-  background: rgba(255,255,255,0.8);
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
+  pointer-events: none;
 }
 
 /* 状态卡片半透明磨砂质感 */
@@ -1194,6 +1244,7 @@ body {
       </div>
       <div class="page-body">
         <div class="menu-item" onclick="openSub('moments-page')">朋友圈</div>
+        <div class="menu-item" onclick="openSub('forum-page')">论坛</div>
       </div>
     </div>
 
@@ -1963,12 +2014,17 @@ body {
           <div class="page-title" id="chatHeaderTitle" style="margin-left:0; font-size:17px; color: #333333;">聊天</div>
           <span id="typingStatus" style="display:none; font-size:12px; color: #777777; font-weight:400; white-space:nowrap;">（输入中…）</span>
         </div>
-        <div style="cursor:pointer; width:32px; height:32px; display:flex; align-items:center; justify-content:center; margin-left:auto;" onclick="toggleChatMenu(event)">
-          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="1"></circle>
-            <circle cx="19" cy="12" r="1"></circle>
-            <circle cx="5" cy="12" r="1"></circle>
-          </svg>
+        <div style="display:flex; align-items:center; margin-left:auto; gap:4px;">
+          <div style="cursor:pointer; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size: 18px;" onclick="toggleChatSearch(event)">
+            🔍
+          </div>
+          <div style="cursor:pointer; width:32px; height:32px; display:flex; align-items:center; justify-content:center;" onclick="toggleChatMenu(event)">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="1"></circle>
+              <circle cx="19" cy="12" r="1"></circle>
+              <circle cx="5" cy="12" r="1"></circle>
+            </svg>
+          </div>
         </div>
       </div>
       <!-- 隐藏的头像容器，保留数据用 -->
@@ -2011,6 +2067,18 @@ body {
           </div>
         </div>
       </div>
+      <div id="chatSearchContainer" style="display:none; flex-direction:column; position:absolute; top:50px; left:0; width:100%; height:calc(100% - 50px); background:var(--bg-cream); z-index:998;">
+        <div style="padding:10px 15px; background:rgba(255,255,255,0.9); border-bottom:1px solid rgba(0,0,0,0.05); box-shadow:0 2px 10px rgba(0,0,0,0.02); backdrop-filter:blur(10px); flex-shrink:0;">
+          <div style="display:flex; align-items:center; background:rgba(0,0,0,0.05); border-radius:16px; padding:8px 12px;">
+            <span style="font-size:14px; color:#999; margin-right:8px;">🔍</span>
+            <input type="text" id="chatSearchInput" placeholder="搜索聊天记录..." style="flex:1; border:none; background:transparent; outline:none; font-size:14px; color:var(--text-dark);" oninput="performChatSearch()">
+            <span style="font-size:14px; color:#999; cursor:pointer; display:none; padding:0 4px;" id="chatSearchClear" onclick="clearChatSearch()">✖</span>
+          </div>
+        </div>
+        <div id="chatSearchResults" style="flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px;">
+          <div style="text-align:center; color:var(--text-light); margin-top:20px; font-size:13px;">输入关键字查找内容</div>
+        </div>
+      </div>
       <div id="chatMenu" style="display:none; position:absolute; top:50px; right:20px; background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); z-index:999; overflow:hidden;">
         <div style="padding:10px 16px; min-width:140px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0e8df;">
           <span style="font-size:14px; color:var(--text-dark);" id="mode-label">线上模式</span>
@@ -2040,14 +2108,6 @@ body {
             <span class="reply-tip-close" onclick="cancelReply()">×</span>
           </div>
           <textarea class="chat-input" id="chatInput" placeholder="输入消息..." autocomplete="off" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendMsg();}" rows="1"></textarea>
-          <div class="attach-panel" id="attachPanel">
-            <div class="attach-grid">
-              <div class="attach-item" onclick="selectFile('image')"><div class="attach-icon">🖼️</div><span>图片</span></div>
-              <div class="attach-item" onclick="selectFile('file')"><div class="attach-icon">📄</div><span>文件</span></div>
-              <div class="attach-item" onclick="selectFile('audio')"><div class="attach-icon">🎙️</div><span>语音</span></div>
-              <div class="attach-item" onclick="selectFile('video')"><div class="attach-icon">🎬</div><span>视频</span></div>
-            </div>
-          </div>
         </div>
         <div class="chat-btn-group">
           <button class="chat-send-btn" onclick="sendMsg()">✓</button>
@@ -2062,6 +2122,18 @@ body {
               <ellipse cx="80" cy="47" rx="10" ry="11" fill="white"/>
             </svg>
           </button>
+        </div>
+      </div>
+      <div class="attach-panel" id="attachPanel">
+        <div class="attach-grid">
+          <div class="attach-item" onclick="selectFile('emoji')"><div class="attach-icon">😀</div><span>表情</span></div>
+          <div class="attach-item" onclick="selectFile('image')"><div class="attach-icon">🖼️</div><span>图片</span></div>
+          <div class="attach-item" onclick="selectFile('image_text')"><div class="attach-icon">📝</div><span>图片(文字)</span></div>
+          <div class="attach-item" onclick="selectFile('audio')"><div class="attach-icon">🎙️</div><span>语音</span></div>
+          <div class="attach-item" onclick="selectFile('red_packet')"><div class="attach-icon">🧧</div><span>红包</span></div>
+          <div class="attach-item" onclick="selectFile('transfer')"><div class="attach-icon">💸</div><span>转账</span></div>
+          <div class="attach-item"><div class="attach-icon">✨</div><span>空白</span></div>
+          <div class="attach-item"><div class="attach-icon">✨</div><span>空白</span></div>
         </div>
       </div>
     </div>
@@ -2368,6 +2440,52 @@ body {
         </div>
         <div id="select-group-list" style="padding:15px; overflow-y:auto; flex:1;"></div>
         <div id="select-contact-list" style="padding:15px; overflow-y:auto; flex:1; display:none;"></div>
+      </div>
+    </div>
+
+    <!-- 论坛二级页面 -->
+    <div class="sub-page" id="forum-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('forum-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">论坛</div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
+          <div style="cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center;" onclick="refreshForum()">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/>
+              <polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </div>
+          <div style="cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size: 24px; color: var(--text-dark); font-weight: bold;" onclick="openSub('post-forum-page')">
+            +
+          </div>
+        </div>
+      </div>
+      <div class="page-body" id="forumContainer" style="padding:15px; background: #f5f5f5;">
+        <div class="empty-tip">点击右上角刷新按钮查看论坛</div>
+      </div>
+    </div>
+
+    <!-- 发帖页面 -->
+    <div class="sub-page" id="post-forum-page">
+      <div class="page-header" style="border-bottom:none;">
+        <div class="page-back" onclick="closeSub('post-forum-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">发帖</div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
+          <div style="cursor:pointer; display:flex; align-items:center; justify-content:center; font-size: 14px; color: white; background: var(--main-pink); padding: 4px 12px; border-radius: 12px;" onclick="publishForumPost()">
+            发布
+          </div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="form-section">
+          <div class="form-label">标题</div>
+          <input class="form-input" id="postForumTitle" placeholder="输入标题...">
+        </div>
+        <div class="form-section">
+          <div class="form-label">内容</div>
+          <textarea class="form-textarea" id="postForumContent" placeholder="这一刻的想法..." style="min-height: 150px;"></textarea>
+        </div>
       </div>
     </div>
 
@@ -2850,14 +2968,16 @@ async function getFromStorage(key) {
 }
 
 // 主题切换函数
-async function selectTheme(themeName) {
-  document.body.classList.remove('theme-pink', 'theme-blue', 'theme-green', 'theme-dark');
-  if (themeName) {
-    document.body.classList.add(themeName);
-    await saveToStorage('THEME_CLASS', themeName);
-  } else {
-    await saveToStorage('THEME_CLASS', '');
-  }
+  async function selectTheme(themeName) {
+    document.body.classList.remove('theme-pink', 'theme-blue', 'theme-green', 'theme-dark');
+    if (themeName) {
+      document.body.classList.add(themeName);
+      await saveToStorage('THEME_CLASS', themeName);
+      try { localStorage.setItem('THEME_CLASS', themeName); } catch(e) {}
+    } else {
+      await saveToStorage('THEME_CLASS', '');
+      try { localStorage.setItem('THEME_CLASS', ''); } catch(e) {}
+    }
   // 更新叙事美化页面中的主题勾选状态
   updateThemeChecks(themeName);
   
@@ -3045,6 +3165,17 @@ let chatSettings = {
 let isOfflineMode = false;
 let activeAIRequests = new Set();
 
+function isCurrentChatBlueMinimalEnabled() {
+  const currentContact = contacts.find(x => x.id === currentContactId);
+  return !!(
+    currentContactId &&
+    currentContact &&
+    !currentContact.isGroup &&
+    isOfflineMode &&
+    document.body.classList.contains('theme-blue')
+  );
+}
+
 // 异步加载全局变量
 async function loadGlobalData() {
   try {
@@ -3077,9 +3208,22 @@ async function loadGlobalData() {
     
     const rawAvatar = await getFromStorage('USER_AVATAR');
     if (rawAvatar) userAvatar = rawAvatar;
+
+    // ✅ 页面初始化时重新应用主题类，修复刷新后“勾选还是简约，但实际掉回默认样式”的问题
+    const savedThemeClass = await getFromStorage('THEME_CLASS');
+    document.body.classList.remove('theme-pink', 'theme-blue', 'theme-green', 'theme-dark');
+    if (savedThemeClass) {
+      document.body.classList.add(savedThemeClass);
+    }
     
     const rawOffline = await getFromStorage('isOfflineMode');
     isOfflineMode = String(rawOffline) === 'true';
+
+    // ✅ 如果当前主题是线下简约，则页面初始化时也强制保持线下模式
+    if (savedThemeClass === 'theme-blue') {
+      isOfflineMode = true;
+      await saveToStorage('isOfflineMode', 'true');
+    }
   } catch(e) {
     console.error('加载全局数据失败:', e);
   }
@@ -3178,6 +3322,8 @@ function closeSub(id) {
         if (document.getElementById('page-chat').classList.contains('active')) {
             document.getElementById('dynamic-island').classList.remove('hidden');
         }
+        const searchContainer = document.getElementById('chatSearchContainer');
+        if (searchContainer) searchContainer.style.display = 'none';
     }
 }
 
@@ -3431,18 +3577,58 @@ function renderGroupManageList() {
   const container = document.getElementById('group-list-container');
   if (!container) return;
   container.innerHTML = '';
-  contactGroups.forEach(g => {
+  
+  contactGroups.forEach((g, index) => {
     const count = contacts.filter(c => (c.group || '默认') === g).length;
     const div = document.createElement('div');
-    div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:12px 15px; background:#fff; border-radius:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);';
+    div.className = 'group-item-drag';
+    div.dataset.index = index;
+    div.dataset.group = g;
+    div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:12px 15px; background:#fff; border-radius:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05); cursor:grab;';
+    
     div.innerHTML = `
-      <div>
-        <div style="font-size:15px; color:var(--text-dark); font-weight:500;">${g}</div>
-        <div style="font-size:12px; color:var(--text-light); margin-top:2px;">${count} 个联系人</div>
+      <div style="display:flex; align-items:center; flex:1;">
+        <div class="drag-handle" style="color:#ccc; margin-right:15px; font-size:20px; padding: 5px;">☰</div>
+        <div>
+          <div style="font-size:15px; color:var(--text-dark); font-weight:500;">${g}</div>
+          <div style="font-size:12px; color:var(--text-light); margin-top:2px;">${count} 个联系人</div>
+        </div>
       </div>
-      ${g !== '默认' ? `<button onclick="deleteGroup('${g.replace(/'/g, "\\'")}')" style="padding:6px 12px; background:#ffcdd2; border:none; border-radius:8px; cursor:pointer; color:#c62828; font-size:13px;">删除</button>` : '<span style="font-size:12px; color:var(--text-light);">默认</span>'}
+      ${g !== '默认' ? `<button onclick="deleteGroup('${g.replace(/'/g, "\\'")}')" style="padding:6px 12px; background:#ffcdd2; border:none; border-radius:8px; cursor:pointer; color:#c62828; font-size:13px; position:relative; z-index:2;">删除</button>` : '<span style="font-size:12px; color:var(--text-light);">默认</span>'}
     `;
     container.appendChild(div);
+  });
+
+  if (container._sortable) {
+    container._sortable.destroy();
+  }
+  container._sortable = new Sortable(container, {
+    animation: 150,
+    filter: 'button',
+    delay: 100,
+    delayOnTouchOnly: true,
+    fallbackTolerance: 5,
+    onEnd: async function (evt) {
+      const newItems = [...container.querySelectorAll('.group-item-drag')];
+      const newOrder = newItems.map(item => item.dataset.group);
+      
+      let orderChanged = false;
+      if (newOrder.length === contactGroups.length) {
+        for (let i = 0; i < contactGroups.length; i++) {
+          if (contactGroups[i] !== newOrder[i]) {
+            orderChanged = true;
+            break;
+          }
+        }
+      }
+      
+      if (orderChanged) {
+        contactGroups = newOrder;
+        await saveContactGroups();
+        renderContactList();
+        updateGroupDropdowns();
+      }
+    }
   });
 }
 
@@ -3502,13 +3688,19 @@ function renderContactList() {
       return getTime(bRecs, b) - getTime(aRecs, a);
     });
     
+    const groupContainer = document.createElement('div');
+    groupContainer.className = 'contact-group-container';
+    groupContainer.dataset.group = groupName;
+    groupContainer.style.marginBottom = '10px';
+    
     // 分组标题（可折叠）
     const header = document.createElement('div');
-    header.style.cssText = 'display:flex; align-items:center; padding:10px 5px 6px; cursor:pointer; user-select:none;';
+    header.className = 'contact-group-header';
+    header.style.cssText = 'display:flex; align-items:center; padding:10px 5px 6px; cursor:grab; user-select:none;';
     header.innerHTML = `
       <span style="font-size:12px; color:var(--text-dark); margin-right:6px; transition:transform 0.2s; display:inline-block; transform:rotate(${isCollapsed ? '0' : '90'}deg);">▶</span>
-      <span style="font-size:14px; font-weight:600; color:var(--text-dark);">${groupName}</span>
-      <span style="font-size:12px; color:var(--text-dark); margin-left:6px;">(${sorted.length})</span>
+      <span style="font-size:14px; font-weight:600; color:var(--text-dark); pointer-events:none;">${groupName}</span>
+      <span style="font-size:12px; color:var(--text-dark); margin-left:6px; pointer-events:none;">(${sorted.length})</span>
     `;
     
     // 联系人容器
@@ -3538,7 +3730,7 @@ function renderContactList() {
     });
     
     // 点击标题切换折叠
-    header.onclick = () => {
+    header.onclick = (e) => {
       const arrow = header.querySelector('span');
       if (body.style.display === 'none') {
         body.style.display = 'block';
@@ -3551,8 +3743,48 @@ function renderContactList() {
       }
     };
     
-    el.appendChild(header);
-    el.appendChild(body);
+    groupContainer.appendChild(header);
+    groupContainer.appendChild(body);
+    el.appendChild(groupContainer);
+  });
+
+  if (el._sortable) {
+    el._sortable.destroy();
+  }
+  el._sortable = new Sortable(el, {
+    handle: '.contact-group-header',
+    animation: 150,
+    delay: 200,
+    delayOnTouchOnly: true,
+    fallbackTolerance: 5,
+    onEnd: async function (evt) {
+      const newItems = [...el.querySelectorAll('.contact-group-container')];
+      const newOrder = newItems.map(item => item.dataset.group);
+      
+      const updatedGroups = [...newOrder];
+      contactGroups.forEach(g => {
+        if (!updatedGroups.includes(g)) {
+          updatedGroups.push(g);
+        }
+      });
+      
+      let orderChanged = false;
+      if (updatedGroups.length === contactGroups.length) {
+        for (let i = 0; i < contactGroups.length; i++) {
+          if (contactGroups[i] !== updatedGroups[i]) {
+            orderChanged = true;
+            break;
+          }
+        }
+      }
+      
+      if (orderChanged) {
+        contactGroups = updatedGroups;
+        await saveContactGroups();
+        updateGroupDropdowns();
+        renderGroupManageList();
+      }
+    }
   });
 }
 
@@ -3876,6 +4108,25 @@ async function openChatPage(contact) {
   document.getElementById('typingStatus').style.display = 'none';
   hideLoading();
   
+  // 先恢复当前联系人的模式，再渲染，避免切窗口时先按旧状态渲染导致“掉回初始模式”
+  if (contact.isGroup) {
+    isOfflineMode = false;
+    await saveToStorage(`isOfflineMode_${contact.id}`, 'false');
+  } else {
+    const rawContactOffline = await getFromStorage(`isOfflineMode_${contact.id}`);
+    if (rawContactOffline !== null) {
+      isOfflineMode = String(rawContactOffline) === 'true';
+    } else {
+      const rawGlobal = await getFromStorage('isOfflineMode');
+      isOfflineMode = String(rawGlobal) === 'true';
+    }
+
+    if (document.body.classList.contains('theme-blue')) {
+      isOfflineMode = true;
+      await saveToStorage(`isOfflineMode_${contact.id}`, 'true');
+    }
+  }
+
   // 核心：先跳转页面，再异步加载内容
   openSub('chat-win');
   
@@ -3891,16 +4142,7 @@ async function openChatPage(contact) {
     hideLoading();
   }
   
-  // ✅ 每个联系人独立加载线上/线下模式
-  const rawContactOffline = await getFromStorage(`isOfflineMode_${contact.id}`);
-  if (rawContactOffline !== null) {
-    isOfflineMode = String(rawContactOffline) === 'true';
-  } else {
-    // 没有单独设置时，使用全局默认值（兼容旧数据）
-    const rawGlobal = await getFromStorage('isOfflineMode');
-    isOfflineMode = String(rawGlobal) === 'true';
-  }
-  
+
   // 更新UI开关状态
   const toggle = document.getElementById('mode-toggle');
   const label = document.getElementById('mode-label');
@@ -3934,15 +4176,30 @@ async function toggleMode() {
   showToast(isOfflineMode ? '已切换为线下模式 🏃' : '已切换为线上模式 💬');
 }
 
-function renderChat() {
+function renderChat(forceStartIdx) {
   const el = document.getElementById('chatContent');
   const rec = chatRecords[currentContactId] || [];
   const c = contacts.find(x => x.id === currentContactId);
   if (!c) return;
   const showCount = 30;
-  const displayRecords = rec.slice(-showCount);
-  const startIdx = Math.max(0, rec.length - showCount);
+  const startIdx = forceStartIdx !== undefined ? forceStartIdx : Math.max(0, rec.length - showCount);
+  const displayRecords = rec.slice(startIdx);
   el.innerHTML = '';
+  
+  const fragment = document.createDocumentFragment();
+  
+  if (startIdx > 0) {
+    const loadMore = document.createElement('div');
+    loadMore.style.textAlign = 'center';
+    loadMore.style.padding = '10px';
+    loadMore.style.color = '#999';
+    loadMore.style.fontSize = '12px';
+    loadMore.style.cursor = 'pointer';
+    loadMore.innerText = '↑ 点击加载更早消息';
+    loadMore.onclick = () => loadMoreMessages(el, rec, startIdx);
+    fragment.appendChild(loadMore);
+  }
+
   displayRecords.forEach((m, idx) => {
     let ava = chatSettings.chatUserAvatar || userAvatar;
     let sName = null;
@@ -3960,19 +4217,11 @@ function renderChat() {
         if (c.isGroup) sName = c.name; // fallback
       }
     }
-    addMsgToUI(m.content, m.side, ava, m.quote, startIdx + idx, m.type, true, sName, m.statusData);
+    const div = createMsgElement(m.content, m.side, ava, m.quote, startIdx + idx, m.type, sName, m.statusData);
+    fragment.appendChild(div);
   });
-  if (rec.length > showCount) {
-    const loadMore = document.createElement('div');
-    loadMore.style.textAlign = 'center';
-    loadMore.style.padding = '10px';
-    loadMore.style.color = '#999';
-    loadMore.style.fontSize = '12px';
-    loadMore.style.cursor = 'pointer';
-    loadMore.innerText = '↑ 点击加载更早消息';
-    loadMore.onclick = () => loadMoreMessages(el, rec, startIdx);
-    el.insertBefore(loadMore, el.firstChild);
-  }
+  
+  el.appendChild(fragment);
 
   function loadMoreMessages(el, rec, currentStartIdx) {
     const pageSize = 20;
@@ -4053,18 +4302,21 @@ function applyHideAvatarSetting() {
 }
 
 function parseTextBeautify(text) {
-  // 保护换行符
-  let html = text.replace(/\n/g, '<br>');
+  if (!text) return '';
+  // 1. 转义 HTML 实体，防止特殊字符破坏 DOM 结构导致渲染卡顿
+  let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   
-  // 使用单引号包裹 class 属性，避免被后续的 "" 匹配到
+  // 2. 保护换行符
+  html = html.replace(/\n/g, '<br>');
+  
+  // 3. 使用单引号包裹 class 属性，避免被后续的 "" 匹配到
   html = html.replace(/\{([^{}]+)\}/g, "<span class='text-brace'>{$1}</span>");
   
-  // 匹配 “” 和 "" 对话
+  // 4. 匹配 “” 和 "" 对话
   html = html.replace(/“([^“”]+)”/g, "<span class='text-quote'>“$1”</span>");
   html = html.replace(/"([^"]+)"/g, "<span class='text-quote'>\"$1\"</span>");
   
   // 将没有被 span 包裹的普通文本用 text-normal 包裹
-  // 为了不破坏现有的HTML标签，我们只在最外层包裹 text-normal
   return `<span class='text-normal'>${html}</span>`;
 }
 
@@ -4075,7 +4327,7 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
   }
 
   const div = document.createElement('div');
-  const isBlueOfflineCard = isOfflineMode && document.body.classList.contains('theme-blue') && side === 'left';
+  const isBlueOfflineCard = isCurrentChatBlueMinimalEnabled() && side === 'left';
   
   if (isBlueOfflineCard) {
     div.className = `msg-item ${side} blue-offline-mode`;
@@ -4116,15 +4368,14 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
       ${statusData && statusData.physiological ? `
       <div class="blue-card-middle">
         <div class="bc-toggle" onclick="const c = this.nextElementSibling; c.style.display = c.style.display === 'none' ? 'block' : 'none';">
-          🔞 隐藏蓝 (点击展开/收起)
-        </div>
-        <div class="bc-hidden-content" style="display:none;">
-          <div class="bc-phys-row"><span>生理状态：</span><span>${statusData.physiological}</span></div>
-          <div class="bc-lust-row">
-            <span>情欲：</span>
-            <div class="bc-lust-bar-bg"><div class="bc-lust-bar-fill" style="width:${statusData.lust || 0}%"></div></div>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <span>🔞 情欲指数：</span>
+            <div class="bc-lust-bar-bg" style="width: 80px; flex: none;"><div class="bc-lust-bar-fill" style="width:${statusData.lust || 0}%"></div></div>
             <span>${statusData.lust || 0}%</span>
           </div>
+        </div>
+        <div class="bc-hidden-content" style="display:none; text-align: center; padding-top: 4px;">
+          <div class="bc-phys-row"><span>生理状态：</span><span>${statusData.physiological}</span></div>
         </div>
       </div>
       ` : ''}
@@ -4594,6 +4845,9 @@ ${statusRules}
 - 不要使用任何特殊符号（如{}、【】等）来标注动作或心理
 - 回复要简洁自然，符合网络聊天的习惯
 - 严格遵守一句话一条消息的规则
+
+【回复长度控制】
+请严格根据你的人设、当前的情感状态以及用户的输入来决定回复的长度。如果是简单的日常寒暄或快速回应，请只回复1-2句话；如果是深入交流，可以回复3-4句。拒绝无意义的废话和凑字数，保持真实网络聊天的节奏感。
 ${favorRules}
 ${statusRules}
 
@@ -4601,7 +4855,11 @@ ${statusRules}
   }
   
     const messages = [{ role: 'system', content: systemPrompt }];
-    const recs = (chatRecords[currentContactId] || []).slice(-8);
+    const rawRecs = chatRecords[currentContactId] || [];
+    const recs = rawRecs.slice(-60); // 获取更多气泡用于合并
+    const mergedMessages = [];
+    let currentMsg = null;
+
     recs.forEach(r => {
       let role = r.side === 'right' ? 'user' : 'assistant';
       let contentPrefix = '';
@@ -4625,29 +4883,44 @@ ${statusRules}
         }
       }
 
-      if (r.type === 'image') {
-      // 图片消息：使用 Vision API 格式传递 image_url
-      messages.push({
-        role: role,
-        content: [
-          { type: 'text', text: contentPrefix + '[图片]' },
-          {
-            type: 'image_url',
-            image_url: { url: r.content }
+      if (!currentMsg) {
+        currentMsg = { role: role, content: r.type === 'image' ? 
+          [ { type: 'text', text: contentPrefix + '[图片]' }, { type: 'image_url', image_url: { url: r.content } } ] : 
+          contentPrefix + r.content };
+      } else if (currentMsg.role === role) {
+        if (r.type === 'image') {
+          if (typeof currentMsg.content === 'string') {
+            currentMsg.content = [{ type: 'text', text: currentMsg.content }];
           }
-        ]
-      });
-    } else {
-      messages.push({ role: role, content: contentPrefix + r.content });
+          currentMsg.content.push({ type: 'text', text: contentPrefix + '[图片]' });
+          currentMsg.content.push({ type: 'image_url', image_url: { url: r.content } });
+        } else {
+          if (typeof currentMsg.content === 'string') {
+            currentMsg.content += '\n' + contentPrefix + r.content;
+          } else {
+            currentMsg.content.push({ type: 'text', text: contentPrefix + r.content });
+          }
+        }
+      } else {
+        mergedMessages.push(currentMsg);
+        currentMsg = { role: role, content: r.type === 'image' ? 
+          [ { type: 'text', text: contentPrefix + '[图片]' }, { type: 'image_url', image_url: { url: r.content } } ] : 
+          contentPrefix + r.content };
+      }
+    });
+
+    if (currentMsg) {
+      mergedMessages.push(currentMsg);
     }
-  });
+    
+    // 取最后 16 个回合（约8轮对话）
+    messages.push(...mergedMessages.slice(-16));
 
   // 记录请求发起时的联系人ID
   const requestContactId = currentContactId;
   activeAIRequests.add(requestContactId);
 
   // 检查是否在聊天中提醒了看朋友圈
-  const rawRecs = chatRecords[currentContactId] || [];
   const latestUserMsg = [...rawRecs].reverse().find(r => r.side === 'right');
   if (latestUserMsg && typeof latestUserMsg.content === 'string' && /朋友圈|动态|点赞|评论|回复|去看看/.test(latestUserMsg.content)) {
     const visibleMoments = moments.filter(m => m.contactId === 'user_self' && checkVisibilityForContact(m, currentContactId));
@@ -4698,12 +4971,31 @@ ${statusRules}
       const physiologicalMatch = statusContent.match(/生理状态[：:]\s*([^\n]+)/);
       const lustMatch = statusContent.match(/情欲(?:百分比)?[：:]\s*(\d+)/);
       
-      // 保存状态数据
+      // 获取旧的好感度用于限制增减幅度
+      let oldFavor = 0;
+      try {
+        const savedStatus = await getFromStorage(`STATUS_${requestContactId}`);
+        if (savedStatus) {
+          const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
+          oldFavor = status.favor || 0;
+        }
+      } catch(e) {}
+      
+      let newFavor = favorMatch ? parseInt(favorMatch[1]) : 0;
+      
+      // 限制好感度增减幅度：最多加5，最多扣15
+      if (newFavor > oldFavor) {
+        newFavor = Math.min(newFavor, oldFavor + 5);
+      } else if (newFavor < oldFavor) {
+        newFavor = Math.max(newFavor, oldFavor - 15);
+      }
+      
+      // 解析状态数据
       parsedStatusData = {
         location: locationMatch ? locationMatch[1].trim() : '未知',
         mood: moodMatch ? moodMatch[1].trim() : '平静',
         thoughts: thoughtsMatch ? thoughtsMatch[1].trim() : '暂无数据',
-        favor: favorMatch ? parseInt(favorMatch[1]) : 0
+        favor: newFavor
       };
 
       if (physiologicalMatch) parsedStatusData.physiological = physiologicalMatch[1].trim();
@@ -4775,30 +5067,6 @@ ${statusRules}
       }
       if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
       chatRecords[requestContactId].push({ side: 'left', content: displayText, time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData });
-    }
-    // 从显示文本中移除状态标签
-    displayText = txt.replace(/<STATUS>[\s\S]*?<\/STATUS>/, '').trim();
-  
-    // 线上模式：将回复按换行符拆分为多条独立消息（泡泡）
-    if (!isOfflineMode) {
-      const lines = displayText.split('\n').filter(l => l.trim() !== '');
-      // 强制限制最多 5 条，防止 AI 话痨
-      const limitedLines = lines.slice(0, 5);
-      
-      limitedLines.forEach(line => {
-        if (isCurrentContact) {
-          addMsgToUI(line, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null);
-        }
-        if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
-        chatRecords[requestContactId].push({ side: 'left', content: line, time: Date.now(), senderId: currentSpeaker.id });
-      });
-    } else {
-      // 线下模式：保持原样，整段发送
-      if (isCurrentContact) {
-        addMsgToUI(displayText, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null);
-      }
-      if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
-      chatRecords[requestContactId].push({ side: 'left', content: displayText, time: Date.now(), senderId: currentSpeaker.id });
     }
     
     await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
@@ -4923,8 +5191,15 @@ async function generateStmEntryForBatch(contactId, stm, batchRecs) {
   const memSettingsStr = await window.storage.getItem('MEMORY_SETTINGS');
   const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
   let stmPrompt = memSettings.stmPrompt || DEFAULT_STM_PROMPT;
-  const userName = await window.storage.getItem('USER_NICKNAME') || '用户';
   
+  // 获取当前聊天设置中的昵称，如果没有则使用全局昵称
+  let chatSettingsForContact = {};
+  const savedSettings = await getFromStorage(`CHAT_SETTINGS_${contactId}`);
+  if (savedSettings) {
+    chatSettingsForContact = typeof savedSettings === 'string' ? JSON.parse(savedSettings) : savedSettings;
+  }
+  const userName = chatSettingsForContact.chatNickname || await window.storage.getItem('USER_NICKNAME') || '用户';
+
   // 替换提示词中的变量
   stmPrompt = stmPrompt
     .replace(/\{charName\}/g, c.name)
@@ -5043,6 +5318,155 @@ function toggleChatMenu(e) {
   if (e) e.stopPropagation();
   const m = document.getElementById('chatMenu');
   m.style.display = m.style.display === 'block' ? 'none' : 'block';
+  
+  const searchContainer = document.getElementById('chatSearchContainer');
+  if (searchContainer && searchContainer.style.display === 'flex') {
+    closeChatSearch();
+  }
+}
+
+function toggleChatSearch(e) {
+  if (e) e.stopPropagation();
+  const searchContainer = document.getElementById('chatSearchContainer');
+  const chatMenu = document.getElementById('chatMenu');
+  if (chatMenu) chatMenu.style.display = 'none';
+  
+  if (searchContainer.style.display === 'flex') {
+    closeChatSearch();
+  } else {
+    searchContainer.style.display = 'flex';
+    document.getElementById('chatSearchInput').focus();
+    clearChatSearch();
+  }
+}
+
+function closeChatSearch() {
+  const searchContainer = document.getElementById('chatSearchContainer');
+  if (searchContainer) searchContainer.style.display = 'none';
+  const input = document.getElementById('chatSearchInput');
+  if (input) input.value = '';
+}
+
+function clearChatSearch() {
+  const input = document.getElementById('chatSearchInput');
+  if (input) input.value = '';
+  const clearBtn = document.getElementById('chatSearchClear');
+  if (clearBtn) clearBtn.style.display = 'none';
+  const resultsContainer = document.getElementById('chatSearchResults');
+  if (resultsContainer) resultsContainer.innerHTML = '<div style="text-align:center; color:var(--text-light); margin-top:20px; font-size:13px;">输入关键字查找内容</div>';
+  if (input) input.focus();
+}
+
+function performChatSearch() {
+  const input = document.getElementById('chatSearchInput');
+  const keyword = input.value.trim().toLowerCase();
+  const clearBtn = document.getElementById('chatSearchClear');
+  const resultsContainer = document.getElementById('chatSearchResults');
+  
+  if (keyword) {
+    clearBtn.style.display = 'inline';
+  } else {
+    clearBtn.style.display = 'none';
+    resultsContainer.innerHTML = '<div style="text-align:center; color:var(--text-light); margin-top:20px; font-size:13px;">输入关键字查找内容</div>';
+    return;
+  }
+  
+  if (!currentContactId) return;
+  const recs = chatRecords[currentContactId] || [];
+  const c = contacts.find(x => x.id === currentContactId);
+  const userName = window.storageSync ? (window.storageSync.getItem('USER_NICKNAME') || '我') : '我';
+  
+  const matches = [];
+  for (let i = 0; i < recs.length; i++) {
+    const r = recs[i];
+    if (r.type === 'image') continue;
+    const text = r.content || '';
+    if (text.toLowerCase().includes(keyword)) {
+      matches.push({ index: i, record: r });
+    }
+  }
+  
+  if (matches.length === 0) {
+    resultsContainer.innerHTML = '<div style="text-align:center; color:var(--text-light); margin-top:20px; font-size:13px;">未找到相关聊天记录</div>';
+    return;
+  }
+  
+  resultsContainer.innerHTML = '';
+  matches.reverse().forEach(match => {
+    const r = match.record;
+    let senderName = r.side === 'right' ? userName : (c ? c.name : 'TA');
+    if (c && c.isGroup && r.side === 'left' && r.senderId) {
+      const member = contacts.find(x => x.id === r.senderId);
+      if (member) senderName = member.name;
+    }
+    
+    let avatarSrc = r.side === 'right' ? (chatSettings.chatUserAvatar || userAvatar) : (c ? c.avatar : '');
+    if (c && c.isGroup && r.side === 'left' && r.senderId) {
+      const member = contacts.find(x => x.id === r.senderId);
+      if (member) avatarSrc = member.avatar;
+    }
+    
+    const timeStr = r.time ? new Date(r.time).toLocaleString('zh-CN', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
+    
+    const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const highlightedContent = r.content.replace(regex, '<span style="color:var(--main-pink); font-weight:bold;">$1</span>');
+    
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex; padding:12px; background:rgba(255,255,255,0.6); border-radius:12px; border:1px solid rgba(0,0,0,0.05); cursor:pointer; margin-bottom:8px;';
+    div.innerHTML = `
+      <img src="${avatarSrc}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; margin-right:12px; flex-shrink:0;">
+      <div style="flex:1; overflow:hidden;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span style="font-size:14px; font-weight:500; color:var(--text-dark);">${senderName}</span>
+          <span style="font-size:11px; color:var(--text-light);">${timeStr}</span>
+        </div>
+        <div style="font-size:13px; color:var(--text-dark); line-height:1.5; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; word-break:break-all;">
+          ${highlightedContent}
+        </div>
+      </div>
+    `;
+    
+    div.onclick = () => {
+      jumpToChatRecord(match.index);
+    };
+    
+    resultsContainer.appendChild(div);
+  });
+}
+
+function jumpToChatRecord(targetIdx) {
+  closeChatSearch();
+  const el = document.getElementById('chatContent');
+  const rec = chatRecords[currentContactId] || [];
+  
+  const showCount = 30;
+  let startIdx = Math.max(0, rec.length - showCount);
+  
+  if (targetIdx < startIdx) {
+    startIdx = Math.max(0, targetIdx - 5);
+    renderChat(startIdx);
+  }
+  
+  setTimeout(() => {
+    const targetBubble = el.querySelector(`.msg-bubble[data-msg-idx="${targetIdx}"], .msg-blue-card[data-msg-idx="${targetIdx}"]`);
+    if (targetBubble) {
+      const targetItem = targetBubble.closest('.msg-item');
+      if (targetItem) {
+        targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        const originalFilter = targetBubble.style.filter;
+        
+        targetBubble.style.transition = 'all 0.3s ease';
+        targetBubble.style.filter = 'brightness(0.8) contrast(1.2)';
+        targetBubble.style.boxShadow = '0 0 15px var(--main-pink)';
+        
+        setTimeout(() => {
+          targetBubble.style.filter = originalFilter;
+          targetBubble.style.boxShadow = '';
+        }, 1500);
+      }
+    }
+  }, 100);
 }
 
 // ========== 聊天设置核心功能 ==========
@@ -8043,7 +8467,7 @@ window.onload = async () => {
     function findBubble(target) {
       if (!target) return null;
       if (target.nodeType === 3) target = target.parentNode; // 文本节点
-      return target && target.closest ? target.closest('.msg-bubble') : null;
+      return target && target.closest ? target.closest('.msg-bubble, .msg-blue-card') : null;
     }
     
     chatContent.addEventListener('touchstart', function(e) {
@@ -8161,6 +8585,99 @@ window.onload = async () => {
     if (playerSub) playerSub.innerText = savedPlayerSub;
   }
 };
+
+// ========== 论坛功能 ==========
+let forumPosts = [];
+
+async function refreshForum() {
+  const container = document.getElementById('forumContainer');
+  
+  // 显示加载提示
+  const loadingDiv = document.createElement('div');
+  loadingDiv.id = 'forum-loading';
+  loadingDiv.style.cssText = 'text-align:center; padding:20px; color:var(--text-light);';
+  loadingDiv.innerHTML = `⚡ 正在刷新论坛...`;
+  container.insertBefore(loadingDiv, container.firstChild);
+  
+  // 模拟网络请求延迟
+  await new Promise(r => setTimeout(r, 800));
+  
+  document.getElementById('forum-loading')?.remove();
+  renderForum();
+  showToast('✅ 刷新成功');
+}
+
+function renderForum() {
+  const container = document.getElementById('forumContainer');
+  
+  if (forumPosts.length === 0) {
+    container.innerHTML = '<div class="empty-tip">点击右上角刷新按钮查看论坛</div>';
+    return;
+  }
+  
+  container.innerHTML = '';
+  
+  forumPosts.forEach((post) => {
+    const div = document.createElement('div');
+    div.className = 'forum-post';
+    
+    const timeStr = formatTime(post.time);
+    
+    div.innerHTML = `
+      <div class="forum-post-header">
+        <img class="forum-post-avatar" src="${post.avatar}">
+        <div class="forum-post-info">
+          <div class="forum-post-name">${post.authorName}</div>
+          <div class="forum-post-time">${timeStr}</div>
+        </div>
+      </div>
+      <div class="forum-post-title">${post.title}</div>
+      <div class="forum-post-content">${post.content}</div>
+    `;
+    
+    container.appendChild(div);
+  });
+}
+
+async function publishForumPost() {
+  const title = document.getElementById('postForumTitle').value.trim();
+  const content = document.getElementById('postForumContent').value.trim();
+  
+  if (!title) {
+    showToast('请输入标题');
+    return;
+  }
+  
+  if (!content) {
+    showToast('请输入内容');
+    return;
+  }
+  
+  const userName = await getFromStorage('USER_NICKNAME') || '我';
+  
+  const newPost = {
+    id: Date.now().toString(),
+    authorName: userName,
+    avatar: userAvatar,
+    title: title,
+    content: content,
+    time: Date.now()
+  };
+  
+  forumPosts.unshift(newPost);
+  
+  // 清理表单
+  document.getElementById('postForumTitle').value = '';
+  document.getElementById('postForumContent').value = '';
+  
+  closeSub('post-forum-page');
+  
+  if (document.getElementById('forum-page').classList.contains('show')) {
+    renderForum();
+  }
+  
+  showToast('✅ 发布成功！');
+}
 
 // ========== 朋友圈功能 - 使用IndexedDB ==========
 let moments = [];
@@ -9365,7 +9882,14 @@ async function memorySummary() {
   const ltmMaxEntries = memSettings.ltmMaxEntries || 20;
   
   // 构建对话内容文本
-  const userName = await getFromStorage('USER_NICKNAME') || '用户';
+  // 获取当前聊天设置中的昵称，如果没有则使用全局昵称
+  let chatSettingsForContact = {};
+  const savedSettings = await getFromStorage(`CHAT_SETTINGS_${currentContactId}`);
+  if (savedSettings) {
+    chatSettingsForContact = typeof savedSettings === 'string' ? JSON.parse(savedSettings) : savedSettings;
+  }
+  const userName = chatSettingsForContact.chatNickname || await getFromStorage('USER_NICKNAME') || '用户';
+
   let conversationText = '';
   rec.forEach(r => {
     const speaker = r.side === 'right' ? userName : c.name;
@@ -9692,7 +10216,13 @@ async function archiveStmToWorldBook(contactId, stm) {
   const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
   if (!cfg.key || !cfg.url || !cfg.model) return;
   
-  const userName = await getFromStorage('USER_NICKNAME') || '用户';
+  // 获取当前聊天设置中的昵称，如果没有则使用全局昵称
+  let chatSettingsForContact = {};
+  const savedSettings = await getFromStorage(`CHAT_SETTINGS_${contactId}`);
+  if (savedSettings) {
+    chatSettingsForContact = typeof savedSettings === 'string' ? JSON.parse(savedSettings) : savedSettings;
+  }
+  const userName = chatSettingsForContact.chatNickname || await getFromStorage('USER_NICKNAME') || '用户';
   
   // 合并10条短期记忆的内容
   let mergedText = stm.entries.map((e, i) => `${i+1}. ${e.content}`).join('\n');
