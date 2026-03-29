@@ -1,4 +1,4 @@
-<html lang="zh-CN">
+﻿<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -551,17 +551,17 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 42px 20px 90px;
+  padding: 27px 20px 90px;
   justify-content: flex-start;
   overflow-y: auto;
 }
 
 .me-time {
-  font-size: 48px;
+  font-size: 70px;
   font-weight: 200;
   color: #333;
   transition: color 0.3s;
-  margin-bottom: 46px;
+  margin-bottom: 16px;
   flex-shrink: 0;
 }
 
@@ -1057,7 +1057,7 @@ body {
   }
   .msg-item.left.blue-offline-mode .msg-blue-card {
     width: 100%;
-    background: rgba(255,255,255,0.85);
+    background: rgba(var(--left-bubble-bg, 255, 255, 255), var(--bubble-opacity, 0.85));
     border-radius: 0;
     padding: 12px 15px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -1073,15 +1073,16 @@ body {
   }
   .blue-card-top {
     display: flex;
-    gap: 12px;
+    gap: 6px;
   }
   .blue-card-avatar {
-    width: 64px;
+    width: 80px;
     border-radius: 10px;
     overflow: hidden;
     flex-shrink: 0;
     border: 2px solid var(--main-pink);
     display: flex;
+    margin-left: -3px;
   }
   .blue-card-avatar img {
     width: 100%;
@@ -1093,6 +1094,7 @@ body {
     display: grid;
     grid-template-columns: 7fr 4fr;
     gap: 6px;
+    padding-right: 4px;
   }
   .bc-status-item {
     background: rgba(255,255,255,0.5);
@@ -2444,40 +2446,186 @@ body {
     </div>
 
     <!-- 论坛二级页面 -->
+    <!-- 论坛主页：三个板块入口 -->
     <div class="sub-page" id="forum-page">
       <div class="page-header">
         <div class="page-back" onclick="closeSub('forum-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">论坛</div>
-        <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
-          <div style="cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center;" onclick="refreshForum()">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="23 4 23 10 17 10"/>
-              <polyline points="1 20 1 14 7 14"/>
-              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-            </svg>
-          </div>
-          <div style="cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size: 24px; color: var(--text-dark); font-weight: bold;" onclick="openSub('post-forum-page')">
-            +
-          </div>
-        </div>
+        <div style="margin-left:auto; font-size:26px; color:var(--text-dark); cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:rgba(0,0,0,0.05);" onclick="openSub('add-forum-board-page')">+</div>
       </div>
-      <div class="page-body" id="forumContainer" style="padding:15px; background: #f5f5f5;">
-        <div class="empty-tip">点击右上角刷新按钮查看论坛</div>
+      <div class="page-body" style="padding:16px; background:linear-gradient(135deg, #1a1a2e 0%, #0d1b2a 50%, #0f1a0f 100%); gap:14px; display:flex; flex-direction:column;" id="forumBoardList">
+        <!-- 板块一：风声暗巷 -->
+        <div class="forum-board-card" onclick="openForumBoard('gossip')" style="background:rgba(255,255,255,0.12); backdrop-filter:blur(24px) saturate(1.6); -webkit-backdrop-filter:blur(24px) saturate(1.6); border:1px solid rgba(255,255,255,0.22); border-radius:16px; padding:20px; cursor:pointer; position:relative; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          <div style="position:absolute; top:-20px; right:-20px; font-size:80px; opacity:0.08; pointer-events:none;">🕵️</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <span style="font-size:22px;">🕵️</span>
+            <div>
+              <div style="font-size:16px; font-weight:700; color:#e8c87a; letter-spacing:1px;">风声暗巷</div>
+              <div style="font-size:11px; color:#9a8fa0; margin-top:2px;">板块一 · 八卦版</div>
+            </div>
+          </div>
+          <div style="font-size:13px; color:#c0b0cc; line-height:1.6;">熟人社会秘闻集散地。办公室、校园、邻里、亲友圈"不可说"话题的匿名树洞。</div>
+          <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+            <span style="background:rgba(232,200,122,0.15); color:#e8c87a; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(232,200,122,0.3);">人际关系</span>
+            <span style="background:rgba(232,200,122,0.15); color:#e8c87a; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(232,200,122,0.3);">匿名树洞</span>
+            <span style="background:rgba(232,200,122,0.15); color:#e8c87a; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(232,200,122,0.3);">秘闻</span>
+          </div>
+          <div style="position:absolute; bottom:16px; right:16px; color:#e8c87a; font-size:18px; opacity:0.7;">›</div>
+        </div>
+
+        <!-- 板块二：星海瞭望台 -->
+        <div class="forum-board-card" onclick="openForumBoard('entertainment')" style="background:rgba(255,255,255,0.12); backdrop-filter:blur(24px) saturate(1.6); -webkit-backdrop-filter:blur(24px) saturate(1.6); border:1px solid rgba(255,255,255,0.22); border-radius:16px; padding:20px; cursor:pointer; position:relative; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          <div style="position:absolute; top:-20px; right:-20px; font-size:80px; opacity:0.08; pointer-events:none;">🌟</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <span style="font-size:22px;">🌟</span>
+            <div>
+              <div style="font-size:16px; font-weight:700; color:#7ab8e8; letter-spacing:1px;">星海瞭望台</div>
+              <div style="font-size:11px; color:#5a7a9a; margin-top:2px;">板块二 · 娱乐版</div>
+            </div>
+          </div>
+          <div style="font-size:13px; color:#8aa8c0; line-height:1.6;">显微镜下的偶像工业观察。不止于"谁和谁恋爱了"，更关注人设、资源、商业动向和行业趋势。</div>
+          <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+            <span style="background:rgba(122,184,232,0.15); color:#7ab8e8; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(122,184,232,0.3);">偶像工业</span>
+            <span style="background:rgba(122,184,232,0.15); color:#7ab8e8; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(122,184,232,0.3);">资源分析</span>
+            <span style="background:rgba(122,184,232,0.15); color:#7ab8e8; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(122,184,232,0.3);">梗文化</span>
+          </div>
+          <div style="position:absolute; bottom:16px; right:16px; color:#7ab8e8; font-size:18px; opacity:0.7;">›</div>
+        </div>
+
+        <!-- 板块三：夜谈档案馆 -->
+        <div class="forum-board-card" onclick="openForumBoard('horror')" style="background:rgba(255,255,255,0.12); backdrop-filter:blur(24px) saturate(1.6); -webkit-backdrop-filter:blur(24px) saturate(1.6); border:1px solid rgba(255,255,255,0.22); border-radius:16px; padding:20px; cursor:pointer; position:relative; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          <div style="position:absolute; top:-20px; right:-20px; font-size:80px; opacity:0.08; pointer-events:none;">🌒</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <span style="font-size:22px;">🌒</span>
+            <div>
+              <div style="font-size:16px; font-weight:700; color:#7ae8a0; letter-spacing:1px;">夜谈档案馆</div>
+              <div style="font-size:11px; color:#4a7a5a; margin-top:2px;">板块三 · 恐怖版</div>
+            </div>
+          </div>
+          <div style="font-size:13px; color:#7aaa88; line-height:1.6;">现代都市怪谈与心理解构现场。对日常生活的异常切片，追求"后劲"和"氛围感"。</div>
+          <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+            <span style="background:rgba(122,232,160,0.15); color:#7ae8a0; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(122,232,160,0.3);">都市怪谈</span>
+            <span style="background:rgba(122,232,160,0.15); color:#7ae8a0; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(122,232,160,0.3);">日常异常</span>
+            <span style="background:rgba(122,232,160,0.15); color:#7ae8a0; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(122,232,160,0.3);">氛围感</span>
+          </div>
+          <div style="position:absolute; bottom:16px; right:16px; color:#7ae8a0; font-size:18px; opacity:0.7;">›</div>
+        </div>
       </div>
     </div>
 
-    <!-- 发帖页面 -->
+    <!-- 新增板块页面 -->
+    <div class="sub-page" id="add-forum-board-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('add-forum-board-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">新增板块</div>
+        <div style="margin-left:auto; font-size:14px; color:white; background:var(--main-pink); padding:6px 16px; border-radius:12px; cursor:pointer; font-weight:500;" onclick="saveNewForumBoard()">保存</div>
+      </div>
+      <div class="page-body">
+        <div class="form-section">
+          <div class="form-label">版块名称</div>
+          <input class="form-input" id="newBoardName" placeholder="输入版块名称（如：技术交流）">
+        </div>
+        <div class="form-section">
+          <div class="form-label">版块描述</div>
+          <textarea class="form-textarea" id="newBoardDesc" placeholder="描述这个版块的主题和内容..." style="min-height:80px;"></textarea>
+        </div>
+        <div class="form-section">
+          <div class="form-label">关联世界书模块</div>
+          <div class="setting-desc">选择与此版块相关的世界书条目，将作为版块背景设定。</div>
+          <div id="boardWorldBookList" style="max-height:180px; overflow-y:auto; background:#fff; border-radius:12px; border:1px solid var(--light-pink); padding:8px; margin-top:8px;">
+            <div style="text-align:center; color:var(--text-light); font-size:13px; padding:10px;">暂无世界书条目</div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-label">修改/删除版块</div>
+          <div class="setting-desc">选择要删除的已有版块。</div>
+          <div id="customBoardDeleteList" style="margin-top:8px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块一：风声暗巷 -->
+    <div class="sub-page" id="forum-gossip-page">
+      <div class="page-header" style="background:#1a1a2e; border-bottom:1px solid #2a2a4e;">
+        <div class="page-back" onclick="closeSub('forum-gossip-page')" style="background:rgba(232,200,122,0.15);"><svg viewBox="0 0 24 24" stroke="#e8c87a"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title" style="color:#e8c87a;">🕵️ 风声暗巷</div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+          <div style="cursor:pointer;" onclick="refreshForumBoard('gossip')">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#e8c87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </div>
+          <div style="cursor:pointer; font-size:22px; color:#e8c87a; font-weight:bold; line-height:1;" onclick="openPostForumPage('gossip')">+</div>
+        </div>
+      </div>
+      <!-- 发帖须知：仅供AI生成帖子时参考，不显示给用户 -->
+      <!-- AI指令: 必须描述"谁在哪做了什么"，需含1-2个无法编造的生活化细节，禁止空洞主观评价。 -->
+      <div class="page-body" id="forumContainer-gossip" style="padding:12px; background:#0e0e1e; flex-direction:column; gap:10px;">
+        <div class="empty-tip" style="color:#5a5a8a;">暗巷还很安静，点击刷新或率先爆料</div>
+      </div>
+    </div>
+
+    <!-- 板块二：星海瞭望台 -->
+    <div class="sub-page" id="forum-entertainment-page">
+      <div class="page-header" style="background:#0d1b2a; border-bottom:1px solid #1a3050;">
+        <div class="page-back" onclick="closeSub('forum-entertainment-page')" style="background:rgba(122,184,232,0.15);"><svg viewBox="0 0 24 24" stroke="#7ab8e8"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title" style="color:#7ab8e8;">🌟 星海瞭望台</div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+          <div style="cursor:pointer;" onclick="refreshForumBoard('entertainment')">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#7ab8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </div>
+          <div style="cursor:pointer; font-size:22px; color:#7ab8e8; font-weight:bold; line-height:1;" onclick="openPostForumPage('entertainment')">+</div>
+        </div>
+      </div>
+      <!-- 发帖须知：仅供AI生成帖子时参考，不显示给用户 -->
+      <!-- AI指令: 必须基于清晰的公开时间线，用可验证信息说话，玩梗需高级，禁止低俗人身攻击。 -->
+      <div class="page-body" id="forumContainer-entertainment" style="padding:12px; background:#080f18; flex-direction:column; gap:10px;">
+        <div class="empty-tip" style="color:#3a5a7a;">瞭望台还没有观察报告，点击刷新或开始分析</div>
+      </div>
+    </div>
+
+    <!-- 板块三：夜谈档案馆 -->
+    <div class="sub-page" id="forum-horror-page">
+      <div class="page-header" style="background:#0f1a0f; border-bottom:1px solid #1a3020;">
+        <div class="page-back" onclick="closeSub('forum-horror-page')" style="background:rgba(122,232,160,0.15);"><svg viewBox="0 0 24 24" stroke="#7ae8a0"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title" style="color:#7ae8a0;">🌒 夜谈档案馆</div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+          <div style="cursor:pointer;" onclick="refreshForumBoard('horror')">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#7ae8a0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </div>
+          <div style="cursor:pointer; font-size:22px; color:#7ae8a0; font-weight:bold; line-height:1;" onclick="openPostForumPage('horror')">+</div>
+        </div>
+      </div>
+      <!-- 发帖须知：仅供AI生成帖子时参考，不显示给用户 -->
+      <!-- AI指令: 场景必须日常，恐怖点源于对日常规则的细微破坏，禁止直接描写鬼怪，用感官细节营造氛围。 -->
+      <div class="page-body" id="forumContainer-horror" style="padding:12px; background:#080e08; flex-direction:column; gap:10px;">
+        <div class="empty-tip" style="color:#3a6a4a;">档案馆暂无记录，点击刷新或提交你的异常档案</div>
+      </div>
+    </div>
+
+    <!-- 发帖页面（三板块共用） -->
     <div class="sub-page" id="post-forum-page">
-      <div class="page-header" style="border-bottom:none;">
+      <div class="page-header" style="border-bottom:none;" id="post-forum-header">
         <div class="page-back" onclick="closeSub('post-forum-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="page-title">发帖</div>
+        <div class="page-title" id="post-forum-page-title">发帖</div>
         <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
-          <div style="cursor:pointer; display:flex; align-items:center; justify-content:center; font-size: 14px; color: white; background: var(--main-pink); padding: 4px 12px; border-radius: 12px;" onclick="publishForumPost()">
+          <div id="post-forum-publish-btn" style="cursor:pointer; display:flex; align-items:center; justify-content:center; font-size: 14px; color: white; background: var(--main-pink); padding: 4px 12px; border-radius: 12px;" onclick="publishForumPost()">
             发布
           </div>
         </div>
       </div>
-      <div class="page-body">
+      <!-- 当前板块标签 -->
+      <div id="post-forum-board-tag" style="padding:8px 16px; font-size:12px; background:#f5f5f5; border-bottom:1px solid #eee;"></div>
+      <!-- 板块规则折叠提示 -->
+      <div id="post-forum-rules" style="margin:10px 16px; border-radius:10px; overflow:hidden; font-size:12px; line-height:1.7;"></div>
+      <div class="page-body" style="padding-top:0;">
         <div class="form-section">
           <div class="form-label">标题</div>
           <input class="form-input" id="postForumTitle" placeholder="输入标题...">
@@ -3018,6 +3166,58 @@ function saveSyncToStorage(key, value) {
   window.storageSync.setItem(key, value);
 }
 
+// ======== 世界书草稿自动保存到IndexedDB（刷新不丢失）========
+let _wbDraftTimer = null;
+function saveWorldBookDraft() {
+  // 编辑已有条目时不覆盖草稿
+  if (window._isEditingWb) return;
+  clearTimeout(_wbDraftTimer);
+  _wbDraftTimer = setTimeout(async () => {
+    try {
+      const nameEl = document.getElementById('worldbook-name');
+      const catEl = document.getElementById('worldbook-category');
+      const contentEl = document.getElementById('worldbook-content');
+      const kwEl = document.getElementById('worldbook-keywords');
+      const triggerEl = document.querySelector('input[name="wb-trigger-type"]:checked');
+      const draft = {
+        name: nameEl ? nameEl.value : '',
+        category: catEl ? catEl.value : '',
+        content: contentEl ? contentEl.value : '',
+        keywords: kwEl ? kwEl.value : '',
+        triggerType: triggerEl ? triggerEl.value : 'always'
+      };
+      // 只有有内容时才保存草稿
+      if (draft.name || draft.content) {
+        await saveToStorage('WORLDBOOK_DRAFT', JSON.stringify(draft));
+      }
+    } catch(e) { console.error('保存世界书草稿失败:', e); }
+  }, 600);
+}
+
+async function restoreWorldBookDraft() {
+  try {
+    const draftStr = await getFromStorage('WORLDBOOK_DRAFT');
+    if (!draftStr) return;
+    const draft = JSON.parse(draftStr);
+    if (!draft.name && !draft.content) return; // 空草稿不恢复
+    const nameEl = document.getElementById('worldbook-name');
+    const catEl = document.getElementById('worldbook-category');
+    const contentEl = document.getElementById('worldbook-content');
+    const kwEl = document.getElementById('worldbook-keywords');
+    if (nameEl) nameEl.value = draft.name || '';
+    if (catEl && draft.category) catEl.value = draft.category;
+    if (contentEl) contentEl.value = draft.content || '';
+    if (kwEl) kwEl.value = draft.keywords || '';
+    if (draft.triggerType === 'keyword') {
+      const kwRadio = document.querySelector('input[name="wb-trigger-type"][value="keyword"]');
+      if (kwRadio) {
+        kwRadio.checked = true;
+        if (typeof window.toggleWbKeywordInput === 'function') window.toggleWbKeywordInput();
+      }
+    }
+  } catch(e) { console.error('恢复世界书草稿失败:', e); }
+}
+
 // 更新时间显示
 function updateTime() {
   const now = new Date();
@@ -3286,6 +3486,8 @@ function openSub(id) {
         const alwaysRadio = document.querySelector('input[name="wb-trigger-type"][value="always"]');
         if (alwaysRadio) alwaysRadio.checked = true;
         if (typeof window.toggleWbKeywordInput === 'function') window.toggleWbKeywordInput();
+        // 恢复未提交的草稿（异步，不阻塞UI）
+        restoreWorldBookDraft();
     }
     window._isEditingWb = false;
 
@@ -3991,11 +4193,16 @@ function openAddGroupChat() {
   originalOpenSub('addGroupChat');
 }
 
-// Intercept openSub to handle addGroupChat initialization
+// Intercept openSub to handle addGroupChat and add-forum-board-page initialization
 const originalOpenSub = openSub;
 openSub = function(id) {
   if (id === 'addGroupChat') {
     openAddGroupChat();
+    return;
+  }
+  if (id === 'add-forum-board-page') {
+    originalOpenSub(id);
+    renderAddForumBoardPage();
     return;
   }
   originalOpenSub(id);
@@ -4359,9 +4566,9 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
       <div class="blue-card-top">
         <div class="blue-card-avatar${ringClass}"><img src="${avatar}"></div>
         <div class="blue-card-status">
+          <div class="bc-status-item thoughts"><div class="bc-label">💭 心声</div><div class="bc-val">${(statusData?.thoughts || '没有想法').substring(0,10)}</div></div>
           <div class="bc-status-item"><div class="bc-label">📍 地点</div><div class="bc-val">${statusData?.location || '未知'}</div></div>
-          <div class="bc-status-item"><div class="bc-label">😊 心情</div><div class="bc-val">${statusData?.mood || '平静'}</div></div>
-          <div class="bc-status-item thoughts"><div class="bc-label">💭 心声</div><div class="bc-val">${statusData?.thoughts || '暂无数据'}</div></div>
+          <div class="bc-status-item"><div class="bc-label">😊 心情</div><div class="bc-val">${(statusData?.mood || '平静').substring(0,10)}</div></div>
           <div class="bc-status-item favor"><div class="bc-label">💚 好感度</div><div class="bc-val">${statusData?.favor || 0}%</div></div>
         </div>
       </div>
@@ -5941,24 +6148,39 @@ function uploadContactAvatarByUrl() {
   }
 }
 
-  // 渲染世界书多选框列表
-  function renderWorldBookCheckboxList() {
-    const container = document.getElementById('worldbook-checkbox-list');
+// 渲染世界书多选框列表（全局函数，按类别分组显示）
+function renderWorldBookCheckboxList() {
+  const container = document.getElementById('worldbook-checkbox-list');
 
-    if (worldBookEntries.length === 0) {
-      container.innerHTML = '<div style="padding:10px; text-align:center; color:var(--text-light); font-size:12px;">暂无世界书条目<br>请先在"世界书管理"中添加</div>';
-      return;
-    }
+  if (worldBookEntries.length === 0) {
+    container.innerHTML = '<div style="padding:10px; text-align:center; color:var(--text-light); font-size:12px;">暂无世界书条目<br>请先在"世界书管理"中添加</div>';
+    return;
+  }
 
-    container.innerHTML = '';
+  container.innerHTML = '';
 
-    // 确保 chatSettings.selectedWorldBooks 存在
-    if (!chatSettings.selectedWorldBooks) {
-      chatSettings.selectedWorldBooks = [];
-    }
+  // 确保 chatSettings.selectedWorldBooks 存在
+  if (!chatSettings.selectedWorldBooks) {
+    chatSettings.selectedWorldBooks = [];
+  }
 
-    // 这里不过滤任何类别，直接展示所有世界书，以供用户选择
-    worldBookEntries.forEach((entry, idx) => {
+  // 按类别分组
+  const categories = {};
+  worldBookEntries.forEach((entry) => {
+    const cat = entry.category || '未分类';
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push(entry);
+  });
+
+  // 按类别渲染
+  Object.keys(categories).forEach(cat => {
+    // 类别标题
+    const catHeader = document.createElement('div');
+    catHeader.style.cssText = 'padding:6px 0 4px; font-size:12px; color:var(--main-pink); font-weight:600; border-bottom:1px solid var(--light-pink); margin-top:6px;';
+    catHeader.textContent = cat;
+    container.appendChild(catHeader);
+
+    categories[cat].forEach((entry) => {
       const isChecked = chatSettings.selectedWorldBooks.includes(entry.id);
       const checkboxItem = document.createElement('div');
       checkboxItem.style.cssText = 'display:flex; align-items:center; padding:8px 0; border-bottom:1px solid #f0e8df;';
@@ -5971,9 +6193,10 @@ function uploadContactAvatarByUrl() {
       `;
       container.appendChild(checkboxItem);
     });
-  }
+  });
+}
 
-// 切换世界书选择
+// 切换世界书选择（全局函数，确保所有类别都能正常勾选）
 function toggleWorldBookSelection(entryId) {
   if (!chatSettings.selectedWorldBooks) {
     chatSettings.selectedWorldBooks = [];
@@ -5984,6 +6207,11 @@ function toggleWorldBookSelection(entryId) {
     chatSettings.selectedWorldBooks.splice(index, 1);
   } else {
     chatSettings.selectedWorldBooks.push(entryId);
+  }
+  
+  // 立即保存到 storage，避免用户忘记点保存按钮导致勾选丢失
+  if (currentContactId) {
+    saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
   }
 }
 
@@ -6118,7 +6346,9 @@ async function loadChatSettings() {
       chatNickname: '',
       sceneSetting: '',
       userMask: '',
-      contactMask: ''
+      contactMask: '',
+      useWorldBook: true,
+      selectedWorldBooks: []
     };
   }
   
@@ -6717,6 +6947,9 @@ function toggleWbKeywordInput() {
       });
     }
     await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+
+  // 清除草稿（保存成功后清除，避免下次开启时误恢复旧内容）
+  await saveToStorage('WORLDBOOK_DRAFT', '');
   
   // 清空表单
   document.getElementById('worldbook-name').value = '';
@@ -6862,6 +7095,7 @@ function applyMeTextColor(isDark) {
   if (timeEl) timeEl.style.color = textColor;
   
   // 昵称
+  const nicknameEl = document.getElementById('user-nickname');
   if (nicknameEl) nicknameEl.style.color = textColor;
   
   // 签名
@@ -7798,7 +8032,7 @@ function toggleTextFormat(btn, prop) {
   applyTextBeautify();
 }
 
-function applyCustomFont(url) {
+async function applyCustomFont(url) {
   const fontInput = document.getElementById('customFontUrl');
   const fontUrl = url !== undefined ? url : (fontInput ? fontInput.value.trim() : '');
   
@@ -7818,15 +8052,31 @@ function applyCustomFont(url) {
   
   // 保持字体大小设置
   const fontSize = document.getElementById('customFontSize')?.value || '14';
+  // CORS fix: fetch font as blob URL to bypass PC browser CORS restriction
+  // Fallback to direct URL if fetch fails (mobile stays compatible)
+  let fontSrc = `url('${fontUrl}')`;
+  try {
+    const resp = await fetch(fontUrl, { mode: 'cors' });
+    if (resp.ok) {
+      const blob = await resp.blob();
+      fontSrc = `url('${URL.createObjectURL(blob)}')`;
+    }
+  } catch(e) {
+    console.warn('[Font] CORS failed, using direct URL:', e.message);
+  }
   
   styleEl.innerHTML = `
     @font-face {
       font-family: 'MyCustomFont';
-      src: url('${fontUrl}');
+      src: ${fontSrc};
     }
-    * {
+    *:not(.me-time):not(#currentTime) {
       font-family: 'MyCustomFont', -apple-system, "SF Pro Display", "PingFang SC", sans-serif !important;
       font-size: ${fontSize}px !important;
+    }
+    .me-time, #currentTime {
+      font-family: 'MyCustomFont', -apple-system, "SF Pro Display", "PingFang SC", sans-serif !important;
+      font-size: 70px !important;
     }
   `;
   
@@ -7844,8 +8094,11 @@ function applyCustomFontSize(size, skipSave = false) {
   }
   
   styleEl.innerHTML = `
-    * {
+    *:not(.me-time):not(#currentTime) {
       font-size: ${size}px !important;
+    }
+    .me-time, #currentTime {
+      font-size: 70px !important;
     }
   `;
   
@@ -8315,6 +8568,9 @@ window.onload = async () => {
     await loadTextBeautifySettings();
     loadMemorySettings();
     loadMomentsCover();
+    loadForumPosts();
+    await loadCustomForumBoards();
+    renderForumBoardList();
     
     // 从IndexedDB加载朋友圈数据
     await loadMomentsFromDB();
@@ -8586,98 +8842,565 @@ window.onload = async () => {
   }
 };
 
-// ========== 论坛功能 ==========
-let forumPosts = [];
+// ========== 新增板块功能 ==========
+let customForumBoards = [];
+let deletedPresetBoards = []; // 记录被删除的预设板块ID
 
-async function refreshForum() {
-  const container = document.getElementById('forumContainer');
-  
-  // 显示加载提示
-  const loadingDiv = document.createElement('div');
-  loadingDiv.id = 'forum-loading';
-  loadingDiv.style.cssText = 'text-align:center; padding:20px; color:var(--text-light);';
-  loadingDiv.innerHTML = `⚡ 正在刷新论坛...`;
-  container.insertBefore(loadingDiv, container.firstChild);
-  
-  // 模拟网络请求延迟
-  await new Promise(r => setTimeout(r, 800));
-  
-  document.getElementById('forum-loading')?.remove();
-  renderForum();
-  showToast('✅ 刷新成功');
+async function loadCustomForumBoards() {
+  const saved = await getFromStorage('CUSTOM_FORUM_BOARDS');
+  if (saved) {
+    try {
+      customForumBoards = typeof saved === 'string' ? JSON.parse(saved) : saved;
+      if (!Array.isArray(customForumBoards)) customForumBoards = [];
+    } catch(e) { customForumBoards = []; }
+  }
+  // 加载已删除的预设板块列表
+  const deletedSaved = await getFromStorage('DELETED_PRESET_BOARDS');
+  if (deletedSaved) {
+    try {
+      deletedPresetBoards = typeof deletedSaved === 'string' ? JSON.parse(deletedSaved) : deletedSaved;
+      if (!Array.isArray(deletedPresetBoards)) deletedPresetBoards = [];
+    } catch(e) { deletedPresetBoards = []; }
+  }
 }
 
-function renderForum() {
-  const container = document.getElementById('forumContainer');
-  
-  if (forumPosts.length === 0) {
-    container.innerHTML = '<div class="empty-tip">点击右上角刷新按钮查看论坛</div>';
-    return;
+function renderAddForumBoardPage() {
+  // 渲染世界书列表
+  const wbList = document.getElementById('boardWorldBookList');
+  if (worldBookEntries.length === 0) {
+    wbList.innerHTML = '<div style="text-align:center; color:var(--text-light); font-size:13px; padding:10px;">暂无世界书条目</div>';
+  } else {
+    wbList.innerHTML = '';
+    worldBookEntries.forEach(entry => {
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex; align-items:center; padding:8px 4px; border-bottom:1px solid #f0e8df;';
+      div.innerHTML = `
+        <input type="checkbox" id="board-wb-${entry.id}" value="${entry.id}" style="width:16px; height:16px; margin-right:10px; cursor:pointer;">
+        <label for="board-wb-${entry.id}" style="flex:1; font-size:13px; color:var(--text-dark); cursor:pointer;">
+          <div style="font-weight:500;">${entry.name}</div>
+          <div style="font-size:11px; color:var(--text-light);">${entry.category}</div>
+        </label>
+      `;
+      wbList.appendChild(div);
+    });
   }
-  
-  container.innerHTML = '';
-  
-  forumPosts.forEach((post) => {
+
+  // 渲染可删除的板块列表（预设 + 自定义）
+  const deleteList = document.getElementById('customBoardDeleteList');
+  deleteList.innerHTML = '';
+
+  // 预设板块
+  const presetBoards = [
+    { key: 'gossip', emoji: '🕵️', name: '风声暗巷', desc: '八卦版' },
+    { key: 'entertainment', emoji: '🌟', name: '星海瞭望台', desc: '娱乐版' },
+    { key: 'horror', emoji: '🌒', name: '夜谈档案馆', desc: '恐怖版' }
+  ];
+  presetBoards.forEach(pb => {
+    const isDeleted = deletedPresetBoards.includes(pb.key);
     const div = document.createElement('div');
-    div.className = 'forum-post';
-    
-    const timeStr = formatTime(post.time);
-    
+    div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:#fff; border-radius:10px; margin-bottom:8px; border:1px solid var(--light-pink);' + (isDeleted ? ' opacity:0.5;' : '');
     div.innerHTML = `
-      <div class="forum-post-header">
-        <img class="forum-post-avatar" src="${post.avatar}">
-        <div class="forum-post-info">
-          <div class="forum-post-name">${post.authorName}</div>
-          <div class="forum-post-time">${timeStr}</div>
+      <div>
+        <div style="font-size:14px; font-weight:500; color:var(--text-dark);">${pb.emoji} ${pb.name}</div>
+        <div style="font-size:12px; color:var(--text-light); margin-top:2px;">${pb.desc}（预设）</div>
+      </div>
+      ${isDeleted
+        ? `<button onclick="restorePresetBoard('${pb.key}')" style="padding:6px 12px; background:#c8e6c9; border:none; border-radius:8px; cursor:pointer; color:#2e7d32; font-size:13px;">恢复</button>`
+        : `<button onclick="deletePresetBoard('${pb.key}')" style="padding:6px 12px; background:#ffcdd2; border:none; border-radius:8px; cursor:pointer; color:#c62828; font-size:13px;">删除</button>`
+      }
+    `;
+    deleteList.appendChild(div);
+  });
+
+  // 自定义板块
+  if (customForumBoards.length === 0 && presetBoards.every(pb => !deletedPresetBoards.includes(pb.key)) && customForumBoards.length === 0) {
+    // 已经有预设板块显示了，不需要额外提示
+  }
+  customForumBoards.forEach((board, idx) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:#fff; border-radius:10px; margin-bottom:8px; border:1px solid var(--light-pink);';
+    div.innerHTML = `
+      <div>
+        <div style="font-size:14px; font-weight:500; color:var(--text-dark);">${board.emoji || '📋'} ${board.name}</div>
+        <div style="font-size:12px; color:var(--text-light); margin-top:2px;">${board.desc || ''}（自定义）</div>
+      </div>
+      <button onclick="deleteCustomBoard(${idx})" style="padding:6px 12px; background:#ffcdd2; border:none; border-radius:8px; cursor:pointer; color:#c62828; font-size:13px;">删除</button>
+    `;
+    deleteList.appendChild(div);
+  });
+}
+
+async function saveNewForumBoard() {
+  const name = document.getElementById('newBoardName').value.trim();
+  const desc = document.getElementById('newBoardDesc').value.trim();
+
+  if (!name) { showToast('请输入版块名称'); return; }
+
+  // 获取选中的世界书
+  const selectedWbs = [];
+  document.querySelectorAll('#boardWorldBookList input[type="checkbox"]:checked').forEach(cb => {
+    selectedWbs.push(cb.value);
+  });
+
+  const emojis = ['📋', '💬', '🌟', '🎭', '🔥', '💡', '🎪', '🌈'];
+  const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+  const newBoard = {
+    id: 'custom_' + Date.now(),
+    name: name,
+    desc: desc,
+    emoji: randomEmoji,
+    worldBooks: selectedWbs,
+    createdAt: Date.now()
+  };
+
+  customForumBoards.push(newBoard);
+  forumPostsByBoard[newBoard.id] = [];
+
+  await saveToStorage('CUSTOM_FORUM_BOARDS', JSON.stringify(customForumBoards));
+
+  // 清空表单
+  document.getElementById('newBoardName').value = '';
+  document.getElementById('newBoardDesc').value = '';
+  document.querySelectorAll('#boardWorldBookList input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+  closeSub('add-forum-board-page');
+  renderForumBoardList();
+  showToast('✅ 版块已创建！');
+}
+
+async function deleteCustomBoard(idx) {
+  if (!confirm(`确定删除版块"${customForumBoards[idx].name}"吗？该版块下的所有帖子也将被删除。`)) return;
+  const boardId = customForumBoards[idx].id;
+  customForumBoards.splice(idx, 1);
+  delete forumPostsByBoard[boardId];
+  await saveToStorage('CUSTOM_FORUM_BOARDS', JSON.stringify(customForumBoards));
+  await window.storage.removeItem(`FORUM_POSTS_${boardId}`);
+  renderAddForumBoardPage();
+  renderForumBoardList();
+  showToast('✅ 版块已删除');
+}
+
+async function deletePresetBoard(key) {
+  const names = { gossip: '风声暗巷', entertainment: '星海瞭望台', horror: '夜谈档案馆' };
+  if (!confirm(`确定删除预设版块"${names[key]}"吗？`)) return;
+  if (!deletedPresetBoards.includes(key)) {
+    deletedPresetBoards.push(key);
+  }
+  await saveToStorage('DELETED_PRESET_BOARDS', JSON.stringify(deletedPresetBoards));
+  renderAddForumBoardPage();
+  renderForumBoardList();
+  showToast('✅ 预设版块已隐藏');
+}
+
+async function restorePresetBoard(key) {
+  deletedPresetBoards = deletedPresetBoards.filter(k => k !== key);
+  await saveToStorage('DELETED_PRESET_BOARDS', JSON.stringify(deletedPresetBoards));
+  renderAddForumBoardPage();
+  renderForumBoardList();
+  showToast('✅ 预设版块已恢复');
+}
+
+function renderForumBoardList() {
+  const container = document.getElementById('forumBoardList');
+  if (!container) return;
+
+  // 隐藏/显示已删除的预设板块
+  const presetBoardEls = container.querySelectorAll('.forum-board-card:not(.custom-board-card)');
+  const presetBoardKeys = ['gossip', 'entertainment', 'horror'];
+  presetBoardEls.forEach((el, idx) => {
+    if (presetBoardKeys[idx] && deletedPresetBoards.includes(presetBoardKeys[idx])) {
+      el.style.display = 'none';
+    } else {
+      el.style.display = '';
+    }
+  });
+
+  // 移除所有自定义板块（class含custom-board-card）
+  container.querySelectorAll('.custom-board-card').forEach(el => el.remove());
+
+  // 渲染自定义板块
+  customForumBoards.forEach(board => {
+    const div = document.createElement('div');
+    div.className = 'forum-board-card custom-board-card';
+    div.onclick = () => openCustomForumBoard(board.id);
+    div.style.cssText = 'background:rgba(255,255,255,0.18); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.3); border-radius:16px; padding:20px; cursor:pointer; position:relative; overflow:hidden;';
+    div.innerHTML = `
+      <div style="position:absolute; top:-20px; right:-20px; font-size:80px; opacity:0.08; pointer-events:none;">${board.emoji}</div>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+        <span style="font-size:22px;">${board.emoji}</span>
+        <div>
+          <div style="font-size:16px; font-weight:700; color:var(--text-dark); letter-spacing:1px;">${board.name}</div>
+          <div style="font-size:11px; color:var(--text-light); margin-top:2px;">自定义版块</div>
         </div>
       </div>
-      <div class="forum-post-title">${post.title}</div>
-      <div class="forum-post-content">${post.content}</div>
+      <div style="font-size:13px; color:var(--text-light); line-height:1.6;">${board.desc || '暂无描述'}</div>
+      <div style="position:absolute; bottom:16px; right:16px; color:var(--text-light); font-size:18px; opacity:0.7;">›</div>
     `;
-    
     container.appendChild(div);
   });
 }
 
+function openCustomForumBoard(boardId) {
+  const board = customForumBoards.find(b => b.id === boardId);
+  if (!board) return;
+
+  // 复用 gossip 板块的页面，动态更新内容
+  currentForumBoard = boardId;
+
+  // 创建临时板块配置
+  FORUM_BOARDS[boardId] = {
+    name: board.name,
+    emoji: board.emoji,
+    pageId: 'forum-gossip-page',
+    containerId: 'forumContainer-gossip',
+    accentColor: 'var(--main-pink)',
+    bgColor: '#f5f5f5',
+    cardBg: '#fff',
+    emptyTip: `${board.name}还没有帖子，点击右上角发帖`,
+    emptyColor: '#999',
+    rules: board.desc || '欢迎讨论！',
+    rulesColor: 'var(--main-pink)',
+    rulesBg: '#fff8fa',
+    rulesTextColor: '#888',
+    postBg: '#fff',
+    postBorder: '#f0e8df',
+    postNameColor: '#555',
+    postTimeColor: '#aaa',
+    postContentColor: '#444',
+    postTitleFontColor: 'var(--main-pink)',
+    headerBg: '#fff',
+    headerBorder: '#f0e8df',
+    publishBtnBg: 'var(--main-pink)',
+    publishBtnColor: '#fff'
+  };
+
+  // 动态更新页面标题和颜色
+  const header = document.getElementById('forum-gossip-page').querySelector('.page-header');
+  if (header) {
+    header.style.background = '#fff';
+    header.style.borderBottom = '1px solid #f0e8df';
+    const backBtn = header.querySelector('.page-back');
+    if (backBtn) { backBtn.style.background = 'rgba(0,0,0,0.05)'; backBtn.querySelector('svg').style.stroke = '#333'; }
+    const title = header.querySelector('.page-title');
+    if (title) { title.style.color = 'var(--main-pink)'; title.textContent = `${board.emoji} ${board.name}`; }
+    // 更新刷新和发帖按钮
+    const btns = header.querySelectorAll('[style*="cursor:pointer"]');
+    btns.forEach(btn => { btn.style.color = 'var(--main-pink)'; });
+  }
+
+
+  // 更新容器背景
+  const container = document.getElementById('forumContainer-gossip');
+  if (container) container.style.background = '#f5f5f5';
+
+  openSub('forum-gossip-page');
+  renderForumBoard(boardId);
+}
+
+// ========== 论坛功能（三板块版） ==========
+// 三个板块的配置信息
+const FORUM_BOARDS = {
+  gossip: {
+    name: '风声暗巷',
+    emoji: '🕵️',
+    pageId: 'forum-gossip-page',
+    containerId: 'forumContainer-gossip',
+    accentColor: '#e8c87a',
+    bgColor: '#0e0e1e',
+    cardBg: '#1a1a1e',
+    emptyTip: '暗巷还很安静，点击刷新或率先爆料',
+    emptyColor: '#5a5a8a',
+    rules: '必须描述"谁在哪做了什么"，需含1-2个无法编造的生活化细节，禁止空洞主观评价。',
+    rulesColor: '#e8c87a',
+    rulesBg: '#1a1a2e',
+    rulesTextColor: '#9a8fa0',
+    postTitleColor: '#e8c87a',
+    postBg: '#1a1a2e',
+    postBorder: '#2a2a4e',
+    postNameColor: '#c0b0cc',
+    postTimeColor: '#5a5a8a',
+    postContentColor: '#b0a0bc',
+    postTitleFontColor: '#e8c87a',
+    headerBg: '#1a1a2e',
+    headerBorder: '#2a2a4e',
+    publishBtnBg: '#e8c87a',
+    publishBtnColor: '#1a1a2e'
+  },
+  entertainment: {
+    name: '星海瞭望台',
+    emoji: '🌟',
+    pageId: 'forum-entertainment-page',
+    containerId: 'forumContainer-entertainment',
+    accentColor: '#7ab8e8',
+    bgColor: '#080f18',
+    cardBg: '#0d1b2a',
+    emptyTip: '瞭望台还没有观察报告，点击刷新或开始分析',
+    emptyColor: '#3a5a7a',
+    rules: '必须基于清晰的公开时间线，用可验证信息说话，玩梗需高级，禁止低俗人身攻击。',
+    rulesColor: '#7ab8e8',
+    rulesBg: '#091522',
+    rulesTextColor: '#5a7a9a',
+    postBg: '#0d1b2a',
+    postBorder: '#1a3050',
+    postNameColor: '#8aa8c0',
+    postTimeColor: '#3a5a7a',
+    postContentColor: '#7a9ab0',
+    postTitleFontColor: '#7ab8e8',
+    headerBg: '#0d1b2a',
+    headerBorder: '#1a3050',
+    publishBtnBg: '#7ab8e8',
+    publishBtnColor: '#0d1b2a'
+  },
+  horror: {
+    name: '夜谈档案馆',
+    emoji: '🌒',
+    pageId: 'forum-horror-page',
+    containerId: 'forumContainer-horror',
+    accentColor: '#7ae8a0',
+    bgColor: '#080e08',
+    cardBg: '#0f1a0f',
+    emptyTip: '档案馆暂无记录，点击刷新或提交你的异常档案',
+    emptyColor: '#3a6a4a',
+    rules: '场景必须日常，恐怖点源于对日常规则的细微破坏，禁止直接描写鬼怪，用感官细节营造氛围。',
+    rulesColor: '#7ae8a0',
+    rulesBg: '#0a120a',
+    rulesTextColor: '#4a7a5a',
+    postBg: '#0f1a0f',
+    postBorder: '#1a3020',
+    postNameColor: '#7aaa88',
+    postTimeColor: '#3a6a4a',
+    postContentColor: '#6a9a78',
+    postTitleFontColor: '#7ae8a0',
+    headerBg: '#0f1a0f',
+    headerBorder: '#1a3020',
+    publishBtnBg: '#7ae8a0',
+    publishBtnColor: '#0f1a0f'
+  }
+};
+
+// 每个板块独立存储帖子
+let forumPostsByBoard = {
+  gossip: [],
+  entertainment: [],
+  horror: []
+};
+
+// 当前正在发帖的板块
+let currentForumBoard = 'gossip';
+
+// 打开某个板块
+function openForumBoard(boardKey) {
+  const board = FORUM_BOARDS[boardKey];
+  if (!board) return;
+  currentForumBoard = boardKey;
+  openSub(board.pageId);
+  renderForumBoard(boardKey);
+}
+
+// 渲染某个板块的帖子列表
+function renderForumBoard(boardKey) {
+  const board = FORUM_BOARDS[boardKey];
+  const container = document.getElementById(board.containerId);
+  const posts = forumPostsByBoard[boardKey] || [];
+
+  if (posts.length === 0) {
+    container.innerHTML = `<div class="empty-tip" style="color:${board.emptyColor};">${board.emptyTip}</div>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  posts.forEach((post, idx) => {
+    const div = document.createElement('div');
+    div.style.cssText = `background:${board.postBg}; border-radius:14px; padding:14px 15px; border:1px solid ${board.postBorder}; position:relative;`;
+
+    const timeStr = formatTime(post.time);
+    div.innerHTML = `
+      <div style="display:flex; align-items:center; margin-bottom:10px;">
+        <img src="${post.avatar}" style="width:36px; height:36px; border-radius:50%; margin-right:10px; object-fit:cover; border:2px solid ${board.postBorder};">
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:600; color:${board.postNameColor};">${post.authorName}</div>
+          <div style="font-size:11px; color:${board.postTimeColor}; margin-top:2px;">${timeStr}</div>
+        </div>
+        <div onclick="deleteForumPost('${boardKey}', ${idx})" style="font-size:16px; color:${board.postTimeColor}; cursor:pointer; padding:4px 8px; opacity:0.6;">×</div>
+      </div>
+      <div style="font-size:15px; font-weight:700; color:${board.postTitleFontColor}; margin-bottom:8px; line-height:1.4;">${post.title}</div>
+      <div style="font-size:13px; color:${board.postContentColor}; line-height:1.7; white-space:pre-wrap;">${post.content}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// 刷新某个板块（重新渲染）
+async function refreshForumBoard(boardKey) {
+  const board = FORUM_BOARDS[boardKey];
+  const container = document.getElementById(board.containerId);
+
+  const loadingDiv = document.createElement('div');
+  loadingDiv.style.cssText = `text-align:center; padding:30px; color:${board.emptyColor};`;
+  loadingDiv.innerHTML = '⚡ AI正在生成新帖子...';
+  container.innerHTML = '';
+  container.appendChild(loadingDiv);
+
+  try {
+    const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+    const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+    if (!cfg.url || !cfg.key || !cfg.model) {
+      loadingDiv.remove();
+      renderForumBoard(boardKey);
+      showToast('⚠️ 请先在设置中配置AI');
+      return;
+    }
+
+    const aiRule = board.rules || '';
+    const boardName = board.name || boardKey;
+    const prompt = `你是一个真实社区论坛的内容生成器，请为"${boardName}"板块生成3条真实感强的帖子。\n\n内部生成规则（严格遵守，不要在帖子中暴露此规则）：\n${aiRule}\n\n请严格按以下JSON格式返回，不要有任何其他文字：\n[\n  {"authorName": "用户昵称", "title": "帖子标题", "content": "帖子正文内容"},\n  {"authorName": "用户昵称", "title": "帖子标题", "content": "帖子正文内容"},\n  {"authorName": "用户昵称", "title": "帖子标题", "content": "帖子正文内容"}\n]\n\n要求：作者名用真实中文网名2-4字，标题15字内，正文50-150字口语化，严格符合内部规则。`;
+
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({ model: cfg.model, temperature: 0.92, messages: [{ role: 'user', content: prompt }] })
+    });
+
+    if (!res.ok) throw new Error('AI请求失败 ' + res.status);
+    const data = await res.json();
+    const rawText = data.choices?.[0]?.message?.content || '[]';
+    const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) throw new Error('AI返回格式错误');
+    const posts = JSON.parse(jsonMatch[0]);
+    if (!Array.isArray(posts) || posts.length === 0) throw new Error('没有生成帖子');
+
+    const aiAvatars = [
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="20" r="20" fill="%23e8c87a"/><text x="50%25" y="55%25" text-anchor="middle" dominant-baseline="middle" font-size="18" fill="%23333">🌸</text></svg>',
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="20" r="20" fill="%237ab8e8"/><text x="50%25" y="55%25" text-anchor="middle" dominant-baseline="middle" font-size="18" fill="%23333">🌙</text></svg>',
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="20" r="20" fill="%237ae8a0"/><text x="50%25" y="55%25" text-anchor="middle" dominant-baseline="middle" font-size="18" fill="%23333">⭐</text></svg>',
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="20" r="20" fill="%23e87a7a"/><text x="50%25" y="55%25" text-anchor="middle" dominant-baseline="middle" font-size="18" fill="%23333">🔥</text></svg>',
+    ];
+
+    if (!forumPostsByBoard[boardKey]) forumPostsByBoard[boardKey] = [];
+    const now = Date.now();
+    posts.reverse().forEach((p, idx) => {
+      forumPostsByBoard[boardKey].unshift({
+        id: (now - idx * 1000).toString(),
+        authorName: p.authorName || '匿名用户',
+        avatar: aiAvatars[Math.floor(Math.random() * aiAvatars.length)],
+        title: p.title || '无标题',
+        content: p.content || '',
+        time: now - idx * 60000,
+        board: boardKey,
+        isAI: true
+      });
+    });
+
+    await saveToStorage(`FORUM_POSTS_${boardKey}`, JSON.stringify(forumPostsByBoard[boardKey]));
+    loadingDiv.remove();
+    renderForumBoard(boardKey);
+    showToast('✅ 刷新成功，AI生成了新帖子');
+
+  } catch (e) {
+    console.error('refreshForumBoard error:', e);
+    loadingDiv.remove();
+    renderForumBoard(boardKey);
+    showToast('❌ 生成失败：' + (e.message || '未知错误'));
+  }
+}
+
+
+// 打开发帖页面（指定板块）
+function openPostForumPage(boardKey) {
+  currentForumBoard = boardKey;
+  const board = FORUM_BOARDS[boardKey];
+
+  // 更新发帖页面的样式和标题
+  const header = document.getElementById('post-forum-header');
+  const titleEl = document.getElementById('post-forum-page-title');
+  const publishBtn = document.getElementById('post-forum-publish-btn');
+  const boardTag = document.getElementById('post-forum-board-tag');
+  const rulesEl = document.getElementById('post-forum-rules');
+
+  if (titleEl) titleEl.textContent = `发帖 · ${board.name}`;
+  if (publishBtn) {
+    publishBtn.style.background = board.publishBtnBg;
+    publishBtn.style.color = board.publishBtnColor;
+  }
+  if (boardTag) {
+    boardTag.innerHTML = `<span style="color:${board.accentColor}; font-weight:600;">${board.emoji} ${board.name}</span> <span style="color:#999; margin-left:6px;">· 你正在此板块发帖</span>`;
+    boardTag.style.background = board.rulesBg;
+    boardTag.style.borderBottom = `1px solid ${board.postBorder}`;
+  }
+
+  // 清空输入框
+  document.getElementById('postForumTitle').value = '';
+  document.getElementById('postForumContent').value = '';
+
+  openSub('post-forum-page');
+}
+
+// 发布帖子
 async function publishForumPost() {
   const title = document.getElementById('postForumTitle').value.trim();
   const content = document.getElementById('postForumContent').value.trim();
-  
-  if (!title) {
-    showToast('请输入标题');
-    return;
-  }
-  
-  if (!content) {
-    showToast('请输入内容');
-    return;
-  }
-  
+
+  if (!title) { showToast('请输入标题'); return; }
+  if (!content) { showToast('请输入内容'); return; }
+
   const userName = await getFromStorage('USER_NICKNAME') || '我';
-  
   const newPost = {
     id: Date.now().toString(),
     authorName: userName,
     avatar: userAvatar,
     title: title,
     content: content,
-    time: Date.now()
+    time: Date.now(),
+    board: currentForumBoard
   };
-  
-  forumPosts.unshift(newPost);
-  
+
+  if (!forumPostsByBoard[currentForumBoard]) forumPostsByBoard[currentForumBoard] = [];
+  forumPostsByBoard[currentForumBoard].unshift(newPost);
+
+  // 持久化保存
+  await saveToStorage(`FORUM_POSTS_${currentForumBoard}`, JSON.stringify(forumPostsByBoard[currentForumBoard]));
+
   // 清理表单
   document.getElementById('postForumTitle').value = '';
   document.getElementById('postForumContent').value = '';
-  
+
   closeSub('post-forum-page');
-  
-  if (document.getElementById('forum-page').classList.contains('show')) {
-    renderForum();
+
+  // 刷新对应板块
+  const board = FORUM_BOARDS[currentForumBoard];
+  if (document.getElementById(board.pageId).classList.contains('show')) {
+    renderForumBoard(currentForumBoard);
   }
-  
+
   showToast('✅ 发布成功！');
 }
+
+// 删除某条帖子
+async function deleteForumPost(boardKey, idx) {
+  if (!confirm('确定删除这条帖子吗？')) return;
+  forumPostsByBoard[boardKey].splice(idx, 1);
+  await saveToStorage(`FORUM_POSTS_${boardKey}`, JSON.stringify(forumPostsByBoard[boardKey]));
+  renderForumBoard(boardKey);
+  showToast('✅ 已删除');
+}
+
+// 加载所有板块的帖子（在 window.onload 中调用）
+async function loadForumPosts() {
+  for (const boardKey of Object.keys(FORUM_BOARDS)) {
+    const saved = await getFromStorage(`FORUM_POSTS_${boardKey}`);
+    if (saved) {
+      try {
+        forumPostsByBoard[boardKey] = typeof saved === 'string' ? JSON.parse(saved) : saved;
+      } catch(e) { forumPostsByBoard[boardKey] = []; }
+    }
+  }
+}
+
+// 兼容旧版 refreshForum / renderForum（保留以防其他地方调用）
+function refreshForum() { showToast('请从论坛主页选择板块'); }
+function renderForum() {}
+let forumPosts = [];
 
 // ========== 朋友圈功能 - 使用IndexedDB ==========
 let moments = [];
