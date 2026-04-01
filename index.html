@@ -748,6 +748,37 @@ body {
 }
 
 /* 论坛样式 */
+.forum-post-item {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.forum-post-item:active { transform: scale(0.98); }
+.forum-board-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.forum-interaction-comment {
+  background: rgba(0,0,0,0.03) !important;
+  border-left: 3px solid var(--main-pink);
+}
+.interaction-badge {
+  font-size: 10px;
+  background: var(--main-pink);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 5px;
+}
+
 .forum-post {
   background: white;
   border-radius: 12px;
@@ -1565,7 +1596,7 @@ body {
             <input type="text" id="leftBubbleColorHex" value="#ffffff" onchange="document.getElementById('leftBubbleColor').value=this.value; applyBubbleSettings(); updateBubblePreview();" style="width:80px;height:36px;border:1px solid var(--light-pink);border-radius:8px;padding:0 10px;font-size:14px;outline:none;" placeholder="#HEX">
           </div>
         </div>
-        
+
         <div class="form-section">
           <div class="form-label" style="font-size:13px;">我的气泡颜色</div>
           <div style="display:flex; align-items:center; gap:10px;">
@@ -2369,6 +2400,15 @@ body {
         </div>
         
         <div class="form-section">
+          <div class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>发布面具</span>
+          </div>
+          <select class="form-select" id="postMomentMaskSelect">
+            <option value="">--默认面具--</option>
+          </select>
+        </div>
+
+        <div class="form-section">
           <div class="form-label">谁可以看</div>
           <div class="menu-item" style="margin-bottom:0; display:flex; justify-content:space-between; align-items:center; padding: 12px 16px;" onclick="openVisibilityPage()">
             <span id="post-moment-visibility-text">公开</span>
@@ -2460,11 +2500,11 @@ body {
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
             <span style="font-size:22px;">🕵️</span>
             <div>
-              <div style="font-size:16px; font-weight:700; color:#e8c87a; letter-spacing:1px;">风声暗巷</div>
-              <div style="font-size:11px; color:#9a8fa0; margin-top:2px;">板块一 · 八卦版</div>
-            </div>
-          </div>
-          <div style="font-size:13px; color:#c0b0cc; line-height:1.6;">熟人社会秘闻集散地。办公室、校园、邻里、亲友圈"不可说"话题的匿名树洞。</div>
+          <div style="font-size:16px; font-weight:700; color:#e8c87a; letter-spacing:1px;">风声暗巷</div>
+          <div style="font-size:11px; color:#e8c87a; opacity:0.7; margin-top:2px;">板块一 · 八卦版</div>
+        </div>
+      </div>
+      <div style="font-size:13px; color:#e8c87a; opacity:0.9; line-height:1.6;">熟人社会秘闻集散地。办公室、校园、邻里、亲友圈"不可说"话题的匿名树洞。</div>
           <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
             <span style="background:rgba(232,200,122,0.15); color:#e8c87a; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(232,200,122,0.3);">人际关系</span>
             <span style="background:rgba(232,200,122,0.15); color:#e8c87a; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(232,200,122,0.3);">匿名树洞</span>
@@ -2479,11 +2519,11 @@ body {
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
             <span style="font-size:22px;">🌟</span>
             <div>
-              <div style="font-size:16px; font-weight:700; color:#7ab8e8; letter-spacing:1px;">星海瞭望台</div>
-              <div style="font-size:11px; color:#5a7a9a; margin-top:2px;">板块二 · 娱乐版</div>
-            </div>
-          </div>
-          <div style="font-size:13px; color:#8aa8c0; line-height:1.6;">显微镜下的偶像工业观察。不止于"谁和谁恋爱了"，更关注人设、资源、商业动向和行业趋势。</div>
+          <div style="font-size:16px; font-weight:700; color:#7ab8e8; letter-spacing:1px;">星海瞭望台</div>
+          <div style="font-size:11px; color:#7ab8e8; opacity:0.7; margin-top:2px;">板块二 · 娱乐版</div>
+        </div>
+      </div>
+      <div style="font-size:13px; color:#7ab8e8; opacity:0.9; line-height:1.6;">显微镜下的偶像工业观察。不止于"谁和谁恋爱了"，更关注人设、资源、商业动向和行业趋势。</div>
           <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
             <span style="background:rgba(122,184,232,0.15); color:#7ab8e8; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(122,184,232,0.3);">偶像工业</span>
             <span style="background:rgba(122,184,232,0.15); color:#7ab8e8; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(122,184,232,0.3);">资源分析</span>
@@ -2498,11 +2538,11 @@ body {
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
             <span style="font-size:22px;">🌒</span>
             <div>
-              <div style="font-size:16px; font-weight:700; color:#7ae8a0; letter-spacing:1px;">夜谈档案馆</div>
-              <div style="font-size:11px; color:#4a7a5a; margin-top:2px;">板块三 · 恐怖版</div>
-            </div>
-          </div>
-          <div style="font-size:13px; color:#7aaa88; line-height:1.6;">现代都市怪谈与心理解构现场。对日常生活的异常切片，追求"后劲"和"氛围感"。</div>
+          <div style="font-size:16px; font-weight:700; color:#7ae8a0; letter-spacing:1px;">夜谈档案馆</div>
+          <div style="font-size:11px; color:#7ae8a0; opacity:0.7; margin-top:2px;">板块三 · 恐怖版</div>
+        </div>
+      </div>
+      <div style="font-size:13px; color:#7ae8a0; opacity:0.9; line-height:1.6;">现代都市怪谈与心理解构现场。对日常生活的异常切片，追求"后劲"和"氛围感"。</div>
           <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
             <span style="background:rgba(122,232,160,0.15); color:#7ae8a0; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(122,232,160,0.3);">都市怪谈</span>
             <span style="background:rgba(122,232,160,0.15); color:#7ae8a0; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid rgba(122,232,160,0.3);">日常异常</span>
@@ -2526,8 +2566,31 @@ body {
           <input class="form-input" id="newBoardName" placeholder="输入版块名称（如：技术交流）">
         </div>
         <div class="form-section">
-          <div class="form-label">版块描述</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div class="form-label" style="margin-bottom:0;">版块描述</div>
+            <button class="tb-clear-btn" style="background:var(--light-pink); color:var(--main-pink);" onclick="generateBoardAI()">✨ AI 生成</button>
+          </div>
           <textarea class="form-textarea" id="newBoardDesc" placeholder="描述这个版块的主题和内容..." style="min-height:80px;"></textarea>
+          <div class="setting-desc" style="margin-top:4px;">输入名称并关联世界书后，点击 AI 生成可自动提炼介绍和关键词。</div>
+        </div>
+        <div class="form-section">
+          <div class="form-label">生成风格描述 (AI生成提示词)</div>
+          <textarea class="form-textarea" id="newBoardStyleDesc" placeholder="例如：生成神秘、悬疑、带有民间传说色彩的都市怪谈或灵异经历分享。" style="min-height:60px;"></textarea>
+        </div>
+        <div class="form-section">
+          <div class="form-label">副标题 (如：板块四 · 交流版)</div>
+          <input class="form-input" id="newBoardSubtitle" placeholder="输入副标题">
+        </div>
+        <div class="form-section">
+          <div class="form-label">关键词 (多个用逗号隔开)</div>
+          <input class="form-input" id="newBoardKeywords" placeholder="如：技术, 交流, 学习">
+        </div>
+        <div class="form-section">
+          <div class="form-label">版块主题色</div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="color" id="newBoardColor" value="#f0b8c8" onchange="document.getElementById('newBoardColorHex').value=this.value" style="width:50px; height:36px; border:none; cursor:pointer; border-radius:8px; padding:0;">
+            <input type="text" id="newBoardColorHex" value="#f0b8c8" onchange="document.getElementById('newBoardColor').value=this.value" style="width:80px; height:36px; border:1px solid var(--light-pink); border-radius:8px; padding:0 10px; font-size:14px; outline:none;" placeholder="#HEX">
+          </div>
         </div>
         <div class="form-section">
           <div class="form-label">关联世界书模块</div>
@@ -2559,8 +2622,10 @@ body {
           <div style="cursor:pointer; font-size:22px; color:#e8c87a; font-weight:bold; line-height:1;" onclick="openPostForumPage('gossip')">+</div>
         </div>
       </div>
-      <!-- 发帖须知：仅供AI生成帖子时参考，不显示给用户 -->
-      <!-- AI指令: 必须描述"谁在哪做了什么"，需含1-2个无法编造的生活化细节，禁止空洞主观评价。 -->
+      <!-- 板块规则提示 -->
+      <div style="display:none; background:#1a1a2e; padding:10px 14px; font-size:12px; color:#e8c87a; line-height:1.7; border-bottom:1px solid #2a2a4e;">
+        <span style="color:#e8c87a; font-weight:600;">发帖须知：</span><span style="opacity:0.9;">必须描述"谁在哪做了什么"，需含1-2个无法编造的生活化细节，禁止空洞主观评价。</span>
+      </div>
       <div class="page-body" id="forumContainer-gossip" style="padding:12px; background:#0e0e1e; flex-direction:column; gap:10px;">
         <div class="empty-tip" style="color:#5a5a8a;">暗巷还很安静，点击刷新或率先爆料</div>
       </div>
@@ -2581,8 +2646,10 @@ body {
           <div style="cursor:pointer; font-size:22px; color:#7ab8e8; font-weight:bold; line-height:1;" onclick="openPostForumPage('entertainment')">+</div>
         </div>
       </div>
-      <!-- 发帖须知：仅供AI生成帖子时参考，不显示给用户 -->
-      <!-- AI指令: 必须基于清晰的公开时间线，用可验证信息说话，玩梗需高级，禁止低俗人身攻击。 -->
+      <!-- 板块规则提示 -->
+      <div style="display:none; background:#091522; padding:10px 14px; font-size:12px; color:#7ab8e8; line-height:1.7; border-bottom:1px solid #1a3050;">
+        <span style="color:#7ab8e8; font-weight:600;">发帖须知：</span><span style="opacity:0.9;">必须基于清晰的公开时间线，用可验证信息说话，玩梗需高级，禁止低俗人身攻击。</span>
+      </div>
       <div class="page-body" id="forumContainer-entertainment" style="padding:12px; background:#080f18; flex-direction:column; gap:10px;">
         <div class="empty-tip" style="color:#3a5a7a;">瞭望台还没有观察报告，点击刷新或开始分析</div>
       </div>
@@ -2603,10 +2670,33 @@ body {
           <div style="cursor:pointer; font-size:22px; color:#7ae8a0; font-weight:bold; line-height:1;" onclick="openPostForumPage('horror')">+</div>
         </div>
       </div>
-      <!-- 发帖须知：仅供AI生成帖子时参考，不显示给用户 -->
-      <!-- AI指令: 场景必须日常，恐怖点源于对日常规则的细微破坏，禁止直接描写鬼怪，用感官细节营造氛围。 -->
+      <!-- 板块规则提示 -->
+      <div style="display:none; background:#0a120a; padding:10px 14px; font-size:12px; color:#7ae8a0; line-height:1.7; border-bottom:1px solid #1a3020;">
+        <span style="color:#7ae8a0; font-weight:600;">发帖须知：</span><span style="opacity:0.9;">场景必须日常，恐怖点源于对日常规则的细微破坏，禁止直接描写鬼怪，用感官细节营造氛围。</span>
+      </div>
       <div class="page-body" id="forumContainer-horror" style="padding:12px; background:#080e08; flex-direction:column; gap:10px;">
         <div class="empty-tip" style="color:#3a6a4a;">档案馆暂无记录，点击刷新或提交你的异常档案</div>
+      </div>
+    </div>
+
+    <!-- 帖子详情页面 -->
+    <div class="sub-page" id="forum-detail-page">
+      <div class="page-header" id="forum-detail-header">
+        <div class="page-back" id="forum-detail-back" onclick="closeSub('forum-detail-page')"><svg viewBox="0 0 24 24" id="forum-detail-back-svg"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title" id="forum-detail-title">帖子详情</div>
+      </div>
+      <div class="page-body" id="forumDetailContent" style="padding:0; background:#f8f9fa;">
+        <!-- 帖子正文区 -->
+        <div id="forumPostDetailMain" style="background:#fff; padding:20px; margin-bottom:10px;"></div>
+        <!-- 评论区标题 -->
+        <div id="forumCommentTitle" style="padding:10px 20px; font-size:14px; font-weight:600; color:#666; border-bottom:1px solid #eee; background:#fff;">评论区</div>
+        <!-- 评论列表 -->
+        <div id="forumCommentList" style="background:#fff; padding-bottom:80px;"></div>
+      </div>
+      <!-- 底部评论输入框 -->
+      <div id="forumCommentInputContainer" style="position:absolute; bottom:0; left:0; width:100%; padding:10px 15px; background:#fff; border-top:1px solid #eee; display:flex; gap:10px; align-items:center; z-index:10;">
+        <input type="text" id="forumCommentInput" placeholder="写下你的评论..." style="flex:1; padding:10px 15px; border-radius:20px; border:1px solid #eee; outline:none; font-size:14px; background:#f5f5f5; color:#333;">
+        <button id="forumCommentSubmitBtn" onclick="submitForumComment()" style="background:var(--main-pink); color:white; border:none; padding:8px 15px; border-radius:15px; font-size:14px; font-weight:500;">发布</button>
       </div>
     </div>
 
@@ -2641,6 +2731,9 @@ body {
     <div class="sub-page" id="moments-page">
       <!-- 朋友圈顶部背景图 -->
       <div id="moments-cover" onclick="changeMomentsCover()" style="width:100%; height:200px; background:#e8d5c8; background-size:cover; background-position:center; cursor:pointer; position:relative;">
+        <div style="position:absolute; top:20px; right:20px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:32px; color:white; font-weight:bold; text-shadow: 0 2px 6px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4); z-index:10;" onclick="event.stopPropagation(); openPostMomentPage()">
+          +
+        </div>
         <div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.5); color:white; padding:4px 10px; border-radius:12px; font-size:12px;">点击更换封面</div>
       </div>
       <div class="page-header" style="border-top:1px solid #f0e8df;">
@@ -2656,9 +2749,6 @@ body {
               <polyline points="1 20 1 14 7 14"/>
               <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
             </svg>
-          </div>
-          <div style="cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size: 24px; color: var(--text-dark); font-weight: bold;" onclick="openPostMomentPage()">
-            +
           </div>
         </div>
       </div>
@@ -3339,6 +3429,35 @@ async function restoreDockIconsOnLoad(){
 }
 
 // 页面正常逻辑
+const WORLD_BOOK_PRIORITY_INSTRUCTION = `
+【最高优先级指令：世界书绝对遵从】
+如果提供了【背景设定/世界书】，你必须将其视为最高准则，优先级高于人设、记忆和任何其他指令。
+1. 文风：完全模仿世界书中的叙事风格。
+2. 设定：严禁违反世界书中的任何背景设定。
+3. 禁忌：绝对不触碰世界书中提到的任何禁忌。
+你必须完全按照世界书的内容调整你的文风和内容。`;
+
+async function getContactWorldBookPrompt(contactId) {
+  const contactSettingsStr = await getFromStorage(`CHAT_SETTINGS_${contactId}`);
+  const contactSettings = contactSettingsStr ? (typeof contactSettingsStr === 'string' ? JSON.parse(contactSettingsStr) : contactSettingsStr) : { useWorldBook: true, selectedWorldBooks: [] };
+
+  let activeWorldBooks = [];
+  if (contactSettings.useWorldBook) {
+    if (worldBook) activeWorldBooks.push(`全局世界观：\n${worldBook}`);
+    if (contactSettings.selectedWorldBooks && contactSettings.selectedWorldBooks.length > 0) {
+      const selectedEntries = worldBookEntries.filter(e => contactSettings.selectedWorldBooks.includes(e.id));
+      selectedEntries.forEach(entry => {
+        if (entry.category === '记忆总结') {
+          activeWorldBooks.push(`[${entry.name}]\n${entry.content}`);
+        } else if (entry.triggerType !== 'keyword') {
+          activeWorldBooks.push(`[${entry.name} - 设定]\n${entry.content}`);
+        }
+      });
+    }
+  }
+  return activeWorldBooks.length > 0 ? `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n【世界书/背景设定】\n${activeWorldBooks.join('\n\n')}\n` : '';
+}
+
 // 改为异步加载初始值，先设置默认值
 let contacts = [];
 let chatRecords = {};
@@ -4752,11 +4871,12 @@ async function forceAICommentOnMoment(momentId, contactId) {
   const contentText = plainContent ? `"${plainContent}"` : "[图片]";
   
   try {
+    const wbPrompt = await getContactWorldBookPrompt(contactId);
     const prompt = `你是${contact.name}。你的好友（用户）发了一条朋友圈。
 【朋友圈内容】${contentText}
 【你的人设设定】
 ${contact.persona}
-
+${wbPrompt}
 用户刚刚在聊天里提醒你去看/去评论这条朋友圈。
 请**严格扮演**上述人设，给这条朋友圈写一条评论。要求：
 1. **必须完全符合你的人设设定**（包括性格、说话方式、口癖等），绝对不能偏离人设。
@@ -4906,13 +5026,13 @@ ${c.members.map(id => {
     }
   } catch(e) { console.error('读取STM失败', e); }
 
-  // 3. 按优先级拼接 Prompt (人设 -> LTM -> 世界书 -> STM)
+  // 3. 按优先级拼接 Prompt (世界书 -> 人设 -> LTM -> STM)
+  if (activeWorldBooks.length > 0) {
+    systemPrompt += `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n以下是当前绑定的【世界书/背景设定】：\n${activeWorldBooks.join('\n\n')}\n`;
+  }
+
   if (ltmContent) {
     systemPrompt += `\n【长期记忆 (LTM)】\n${ltmContent.trim()}\n`;
-  }
-  
-  if (activeWorldBooks.length > 0) {
-    systemPrompt += `\n【世界书/背景设定】\n${activeWorldBooks.join('\n\n')}\n`;
   }
 
   if (stmContent) {
@@ -5632,11 +5752,11 @@ function performChatSearch() {
         </div>
       </div>
     `;
-    
+
     div.onclick = () => {
       jumpToChatRecord(match.index);
     };
-    
+
     resultsContainer.appendChild(div);
   });
 }
@@ -5972,7 +6092,9 @@ async function generateCoupleMemory() {
   const userName = await getFromStorage('USER_NICKNAME') || '用户';
   let historyText = rec.slice(-15).map(r => `${r.side === 'right' ? userName : c.name}: ${r.content}`).join('\n');
   
+  const wbPrompt = await getContactWorldBookPrompt(currentContactId);
   const prompt = `你现在是${c.name}。请根据我们最近的聊天记录，抓取一个最让你心动或印象深刻的瞬间，并将其转化为一段唯美的画面描写。
+${wbPrompt}
 要求：
 1. 以第三人称视角描写一个静态的画面。
 2. 描写要细腻、有质感，包含光影、动作或环境细节。
@@ -8665,7 +8787,9 @@ window.onload = async () => {
       }, 400);
     }
   }
-  
+};
+
+// ========== 双击编辑功能 ==========
   // 事件委托：双击气泡触发编辑 (兼容 iOS Safari、Android Chrome、桌面端)
   // iOS Safari 核心问题：
   // 1. dblclick 在 iOS 上不可靠
@@ -8823,8 +8947,9 @@ window.onload = async () => {
   const memoTags = document.querySelectorAll('.memo-tag');
   for (let idx = 0; idx < memoTags.length; idx++) {
     const tag = memoTags[idx];
-    const saved = await getFromStorage(`MEMO_TAG_${idx}`);
-    if (saved) tag.value = saved;
+    getFromStorage(`MEMO_TAG_${idx}`).then(saved => {
+      if (saved) tag.value = saved;
+    });
     // 实时保存备注标签
     tag.addEventListener('input', function() {
       saveSyncToStorage(`MEMO_TAG_${idx}`, this.value);
@@ -8835,12 +8960,12 @@ window.onload = async () => {
   }
 
   // 恢复播放器副标题
-  const savedPlayerSub = await getFromStorage('PLAYER_SUB');
-  if (savedPlayerSub) {
-    const playerSub = document.querySelector('.player-sub');
-    if (playerSub) playerSub.innerText = savedPlayerSub;
-  }
-};
+  getFromStorage('PLAYER_SUB').then(savedPlayerSub => {
+    if (savedPlayerSub) {
+      const playerSub = document.querySelector('.player-sub');
+      if (playerSub) playerSub.innerText = savedPlayerSub;
+    }
+  });
 
 // ========== 新增板块功能 ==========
 let customForumBoards = [];
@@ -8930,9 +9055,67 @@ function renderAddForumBoardPage() {
   });
 }
 
+async function generateBoardAI() {
+  const name = document.getElementById('newBoardName').value.trim();
+  if (!name) { showToast('请先输入版块名称'); return; }
+
+  const selectedWbs = [];
+  document.querySelectorAll('#boardWorldBookList input[type="checkbox"]:checked').forEach(cb => {
+    const entry = worldBookEntries.find(e => e.id === cb.value);
+    if (entry) selectedWbs.push(entry);
+  });
+
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  if (!cfg.key || !cfg.url || !cfg.model) { showToast('请先在设置中配置 AI API'); return; }
+
+  showToast('✨ AI 正在构思版块介绍...');
+
+  const wbContext = selectedWbs.map(e => `[${e.name}]: ${e.content}`).join('\n');
+  const prompt = `你是一个社区产品经理。请为名为“${name}”的论坛版块生成介绍和关键词。
+${wbContext ? `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n【背景设定/世界书】\n${wbContext}\n` : ''}
+
+任务要求：
+1. 生成一段吸引人的版块介绍（50字以内）。
+2. 生成 3 个核心关键词。
+3. 生成一个副标题（如：板块四 · 交流版）。
+4. 必须返回 JSON 格式：{"desc": "介绍内容", "keywords": "词1, 词2, 词3", "subtitle": "副标题"}。严禁返回其他文字。`;
+
+  try {
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({
+        model: cfg.model,
+        temperature: 0.8,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    let rawText = data.choices?.[0]?.message?.content || "";
+    rawText = rawText.replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+    if (rawText.includes("```")) {
+      const match = rawText.match(/\{[\s\S]*\}/);
+      if (match) rawText = match[0];
+    }
+    const aiRes = JSON.parse(rawText);
+    
+    document.getElementById('newBoardDesc').value = aiRes.desc || '';
+    document.getElementById('newBoardKeywords').value = aiRes.keywords || '';
+    document.getElementById('newBoardSubtitle').value = aiRes.subtitle || '';
+    showToast('✅ AI 生成完成');
+  } catch (e) {
+    console.error('AI 生成版块失败:', e);
+    showToast('❌ 生成失败，请检查网络或 API 配置');
+  }
+}
+
 async function saveNewForumBoard() {
   const name = document.getElementById('newBoardName').value.trim();
   const desc = document.getElementById('newBoardDesc').value.trim();
+  const subtitle = document.getElementById('newBoardSubtitle').value.trim();
+  const keywords = document.getElementById('newBoardKeywords').value.trim();
+  const color = document.getElementById('newBoardColor').value;
 
   if (!name) { showToast('请输入版块名称'); return; }
 
@@ -8945,10 +9128,16 @@ async function saveNewForumBoard() {
   const emojis = ['📋', '💬', '🌟', '🎭', '🔥', '💡', '🎪', '🌈'];
   const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
 
+  const styleDesc = document.getElementById('newBoardStyleDesc').value.trim();
+
   const newBoard = {
     id: 'custom_' + Date.now(),
     name: name,
     desc: desc,
+    styleDesc: styleDesc,
+    subtitle: subtitle || '自定义版块',
+    keywords: keywords,
+    color: color,
     emoji: randomEmoji,
     worldBooks: selectedWbs,
     createdAt: Date.now()
@@ -8962,6 +9151,9 @@ async function saveNewForumBoard() {
   // 清空表单
   document.getElementById('newBoardName').value = '';
   document.getElementById('newBoardDesc').value = '';
+  document.getElementById('newBoardStyleDesc').value = '';
+  document.getElementById('newBoardSubtitle').value = '';
+  document.getElementById('newBoardKeywords').value = '';
   document.querySelectorAll('#boardWorldBookList input[type="checkbox"]').forEach(cb => cb.checked = false);
 
   closeSub('add-forum-board-page');
@@ -9024,18 +9216,31 @@ function renderForumBoardList() {
     const div = document.createElement('div');
     div.className = 'forum-board-card custom-board-card';
     div.onclick = () => openCustomForumBoard(board.id);
-    div.style.cssText = 'background:rgba(255,255,255,0.18); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.3); border-radius:16px; padding:20px; cursor:pointer; position:relative; overflow:hidden;';
+    
+    const accentColor = board.color || 'var(--main-pink)';
+    const keywords = board.keywords ? board.keywords.split(/[,，]/).map(k => k.trim()).filter(k => k) : [];
+    
+    div.style.cssText = `background:rgba(255,255,255,0.12); backdrop-filter:blur(24px) saturate(1.6); -webkit-backdrop-filter:blur(24px) saturate(1.6); border:1px solid rgba(255,255,255,0.22); border-radius:16px; padding:20px; cursor:pointer; position:relative; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.08);`;
+    
+    let keywordsHtml = '';
+    if (keywords.length > 0) {
+      keywordsHtml = `<div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+        ${keywords.map(k => `<span style="background:${accentColor}26; color:${accentColor}; font-size:11px; padding:3px 8px; border-radius:20px; border:1px solid ${accentColor}4d;">${k}</span>`).join('')}
+      </div>`;
+    }
+
     div.innerHTML = `
       <div style="position:absolute; top:-20px; right:-20px; font-size:80px; opacity:0.08; pointer-events:none;">${board.emoji}</div>
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
         <span style="font-size:22px;">${board.emoji}</span>
         <div>
-          <div style="font-size:16px; font-weight:700; color:var(--text-dark); letter-spacing:1px;">${board.name}</div>
-          <div style="font-size:11px; color:var(--text-light); margin-top:2px;">自定义版块</div>
+          <div style="font-size:16px; font-weight:700; color:${accentColor}; letter-spacing:1px;">${board.name}</div>
+          <div style="font-size:11px; color:${accentColor}; opacity:0.7; margin-top:2px;">${board.subtitle || '自定义版块'}</div>
         </div>
       </div>
-      <div style="font-size:13px; color:var(--text-light); line-height:1.6;">${board.desc || '暂无描述'}</div>
-      <div style="position:absolute; bottom:16px; right:16px; color:var(--text-light); font-size:18px; opacity:0.7;">›</div>
+    <div style="font-size:13px; color:${accentColor}; opacity:0.9; line-height:1.6;">${board.desc || '暂无描述'}</div>
+      ${keywordsHtml}
+      <div style="position:absolute; bottom:16px; right:16px; color:${accentColor}; font-size:18px; opacity:0.7;">›</div>
     `;
     container.appendChild(div);
   });
@@ -9047,6 +9252,7 @@ function openCustomForumBoard(boardId) {
 
   // 复用 gossip 板块的页面，动态更新内容
   currentForumBoard = boardId;
+  const accentColor = board.color || 'var(--main-pink)';
 
   // 创建临时板块配置
   FORUM_BOARDS[boardId] = {
@@ -9054,45 +9260,69 @@ function openCustomForumBoard(boardId) {
     emoji: board.emoji,
     pageId: 'forum-gossip-page',
     containerId: 'forumContainer-gossip',
-    accentColor: 'var(--main-pink)',
-    bgColor: '#f5f5f5',
-    cardBg: '#fff',
-    emptyTip: `${board.name}还没有帖子，点击右上角发帖`,
-    emptyColor: '#999',
+    accentColor: accentColor,
+    bgColor: '#0e0e1e', // 保持深色背景风格
+    cardBg: '#1a1a1e',
+    emptyTip: `${board.name}还没有帖子，点击刷新或率先爆料`,
+    emptyColor: '#5a5a8a',
     rules: board.desc || '欢迎讨论！',
-    rulesColor: 'var(--main-pink)',
-    rulesBg: '#fff8fa',
-    rulesTextColor: '#888',
-    postBg: '#fff',
-    postBorder: '#f0e8df',
-    postNameColor: '#555',
-    postTimeColor: '#aaa',
-    postContentColor: '#444',
-    postTitleFontColor: 'var(--main-pink)',
-    headerBg: '#fff',
-    headerBorder: '#f0e8df',
-    publishBtnBg: 'var(--main-pink)',
-    publishBtnColor: '#fff'
+    styleDesc: board.styleDesc || '',
+    rulesColor: accentColor,
+    rulesBg: '#1a1a2e',
+    rulesTextColor: '#ffffff',
+    postBg: '#1a1a2e',
+    postBorder: '#2a2a4e',
+    postNameColor: '#c0b0cc',
+    postTimeColor: '#5a5a8a',
+    postContentColor: '#b0a0bc',
+    postTitleFontColor: accentColor,
+    headerBg: '#1a1a2e',
+    headerBorder: '#2a2a4e',
+    publishBtnBg: accentColor,
+    publishBtnColor: '#1a1a2e'
   };
 
   // 动态更新页面标题和颜色
   const header = document.getElementById('forum-gossip-page').querySelector('.page-header');
   if (header) {
-    header.style.background = '#fff';
-    header.style.borderBottom = '1px solid #f0e8df';
+    header.style.background = '#1a1a2e';
+    header.style.borderBottom = '1px solid #2a2a4e';
     const backBtn = header.querySelector('.page-back');
-    if (backBtn) { backBtn.style.background = 'rgba(0,0,0,0.05)'; backBtn.querySelector('svg').style.stroke = '#333'; }
+    if (backBtn) { 
+      backBtn.style.background = `${accentColor}26`; 
+      backBtn.querySelector('svg').style.stroke = accentColor; 
+    }
     const title = header.querySelector('.page-title');
-    if (title) { title.style.color = 'var(--main-pink)'; title.textContent = `${board.emoji} ${board.name}`; }
+    if (title) { 
+      title.style.color = accentColor; 
+      title.textContent = `${board.emoji} ${board.name}`; 
+    }
     // 更新刷新和发帖按钮
     const btns = header.querySelectorAll('[style*="cursor:pointer"]');
-    btns.forEach(btn => { btn.style.color = 'var(--main-pink)'; });
+    btns.forEach(btn => { 
+      if (btn.querySelector('svg')) {
+        btn.querySelector('svg').style.stroke = accentColor;
+        btn.onclick = () => refreshForumBoard(boardId);
+      } else {
+        btn.style.color = accentColor; 
+        btn.onclick = () => openPostForumPage(boardId);
+      }
+    });
   }
 
+  // 更新板块规则
+  const rulesEl = document.querySelector('#forum-gossip-page > div:nth-child(3)');
+  if (rulesEl && rulesEl.style.padding) {
+    rulesEl.style.background = '#1a1a2e';
+    rulesEl.style.borderBottom = '1px solid #2a2a4e';
+    rulesEl.style.color = '#9a8fa0';
+    rulesEl.innerHTML = `<span style="color:${accentColor}; font-weight:600;">版块介绍：</span>${board.desc || '欢迎讨论！'}`;
+    // rulesEl.style.display = 'block'; // 永久隐藏发帖须知
+  }
 
   // 更新容器背景
   const container = document.getElementById('forumContainer-gossip');
-  if (container) container.style.background = '#f5f5f5';
+  if (container) container.style.background = '#0e0e1e';
 
   openSub('forum-gossip-page');
   renderForumBoard(boardId);
@@ -9112,9 +9342,10 @@ const FORUM_BOARDS = {
     emptyTip: '暗巷还很安静，点击刷新或率先爆料',
     emptyColor: '#5a5a8a',
     rules: '必须描述"谁在哪做了什么"，需含1-2个无法编造的生活化细节，禁止空洞主观评价。',
+    styleDesc: '生成轻松、八卦、带有调侃和网络流行语的娱乐话题。',
     rulesColor: '#e8c87a',
     rulesBg: '#1a1a2e',
-    rulesTextColor: '#9a8fa0',
+    rulesTextColor: '#ffffff',
     postTitleColor: '#e8c87a',
     postBg: '#1a1a2e',
     postBorder: '#2a2a4e',
@@ -9138,9 +9369,10 @@ const FORUM_BOARDS = {
     emptyTip: '瞭望台还没有观察报告，点击刷新或开始分析',
     emptyColor: '#3a5a7a',
     rules: '必须基于清晰的公开时间线，用可验证信息说话，玩梗需高级，禁止低俗人身攻击。',
+    styleDesc: '生成关于偶像工业、资源分析、商业动向和行业趋势的讨论，带有饭圈用语和梗文化。',
     rulesColor: '#7ab8e8',
     rulesBg: '#091522',
-    rulesTextColor: '#5a7a9a',
+    rulesTextColor: '#ffffff',
     postBg: '#0d1b2a',
     postBorder: '#1a3050',
     postNameColor: '#8aa8c0',
@@ -9163,9 +9395,10 @@ const FORUM_BOARDS = {
     emptyTip: '档案馆暂无记录，点击刷新或提交你的异常档案',
     emptyColor: '#3a6a4a',
     rules: '场景必须日常，恐怖点源于对日常规则的细微破坏，禁止直接描写鬼怪，用感官细节营造氛围。',
+    styleDesc: '生成神秘、悬疑、带有民间传说色彩的都市怪谈或灵异经历分享，追求氛围感和后劲。',
     rulesColor: '#7ae8a0',
     rulesBg: '#0a120a',
-    rulesTextColor: '#4a7a5a',
+    rulesTextColor: '#ffffff',
     postBg: '#0f1a0f',
     postBorder: '#1a3020',
     postNameColor: '#7aaa88',
@@ -9194,6 +9427,14 @@ function openForumBoard(boardKey) {
   const board = FORUM_BOARDS[boardKey];
   if (!board) return;
   currentForumBoard = boardKey;
+  
+  // 显示并同步板块规则颜色
+  const rulesEl = document.querySelector(`#${board.pageId} > div:nth-child(2)`);
+  if (rulesEl) {
+    // rulesEl.style.display = 'block'; // 永久隐藏发帖须知
+    rulesEl.style.color = board.rulesTextColor || '#ffffff';
+  }
+  
   openSub(board.pageId);
   renderForumBoard(boardKey);
 }
@@ -9210,25 +9451,351 @@ function renderForumBoard(boardKey) {
   }
 
   container.innerHTML = '';
+
   posts.forEach((post, idx) => {
     const div = document.createElement('div');
-    div.style.cssText = `background:${board.postBg}; border-radius:14px; padding:14px 15px; border:1px solid ${board.postBorder}; position:relative;`;
+    div.className = 'forum-post-item';
+    div.style.background = board.postBg;
+    div.style.borderColor = board.postBorder;
+    div.onclick = () => openForumDetail(boardKey, post.id);
 
     const timeStr = formatTime(post.time);
+    const titlePreview = (post.title || "无题").substring(0, 10) + (post.title?.length > 10 ? '...' : '');
+    const contentPreview = (post.content || "").substring(0, 100) + (post.content?.length > 100 ? '...' : '');
+
     div.innerHTML = `
+      <div class="forum-board-badge" style="background:${board.accentColor}22; color:${board.accentColor};">${board.emoji} ${board.name}</div>
       <div style="display:flex; align-items:center; margin-bottom:10px;">
-        <img src="${post.avatar}" style="width:36px; height:36px; border-radius:50%; margin-right:10px; object-fit:cover; border:2px solid ${board.postBorder};">
-        <div style="flex:1;">
-          <div style="font-size:13px; font-weight:600; color:${board.postNameColor};">${post.authorName}</div>
-          <div style="font-size:11px; color:${board.postTimeColor}; margin-top:2px;">${timeStr}</div>
+        <div style="width:32px; height:32px; border-radius:50%; margin-right:8px; border:1px solid ${board.postBorder}; overflow:hidden; flex-shrink:0;">
+          <img src="${post.avatar || 'clover.png'}" style="width:100%; height:100%; object-fit:cover;">
         </div>
-        <div onclick="deleteForumPost('${boardKey}', ${idx})" style="font-size:16px; color:${board.postTimeColor}; cursor:pointer; padding:4px 8px; opacity:0.6;">×</div>
+        <div style="flex:1;">
+          <div style="font-size:12px; font-weight:600; color:${board.postNameColor};">${post.authorName}</div>
+          <div style="font-size:10px; color:${board.postTimeColor};">${timeStr}</div>
+        </div>
+        <div onclick="event.stopPropagation(); deleteForumPost('${boardKey}', ${idx})" style="font-size:16px; color:${board.postTimeColor}; cursor:pointer; padding:4px;">×</div>
       </div>
-      <div style="font-size:15px; font-weight:700; color:${board.postTitleFontColor}; margin-bottom:8px; line-height:1.4;">${post.title}</div>
-      <div style="font-size:13px; color:${board.postContentColor}; line-height:1.7; white-space:pre-wrap;">${post.content}</div>
+      <div style="font-size:14px; font-weight:700; color:${board.postTitleFontColor}; margin-bottom:5px;">${titlePreview}</div>
+      <div style="font-size:12px; color:${board.postContentColor}; line-height:1.5; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; margin-bottom:8px;">${contentPreview}</div>
+      <div style="display:flex; justify-content:flex-end; align-items:center;">
+        <div style="font-size:11px; color:${board.accentColor}; background:${board.accentColor}15; padding:3px 8px; border-radius:12px; display:flex; align-items:center; gap:4px;">
+          <span>🔥</span> 已有${post.comments?.length || 0}条热议
+        </div>
+      </div>
     `;
     container.appendChild(div);
   });
+}
+
+let currentDetailPost = null;
+function openForumDetail(boardKey, postId) {
+  const posts = forumPostsByBoard[boardKey] || [];
+  const post = posts.find(p => p.id === postId);
+  if (!post) return;
+  currentDetailPost = post;
+  
+  const board = FORUM_BOARDS[boardKey];
+  const mainEl = document.getElementById('forumPostDetailMain');
+  const timeStr = new Date(post.time).toLocaleString();
+  
+  // Apply board colors to the detail page
+  const header = document.getElementById('forum-detail-header');
+  const backBtn = document.getElementById('forum-detail-back');
+  const backSvg = document.getElementById('forum-detail-back-svg');
+  const titleEl = document.getElementById('forum-detail-title');
+  const detailContent = document.getElementById('forumDetailContent');
+  const commentTitle = document.getElementById('forumCommentTitle');
+  const commentList = document.getElementById('forumCommentList');
+  const inputContainer = document.getElementById('forumCommentInputContainer');
+  const commentInput = document.getElementById('forumCommentInput');
+  const submitBtn = document.getElementById('forumCommentSubmitBtn');
+
+  if (header) {
+    header.style.background = board.headerBg;
+    header.style.borderBottom = `1px solid ${board.headerBorder}`;
+  }
+  if (backBtn) {
+    backBtn.style.background = `${board.accentColor}22`;
+  }
+  if (backSvg) {
+    backSvg.style.stroke = board.accentColor;
+  }
+  if (titleEl) {
+    titleEl.style.color = board.accentColor;
+  }
+  if (detailContent) {
+    detailContent.style.background = board.bgColor;
+  }
+  if (mainEl) {
+    mainEl.style.background = board.postBg;
+    mainEl.style.borderBottom = `1px solid ${board.postBorder}`;
+  }
+  if (commentTitle) {
+    commentTitle.style.background = board.postBg;
+    commentTitle.style.color = board.accentColor;
+    commentTitle.style.borderBottom = `1px solid ${board.postBorder}`;
+  }
+  if (commentList) {
+    commentList.style.background = board.postBg;
+  }
+  if (inputContainer) {
+    inputContainer.style.background = board.headerBg;
+    inputContainer.style.borderTop = `1px solid ${board.headerBorder}`;
+  }
+  if (commentInput) {
+    commentInput.style.background = board.bgColor;
+    commentInput.style.color = board.postContentColor;
+    commentInput.style.border = `1px solid ${board.postBorder}`;
+  }
+  if (submitBtn) {
+    submitBtn.style.background = board.accentColor;
+    submitBtn.style.color = board.publishBtnColor;
+  }
+  
+  mainEl.innerHTML = `
+    <div class="forum-board-badge" style="background:${board.accentColor}22; color:${board.accentColor};">${board.emoji} ${board.name}</div>
+    <div style="display:flex; align-items:center; margin-bottom:15px;">
+      <img src="${post.avatar || 'clover.png'}" style="width:40px; height:40px; border-radius:50%; margin-right:12px; border:2px solid ${board.accentColor}44;">
+      <div style="flex:1;">
+        <div style="font-size:14px; font-weight:600; color:${board.postNameColor};">${post.authorName}</div>
+        <div style="font-size:11px; color:${board.postTimeColor}; margin-top:2px;">${timeStr}</div>
+      </div>
+    </div>
+    <div style="font-size:18px; font-weight:700; color:${board.postTitleFontColor}; margin-bottom:12px; line-height:1.4;">${post.title}</div>
+    <div style="font-size:15px; color:${board.postContentColor}; line-height:1.8; white-space:pre-wrap; margin-bottom:20px;">${post.content}</div>
+    <div style="display:flex; gap:20px; border-top:1px solid ${board.postBorder}; padding-top:15px;">
+      <div style="font-size:13px; color:${board.postTimeColor}; cursor:pointer;">❤️ 点赞 (${post.likes || 0})</div>
+      <div style="font-size:13px; color:${board.postTimeColor}; cursor:pointer;">💬 评论 (${post.comments?.length || 0})</div>
+    </div>
+  `;
+  
+  renderForumComments();
+  openSub('forum-detail-page');
+}
+
+function renderForumComments() {
+  const container = document.getElementById('forumCommentList');
+  const comments = currentDetailPost.comments || [];
+  const board = FORUM_BOARDS[currentDetailPost.board];
+  
+  if (comments.length === 0) {
+    container.innerHTML = `<div style="padding:40px; text-align:center; color:${board.postTimeColor}; font-size:13px;">暂无评论，快来抢沙发吧~</div>`;
+    return;
+  }
+  
+  container.innerHTML = '';
+  comments.forEach(comment => {
+    const div = document.createElement('div');
+    div.style.cssText = `padding:15px 20px; border-bottom:1px solid ${board.postBorder};`;
+    if (comment.isInteraction) {
+      div.style.background = `${board.accentColor}11`;
+      div.style.borderLeft = `3px solid ${board.accentColor}`;
+    }
+    
+    const timeStr = formatTime(comment.time);
+    div.innerHTML = `
+      <div style="display:flex; align-items:center; margin-bottom:8px;">
+        <div style="font-size:13px; font-weight:600; color:${board.accentColor};">${comment.authorName}${comment.isInteraction ? `<span class="interaction-badge" style="background:${board.accentColor};">互动</span>` : ''}</div>
+        <div style="font-size:11px; color:${board.postTimeColor}; margin-left:auto;">${timeStr}</div>
+      </div>
+      <div style="font-size:14px; color:${board.postContentColor}; line-height:1.6;">${comment.content}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+async function submitForumComment() {
+  const input = document.getElementById('forumCommentInput');
+  const content = input.value.trim();
+  if (!content || !currentDetailPost) return;
+  
+  const userName = await getFromStorage('USER_NICKNAME') || '我';
+  const newComment = {
+    id: Date.now().toString(),
+    authorName: userName,
+    content: content,
+    time: Date.now(),
+    isInteraction: false
+  };
+  
+  if (!currentDetailPost.comments) currentDetailPost.comments = [];
+  currentDetailPost.comments.push(newComment);
+  
+  // 保存到数据库
+  await saveToStorage(`FORUM_POSTS_${currentDetailPost.board}`, JSON.stringify(forumPostsByBoard[currentDetailPost.board]));
+  
+  input.value = '';
+  renderForumComments();
+  showToast('✅ 评论已发布！');
+  
+  // 触发自动互动
+  triggerForumInteraction(currentDetailPost, content);
+}
+
+// 核心：生成动态帖子的初始评论链
+async function generateInitialCommentsForPost(post, cfg, board) {
+  if (!cfg || !cfg.key || !cfg.url || !cfg.model) return;
+  
+  // 获取关联的世界书内容
+  let wbContext = "";
+  if (worldBook) wbContext += `[全局设定]: ${worldBook}\n`;
+  const customBoard = customForumBoards.find(b => b.id === post.board);
+  if (customBoard && customBoard.worldBooks && customBoard.worldBooks.length > 0) {
+    const selectedEntries = worldBookEntries.filter(e => customBoard.worldBooks.includes(e.id));
+    wbContext += selectedEntries.map(e => `[${e.name}]: ${e.content}`).join('\n');
+  }
+
+  // 1. 随机挑选 1-2 个用户创建的联系人
+  const individualContacts = contacts.filter(c => !c.isGroup);
+  const contactCount = Math.min(individualContacts.length, Math.floor(Math.random() * 2) + 1);
+  const selectedContacts = [...individualContacts].sort(() => Math.random() - 0.5).slice(0, contactCount);
+  
+  const count = 5; // 固定生成 5 条回复
+  
+  const interactionPrompt = `你现在是论坛互动模块（模块A）。请根据以下帖子内容，同步生成一个包含 ${count} 条评论的初始讨论现场。
+
+${wbContext ? `\n【背景设定/世界书（作为背景参考，在保持角色人设和论坛风格的前提下，自然融入世界书设定）】\n${wbContext}\n` : ''}
+【帖子标题】${post.title}
+【帖子正文】${post.content}
+【楼主】${post.authorName}
+【所属板块】${board.name}
+${board.styleDesc ? `【板块风格】${board.styleDesc}\n` : ''}
+
+可用“联系人”身份列表（必须从中选择 ${contactCount} 个身份进行评论）：
+${selectedContacts.map((c, i) => `${i+1}. 姓名: ${c.name}, 设定: ${c.persona}`).join('\n')}
+
+任务要求：
+1. 总共生成 ${count} 条评论。其中 ${contactCount} 条必须由上面提供的“联系人”身份发出，剩下的 ${5 - contactCount} 条由你随机生成具有真实感的网友NPC身份发出。
+2. **互动逻辑**：
+   - 联系人必须严格根据自己的**人设**进行发言。
+   - 除非人设里明确写了认识对方，否则他们默认**互不认识**，以陌生网友的身份互动。
+   - 他们之间可以互相回复，也可以只回复楼主。
+3. 评论必须形成一个有逻辑的讨论现场，包含观点交锋、追问或调侃。
+4. 所有评论必须高度契合主帖内容，杜绝“已阅”、“666”等无效回复。
+5. 必须返回 JSON 数组格式：[{"authorName": "姓名", "content": "评论内容", "isInteraction": true}, ...]。严禁返回其他文字。
+6. 字数每条在 30 字以内。`;
+
+  try {
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({
+        model: cfg.model,
+        temperature: 0.8,
+        messages: [{ role: 'user', content: interactionPrompt }]
+      })
+    });
+    const data = await res.json();
+    let rawText = data.choices?.[0]?.message?.content || "";
+    
+    // 提取 JSON
+    rawText = rawText.replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+    if (rawText.includes("```")) {
+      const match = rawText.match(/\[[\s\S]*\]/);
+      if (match) rawText = match[0];
+    }
+    const aiRes = JSON.parse(rawText);
+    
+    if (Array.isArray(aiRes)) {
+      if (!post.comments) post.comments = [];
+      aiRes.forEach((item, i) => {
+        post.comments.push({
+          id: (Date.now() + i + 1).toString(),
+          authorName: item.authorName,
+          content: item.content,
+          time: Date.now() + (i + 1) * 1000,
+          isInteraction: item.isInteraction || false
+        });
+      });
+      
+      await saveToStorage(`FORUM_POSTS_${post.board}`, JSON.stringify(forumPostsByBoard[post.board]));
+      
+      // 更新 UI
+      if (document.getElementById(board.pageId || '').classList.contains('show')) {
+        renderForumBoard(post.board);
+      }
+      if (currentDetailPost && currentDetailPost.id === post.id) {
+        renderForumComments();
+      }
+    }
+  } catch (e) { console.error('生成初始评论链失败:', e); }
+}
+
+async function triggerForumInteraction(post, userComment) {
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  if (!cfg.key || !cfg.url || !cfg.model) return;
+
+  const board = FORUM_BOARDS[post.board] || { name: '综合版块', rules: '' };
+  
+  // 获取关联的世界书内容
+  let wbContext = "";
+  if (worldBook) wbContext += `[全局设定]: ${worldBook}\n`;
+  const customBoard = customForumBoards.find(b => b.id === post.board);
+  if (customBoard && customBoard.worldBooks && customBoard.worldBooks.length > 0) {
+    const selectedEntries = worldBookEntries.filter(e => customBoard.worldBooks.includes(e.id));
+    wbContext += selectedEntries.map(e => `[${e.name}]: ${e.content}`).join('\n');
+  }
+
+  // 随机挑选 2-3 个联系人作为互动者
+  const eligibleContacts = contacts.filter(c => !c.isGroup);
+  const count = Math.floor(Math.random() * 2) + 2; // 2-3条
+  const selected = eligibleContacts.sort(() => Math.random() - 0.5).slice(0, count);
+  
+  const interactionPrompt = `你现在是论坛互动模块（模块A）。请根据以下帖子内容和用户的最新评论，生成 ${count} 条互动评论。
+
+${wbContext ? `\n【背景设定/世界书（作为背景参考，在保持角色人设和论坛风格的前提下，自然融入世界书设定）】\n${wbContext}\n` : ''}
+【帖子标题】${post.title}
+【帖子正文】${post.content}
+【用户评论】${userComment}
+【所属板块】${board.name}
+${board.styleDesc ? `【板块风格】${board.styleDesc}\n` : ''}
+
+可用身份列表：
+${selected.map((c, i) => `${i+1}. 姓名: ${c.name}, 设定: ${c.persona}`).join('\n')}
+(若身份不足，请自行生成具有真实感的网友昵称)
+
+任务要求：
+1. 贴合帖子主题，有互动感（提问、反驳、补充、共情）。
+2. **互动逻辑**：
+   - 联系人必须严格根据自己的**人设**进行发言。
+   - 除非人设里明确写了认识对方，否则他们默认**互不认识**，以陌生网友的身份互动。
+   - 他们之间可以互相回复，也可以只回复楼主。
+3. 符合板块风格（八卦版带吃瓜语气，恐怖版带阴森/怀疑语气）。
+4. 必须返回 JSON 数组格式：[{"authorName": "姓名", "content": "评论内容"}, ...]。严禁返回其他文字。
+5. 字数在 30 字以内。`;
+
+  try {
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({
+        model: cfg.model,
+        temperature: 0.8,
+        messages: [{ role: 'user', content: interactionPrompt }]
+      })
+    });
+    const data = await res.json();
+    const aiRes = JSON.parse(data.choices[0].message.content.replace(/```json|```/g, ''));
+    
+    aiRes.forEach((item, i) => {
+      post.comments.push({
+        id: (Date.now() + i + 1).toString(),
+        authorName: item.authorName,
+        content: item.content,
+        time: Date.now() + (i + 1) * 1000,
+        isInteraction: true
+      });
+    });
+    
+    await saveToStorage(`FORUM_POSTS_${post.board}`, JSON.stringify(forumPostsByBoard[post.board]));
+    
+    // 如果用户还在详情页，自动刷新
+    if (currentDetailPost && currentDetailPost.id === post.id) {
+      renderForumComments();
+      // 自动展开/滚动到新评论（可选，目前已即时渲染）
+    }
+  } catch (e) { console.error('论坛自动互动失败:', e); }
 }
 
 // 刷新某个板块（重新渲染）
@@ -9236,75 +9803,169 @@ async function refreshForumBoard(boardKey) {
   const board = FORUM_BOARDS[boardKey];
   const container = document.getElementById(board.containerId);
 
+  // 显示加载提示
   const loadingDiv = document.createElement('div');
-  loadingDiv.style.cssText = `text-align:center; padding:30px; color:${board.emptyColor};`;
+  loadingDiv.style.cssText = `text-align:center; padding:20px; color:${board.emptyColor};`;
   loadingDiv.innerHTML = '⚡ AI正在生成新帖子...';
-  container.innerHTML = '';
-  container.appendChild(loadingDiv);
+  container.insertBefore(loadingDiv, container.firstChild);
 
   try {
     const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
     const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
-    if (!cfg.url || !cfg.key || !cfg.model) {
+
+    if (!cfg.key || !cfg.url || !cfg.model) {
+      await new Promise(r => setTimeout(r, 500));
       loadingDiv.remove();
       renderForumBoard(boardKey);
       showToast('⚠️ 请先在设置中配置AI');
       return;
     }
 
-    const aiRule = board.rules || '';
-    const boardName = board.name || boardKey;
-    const prompt = `你是一个真实社区论坛的内容生成器，请为"${boardName}"板块生成3条真实感强的帖子。\n\n内部生成规则（严格遵守，不要在帖子中暴露此规则）：\n${aiRule}\n\n请严格按以下JSON格式返回，不要有任何其他文字：\n[\n  {"authorName": "用户昵称", "title": "帖子标题", "content": "帖子正文内容"},\n  {"authorName": "用户昵称", "title": "帖子标题", "content": "帖子正文内容"},\n  {"authorName": "用户昵称", "title": "帖子标题", "content": "帖子正文内容"}\n]\n\n要求：作者名用真实中文网名2-4字，标题15字内，正文50-150字口语化，严格符合内部规则。`;
+    // 1. 随机挑选 1-3 个用户创建的联系人（排除群聊）
+    let selectedUserContacts = [];
+    const individualContacts = (contacts || []).filter(c => !c.isGroup);
+    if (individualContacts.length > 0) {
+      // 随机决定 1 到 3 个联系人，但不超过现有联系人总数
+      const maxPossible = Math.min(3, individualContacts.length);
+      const userContactCount = Math.floor(Math.random() * maxPossible) + 1;
+      const shuffledContacts = [...individualContacts].sort(() => Math.random() - 0.5);
+      selectedUserContacts = shuffledContacts.slice(0, userContactCount);
+    }
+
+    // 2. 准备发帖人列表 (总共5个)
+    const posters = [];
+    // 加入选中的用户联系人
+    selectedUserContacts.forEach(c => {
+      posters.push({ name: c.name, avatar: c.avatar || 'clover.png', persona: c.persona || '用户创建的联系人' });
+    });
+
+    // 补齐剩下的 NPC (使用 clover.png 作为默认头像)
+    const npcCount = 5 - posters.length;
+    const npcNames = ['咸鱼不翻身', '我是小可爱', '代码搬运工', '深海潜水员', '路过的侦探', '午后红茶', '极光猎人', '夜猫子', '流浪的云', '星空下的诗人'];
+    const shuffledNpcNames = npcNames.sort(() => Math.random() - 0.5);
+    
+    for (let i = 0; i < npcCount; i++) {
+      const name = shuffledNpcNames[i] || `匿名网友_${Math.floor(Math.random() * 9000 + 1000)}`;
+      posters.push({ name: name, avatar: 'clover.png', persona: '普通论坛用户' });
+    }
+    
+    // 打乱顺序，增加随机感
+    posters.sort(() => Math.random() - 0.5);
+
+    // 获取关联的世界书内容
+    let wbContext = "";
+    const customBoard = customForumBoards.find(b => b.id === boardKey);
+    if (customBoard && customBoard.worldBooks && customBoard.worldBooks.length > 0) {
+      const selectedEntries = worldBookEntries.filter(e => customBoard.worldBooks.includes(e.id));
+      wbContext = selectedEntries.map(e => `[${e.name}]: ${e.content}`).join('\n');
+    }
+
+    const prompt = `你是一个真实社区论坛的内容生成器。请为"${board.name}"板块生成5个新帖子。
+${wbContext ? `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n【背景设定/世界书】\n${wbContext}\n` : ''}
+板块规则：${board.rules}
+${board.styleDesc ? `板块风格：${board.styleDesc}\n` : ''}
+请**必须**使用以下指定的发帖人身份（按照顺序对应5个帖子）：
+${posters
+  .map((p, i) => `${i + 1}. 姓名: ${p.name}, 身份: ${p.persona}`)
+  .join("\n")}
+
+请严格遵守以下要求：
+1. **必须返回一个纯 JSON 数组**，严禁包含任何 Markdown 标记（如 \`\`\`json），严禁任何解释性文字。
+2. 格式必须严格如下：
+[
+  { "authorName": "指定的发帖人姓名", "title": "帖子标题", "content": "帖子正文" },
+  ...
+]
+3. 帖子内容要真实、生活化，严格符合发帖人的身份设定。除非人设里明确写了认识对方，否则他们默认互不认识，以陌生网友的身份发帖。
+4. **严禁出现乱码**、特殊不可见字符或编码错误。确保输出为纯净、标准的中文简体。不要使用任何生僻字或特殊的 Unicode 装饰符号。
+5. 标题要吸引人（15字以内），内容在100字左右，语气口语化，像真实网友在发帖。
+6. 严格禁止返回除 JSON 数组以外的任何内容。
+7. 确保输出的编码为标准的 UTF-8。`;
 
     const res = await fetch(`${cfg.url}/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
-      body: JSON.stringify({ model: cfg.model, temperature: 0.92, messages: [{ role: 'user', content: prompt }] })
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cfg.key}`,
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        model: cfg.model,
+        temperature: 0.8,
+        messages: [{ role: "user", content: prompt }],
+      }),
     });
 
-    if (!res.ok) throw new Error('AI请求失败 ' + res.status);
+    if (!res.ok) throw new Error("AI请求失败");
     const data = await res.json();
-    const rawText = data.choices?.[0]?.message?.content || '[]';
-    const jsonMatch = rawText.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) throw new Error('AI返回格式错误');
-    const posts = JSON.parse(jsonMatch[0]);
-    if (!Array.isArray(posts) || posts.length === 0) throw new Error('没有生成帖子');
+    let rawText = data.choices?.[0]?.message?.content || "";
 
-    const aiAvatars = [
-      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="20" r="20" fill="%23e8c87a"/><text x="50%25" y="55%25" text-anchor="middle" dominant-baseline="middle" font-size="18" fill="%23333">🌸</text></svg>',
-      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="20" r="20" fill="%237ab8e8"/><text x="50%25" y="55%25" text-anchor="middle" dominant-baseline="middle" font-size="18" fill="%23333">🌙</text></svg>',
-      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="20" r="20" fill="%237ae8a0"/><text x="50%25" y="55%25" text-anchor="middle" dominant-baseline="middle" font-size="18" fill="%23333">⭐</text></svg>',
-      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="20" r="20" fill="%23e87a7a"/><text x="50%25" y="55%25" text-anchor="middle" dominant-baseline="middle" font-size="18" fill="%23333">🔥</text></svg>',
-    ];
+    // 更加鲁棒的 JSON 提取逻辑
+    let generatedPosts = [];
+    try {
+      // 清除可能存在的 Unicode 零宽字符、BOM 等干扰字符
+      rawText = rawText.replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+      // 移除可能存在的 Markdown 代码块包裹
+      if (rawText.includes("```")) {
+        const match = rawText.match(/\[[\s\S]*\]/);
+        if (match) rawText = match[0];
+      }
 
-    if (!forumPostsByBoard[boardKey]) forumPostsByBoard[boardKey] = [];
-    const now = Date.now();
-    posts.reverse().forEach((p, idx) => {
-      forumPostsByBoard[boardKey].unshift({
-        id: (now - idx * 1000).toString(),
-        authorName: p.authorName || '匿名用户',
-        avatar: aiAvatars[Math.floor(Math.random() * aiAvatars.length)],
-        title: p.title || '无标题',
+      generatedPosts = JSON.parse(rawText);
+    } catch (e) {
+      // 尝试第二次提取
+      try {
+        const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          generatedPosts = JSON.parse(jsonMatch[0]);
+        } else {
+          throw e;
+        }
+      } catch (e2) {
+        console.error("JSON解析失败，原始文本:", rawText);
+        throw new Error("AI返回格式错误");
+      }
+    }
+    
+    // 将生成的帖子与发帖人信息对应
+    const finalPosts = generatedPosts.slice(0, 5).map((p, i) => {
+      // 尽量匹配姓名，匹配不到则按顺序对应
+      let poster = posters.find(postr => postr.name === p.authorName) || posters[i % posters.length];
+      
+      return {
+        id: (Date.now() + i).toString(),
+        authorName: poster.name, 
+        avatar: poster.avatar || 'clover.png',
+        title: p.title || '无题',
         content: p.content || '',
-        time: now - idx * 60000,
+        time: Date.now() - (i * 3600000 + Math.floor(Math.random() * 1800000)), // 随机分布在过去几小时内
         board: boardKey,
-        isAI: true
-      });
+        isAI: true,
+        comments: []
+      };
     });
 
-    await saveToStorage(`FORUM_POSTS_${boardKey}`, JSON.stringify(forumPostsByBoard[boardKey]));
+    forumPostsByBoard[boardKey] = finalPosts;
+    await saveToStorage(`FORUM_POSTS_${boardKey}`, JSON.stringify(finalPosts));
+    
     loadingDiv.remove();
     renderForumBoard(boardKey);
-    showToast('✅ 刷新成功，AI生成了新帖子');
+    showToast('✅ 刷新成功，正在生成现场讨论...');
+
+    // Generate initial comments for each post
+    for (const post of finalPosts) {
+      generateInitialCommentsForPost(post, cfg, board);
+    }
 
   } catch (e) {
     console.error('refreshForumBoard error:', e);
+    const ld = document.getElementById('moments-loading');
+    if (ld) ld.remove();
     loadingDiv.remove();
     renderForumBoard(boardKey);
-    showToast('❌ 生成失败：' + (e.message || '未知错误'));
+    showToast('? ˢʧ: ' + e.message);
   }
 }
-
 
 // 打开发帖页面（指定板块）
 function openPostForumPage(boardKey) {
@@ -9328,12 +9989,31 @@ function openPostForumPage(boardKey) {
     boardTag.style.background = board.rulesBg;
     boardTag.style.borderBottom = `1px solid ${board.postBorder}`;
   }
+  if (rulesEl) {
+    rulesEl.style.display = 'none';
+    // rulesEl.style.background = board.rulesBg;
+    // rulesEl.style.border = `1px solid ${board.postBorder}`;
+    // rulesEl.style.padding = '10px 14px';
+    // rulesEl.innerHTML = `<span style="color:${board.rulesColor}; font-weight:600;">📋 发帖须知：</span><span style="color:${board.rulesTextColor};">${board.rules}</span>`;
+  }
 
   // 清空输入框
   document.getElementById('postForumTitle').value = '';
   document.getElementById('postForumContent').value = '';
 
   openSub('post-forum-page');
+}
+
+let currentPostIdentity = 'user';
+function switchPostIdentity(id) {
+  currentPostIdentity = id;
+  document.querySelectorAll('.post-identity-btn').forEach(btn => {
+    btn.classList.remove('active');
+    btn.style.borderColor = '#ddd';
+  });
+  const activeBtn = document.getElementById('identity-' + id);
+  activeBtn.classList.add('active');
+  activeBtn.style.borderColor = 'var(--main-pink)';
 }
 
 // 发布帖子
@@ -9344,36 +10024,88 @@ async function publishForumPost() {
   if (!title) { showToast('请输入标题'); return; }
   if (!content) { showToast('请输入内容'); return; }
 
+  showToast('⚡ 正在通过模块A优化内容...');
+  
+  const board = FORUM_BOARDS[currentForumBoard] || { name: '综合版块', rules: '' };
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  
+  let finalTitle = title;
+  let finalContent = content;
+
+  if (cfg.key && cfg.url && cfg.model) {
+    try {
+      // 获取关联的世界书内容
+      let wbContext = "";
+      const customBoard = customForumBoards.find(b => b.id === currentForumBoard);
+      if (customBoard && customBoard.worldBooks && customBoard.worldBooks.length > 0) {
+        const selectedEntries = worldBookEntries.filter(e => customBoard.worldBooks.includes(e.id));
+        wbContext = selectedEntries.map(e => `[${e.name}]: ${e.content}`).join('\n');
+      }
+
+      const prompt = `你现在是论坛内容生成器（模块A）。用户提交了一个帖子，请你根据所属板块的“世界书”规则，对标题和正文进行细节扩充和润色。
+${wbContext ? `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n【背景设定/世界书】\n${wbContext}\n` : ''}
+【所属板块】${board.name}
+【板块规则】${board.rules}
+${board.styleDesc ? `【板块风格】${board.styleDesc}\n` : ''}
+【原始标题】${title}
+【原始正文】${content}
+
+任务要求：
+1. 保持原意，但增加符合板块氛围的细节。
+2. 八卦版：补充“动机+细节锚点”（如：偷听到的地点、具体的物品颜色）。
+3. 娱乐版：补充“场景+心理描写”（如：拍摄现场的灯光、发帖人的激动心情）。
+4. 恐怖版：补充“环境+感官描写”（如：潮湿的气味、背后发凉的触感）。
+5. 保持口语化，像真实网友发帖。
+6. 必须返回 JSON 格式：{"title": "扩充后的标题", "content": "扩充后的正文"}。严禁返回其他文字。`;
+
+      const res = await fetch(`${cfg.url}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+        body: JSON.stringify({
+          model: cfg.model,
+          temperature: 0.8,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await res.json();
+      const aiRes = JSON.parse(data.choices[0].message.content.replace(/```json|```/g, ''));
+      finalTitle = aiRes.title || title;
+      finalContent = aiRes.content || content;
+    } catch (e) { console.error('模块A优化失败:', e); }
+  }
+
   const userName = await getFromStorage('USER_NICKNAME') || '我';
+  const authorName = currentPostIdentity === 'user' ? `联系人[${userName}]` : '匿名用户';
+  
   const newPost = {
-    id: Date.now().toString(),
-    authorName: userName,
-    avatar: userAvatar,
-    title: title,
-    content: content,
+    id: Date.now().toString() + Math.floor(Math.random()*1000),
+    authorName: authorName,
+    avatar: currentPostIdentity === 'user' ? userAvatar : 'clover.png',
+    title: finalTitle,
+    content: finalContent,
     time: Date.now(),
-    board: currentForumBoard
+    board: currentForumBoard,
+    comments: []
   };
 
   if (!forumPostsByBoard[currentForumBoard]) forumPostsByBoard[currentForumBoard] = [];
   forumPostsByBoard[currentForumBoard].unshift(newPost);
 
-  // 持久化保存
   await saveToStorage(`FORUM_POSTS_${currentForumBoard}`, JSON.stringify(forumPostsByBoard[currentForumBoard]));
 
-  // 清理表单
   document.getElementById('postForumTitle').value = '';
   document.getElementById('postForumContent').value = '';
-
   closeSub('post-forum-page');
 
-  // 刷新对应板块
-  const board = FORUM_BOARDS[currentForumBoard];
-  if (document.getElementById(board.pageId).classList.contains('show')) {
+  if (document.getElementById(board.pageId || '').classList.contains('show')) {
     renderForumBoard(currentForumBoard);
   }
 
-  showToast('✅ 发布成功！');
+  showToast('✅ 发帖成功！正在生成现场讨论...');
+  
+  // Generate initial comments for user post
+  generateInitialCommentsForPost(newPost, cfg, board);
 }
 
 // 删除某条帖子
@@ -9422,6 +10154,32 @@ function openPostMomentPage() {
   document.getElementById('postMomentContent').value = '';
   postMomentImages = [];
   renderPostMomentImages();
+  
+  const maskSelect = document.getElementById('postMomentMaskSelect');
+  if (maskSelect) {
+    maskSelect.innerHTML = '<option value="">--默认面具--</option>';
+    if (typeof userMasks !== 'undefined' && Array.isArray(userMasks)) {
+      userMasks.forEach(mask => {
+        const opt = document.createElement('option');
+        opt.value = mask.id;
+        opt.textContent = mask.idName || '未命名面具';
+        maskSelect.appendChild(opt);
+      });
+      
+      // 默认选中当前活动的面具
+      if (typeof chatSettings !== 'undefined' && chatSettings.userMaskId) {
+         const activeMask = userMasks.find(m => m.persona === chatSettings.userMask || m.id === chatSettings.userMaskId);
+         if(activeMask) {
+            maskSelect.value = activeMask.id;
+         } else if (userMasks.length > 0) {
+            maskSelect.value = userMasks[0].id;
+         }
+      } else if (userMasks.length > 0) {
+         maskSelect.value = userMasks[0].id;
+      }
+    }
+  }
+
   openSub('post-moment-page');
 }
 
@@ -9663,6 +10421,9 @@ async function publishUserMoment() {
   
   const fullContent = content + imagesHtml;
   
+  const maskSelect = document.getElementById('postMomentMaskSelect');
+  const selectedMaskId = maskSelect ? maskSelect.value : '';
+
   const newMoment = {
     id: (Date.now() + Math.random()).toString(),
     contactId: 'user_self',
@@ -9673,6 +10434,7 @@ async function publishUserMoment() {
     time: Date.now(),
     comments: [],
     likes: [],
+    mask_id: selectedMaskId,
     visibility: {
       type: currentVisibilityType,
       contacts: [...currentVisibilityData.contacts],
@@ -9736,8 +10498,57 @@ async function publishUserMoment() {
 async function generateCommentsForUserMoment(moment, eligibleContacts, cfg) {
   if (!eligibleContacts || eligibleContacts.length === 0) return;
   
+  // 根据选中的身份筛选相关联系人
+  let priorityContacts = [];
+  let otherContacts = [...eligibleContacts];
+  
+  if (moment.mask_id && typeof chatRecords !== 'undefined') {
+    const maskInfo = userMasks ? userMasks.find(m => m.id === moment.mask_id) : null;
+    if (maskInfo) {
+      for (let contact of eligibleContacts) {
+        // 尝试获取该联系人的聊天设置，判断是否使用了当前面具
+        let matchMask = false;
+        try {
+          const settingsStr = await getFromStorage(`CHAT_SETTINGS_${contact.id}`);
+          if (settingsStr) {
+            const settings = typeof settingsStr === 'string' ? JSON.parse(settingsStr) : settingsStr;
+            // 简单判断面具关联：人设一致 或 昵称一致
+            if (settings.userMask === maskInfo.persona || settings.chatNickname === maskInfo.idName) {
+              matchMask = true;
+            }
+          }
+        } catch(e) {}
+        
+        const recs = chatRecords[contact.id] || [];
+        if (matchMask && recs.length > 0) {
+           priorityContacts.push({contact, time: recs[recs.length-1].time});
+        }
+      }
+      
+      // 按最后聊天时间排序
+      priorityContacts.sort((a,b) => b.time - a.time);
+      priorityContacts = priorityContacts.map(p => p.contact);
+      
+      // 将优先联系人从其他人中移除
+      otherContacts = otherContacts.filter(c => !priorityContacts.find(p => p.id === c.id));
+    }
+  }
+
   const count = Math.min(Math.floor(Math.random() * 3) + 1, eligibleContacts.length);
-  const selectedContacts = [...eligibleContacts].sort(() => Math.random() - 0.5).slice(0, count);
+  let selectedContacts = [];
+  
+  // 首先加入强制评论联系人（至少1个，如果有的话）
+  if (priorityContacts.length > 0) {
+     const forceCount = Math.min(priorityContacts.length, Math.max(1, Math.floor(count / 2)));
+     selectedContacts = priorityContacts.slice(0, forceCount);
+  }
+  
+  // 补充其他联系人
+  const remainingCount = count - selectedContacts.length;
+  if (remainingCount > 0 && otherContacts.length > 0) {
+     const randomOthers = otherContacts.sort(() => Math.random() - 0.5).slice(0, remainingCount);
+     selectedContacts = [...selectedContacts, ...randomOthers];
+  }
   
   // 提取纯文本内容，去掉图片HTML
   const plainContent = moment.content.replace(/<[^>]*>?/gm, '').trim();
@@ -9746,11 +10557,12 @@ async function generateCommentsForUserMoment(moment, eligibleContacts, cfg) {
   for (let i = 0; i < selectedContacts.length; i++) {
     const contact = selectedContacts[i];
     try {
+      const wbPrompt = await getContactWorldBookPrompt(contact.id);
       const prompt = `你是${contact.name}。你的好友（用户）发了一条朋友圈。
 【朋友圈内容】${contentText}
 【你的人设设定】
 ${contact.persona}
-
+${wbPrompt}
 请**严格扮演**上述人设，给这条朋友圈写一条评论。要求：
 1. **必须完全符合你的人设设定**（包括性格、说话方式、口癖等），绝对不能偏离人设。
 2. 语气要自然真实，像真人在评论，不要像AI。
@@ -9932,13 +10744,72 @@ async function refreshMoments() {
   const newMoments = [];
   for (const contact of selectedContacts) {
     try {
-      const prompt = `你是${contact.name}。请根据你的人设，发一条符合你性格、生活化、充满“活人感”的朋友圈动态。
+      // 获取该联系人的聊天设置
+      const contactSettingsStr = await getFromStorage(`CHAT_SETTINGS_${contact.id}`);
+      const contactSettings = contactSettingsStr ? (typeof contactSettingsStr === 'string' ? JSON.parse(contactSettingsStr) : contactSettingsStr) : { useWorldBook: true, selectedWorldBooks: [] };
+
+      // 提取被选中的世界书（常驻 + 关键词触发）
+      let activeWorldBooks = [];
+      if (contactSettings.useWorldBook) {
+        if (worldBook) activeWorldBooks.push(`全局世界观：\n${worldBook}`);
+        if (contactSettings.selectedWorldBooks && contactSettings.selectedWorldBooks.length > 0) {
+          const selectedEntries = worldBookEntries.filter(e => contactSettings.selectedWorldBooks.includes(e.id));
+          selectedEntries.forEach(entry => {
+            if (entry.category === '记忆总结') {
+              activeWorldBooks.push(`[${entry.name}]\n${entry.content}`);
+            } else if (entry.triggerType !== 'keyword') {
+              activeWorldBooks.push(`[${entry.name} - 设定]\n${entry.content}`);
+            }
+          });
+        }
+      }
+      const wbPrompt = activeWorldBooks.length > 0 ? `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n【世界书/背景设定】\n${activeWorldBooks.join('\n\n')}\n` : '';
+
+      // 提取长期记忆 (LTM)
+      let ltmContent = '';
+      try {
+        const ltmData = await window.storage.getItem(`LTM_${contact.id}`);
+        if (ltmData) {
+          const entries = typeof ltmData === 'string' ? JSON.parse(ltmData) : ltmData;
+          if (Array.isArray(entries)) {
+            ltmContent = entries.map(e => `[${e.name}]\n${e.content}`).join('\n\n');
+          }
+        }
+      } catch(e) { console.error('读取LTM失败', e); }
+      const ltmPrompt = ltmContent ? `\n【长期记忆 (LTM)】\n${ltmContent}\n` : '';
+
+      // 提取最近聊天记录
+      let recentChat = '';
+      try {
+        const records = chatRecords[contact.id] || [];
+        const recent = records.slice(-10);
+        if (recent.length > 0) {
+          recentChat = recent.map(r => {
+            const side = r.side === 'right' ? '用户' : contact.name;
+            const text = typeof r.content === 'string' ? r.content : '[图片]';
+            return `${side}: ${text}`;
+          }).join('\n');
+        }
+      } catch(e) { console.error('读取聊天记录失败', e); }
+      const chatPrompt = recentChat ? `\n【最近对话内容】\n${recentChat}\n` : '';
+
+      // 提取短期记忆 (STM)
+      let stmContent = '';
+      try {
+        const stmData = await getStmData(contact.id);
+        if (stmData && stmData.entries && stmData.entries.length > 0) {
+          stmContent = stmData.entries.map((e, i) => `${i+1}. ${e.content}`).join('\n');
+        }
+      } catch(e) { console.error('读取STM失败', e); }
+      const stmPrompt = stmContent ? `\n【短期记忆 (STM)】\n以下是最近发生的事情总结：\n${stmContent}\n` : '';
+
+      const prompt = `你是${contact.name}。请根据你的人设、当前的记忆、最近聊天和背景设定，发一条符合你性格、生活化、充满“活人感”的朋友圈动态。
 【你的人设设定】
 ${contact.persona}
-
+${wbPrompt}${ltmPrompt}${chatPrompt}${stmPrompt}
 【任务要求】
 1. **必须完全符合你的人设设定**（包括性格、身份、说话方式、口癖等），绝对不能偏离人设。
-2. 动态内容要生活化、诙谐幽默或有明显情绪起伏，展现出强烈的“活人感”。
+2. 可以结合记忆或背景设定中的事件来发动态，但不要生硬，要自然、生活化、诙谐幽默或有明显情绪起伏，展现出强烈的“活人感”。
 3. 字数50字以内。
 4. 只需要返回朋友圈文字内容，不要带引号或其他说明。`;
       
@@ -10216,7 +11087,7 @@ function renderMoments() {
       </div>
       <div class="moment-content">${moment.content}</div>
       <div class="moment-actions">
-        <div class="moment-action-btn" onclick="likeMoment('${moment.id}')">👍 赞</div>
+        <div class="moment-action-btn" onclick="likeMoment('${moment.id}')">${(moment.likes && moment.likes.indexOf('我') > -1) ? '<span style="color:var(--main-pink);">❤️ 已赞</span>' : '🤍 赞'}</div>
         <div class="moment-action-btn" onclick="commentMoment('${moment.id}')">💬 评论</div>
         <div class="moment-action-btn delete-moment" onclick="deleteMoment('${moment.id}')">🗑️ 删除</div>
       </div>
@@ -10368,14 +11239,30 @@ async function submitComment() {
     let prompt = '';
     
     if (replyTo && replyTo !== '我') {
-      aiToReply = contacts.find(c => c.name === replyTo);
+      aiToReply = contacts.find(c => c.name.trim() === replyTo.trim());
+      if (!aiToReply && moment.contactId !== 'user_self') {
+        // 如果回复的是路人，但朋友圈是某个NPC发的，则由该NPC出来维护秩序或互动
+        aiToReply = contacts.find(c => c.id === moment.contactId);
+      }
+      
       if (aiToReply) {
-        prompt = `你是${aiToReply.name}。在朋友圈里，发帖人是${moment.contactName}，内容是：“${moment.content}”。
-你的好友（用户）回复了你的评论，对你说：“${content}”。
-请**严格扮演**你的人设进行回复。
-【你的人设设定】
-${aiToReply.persona}
+        // 提取记忆
+        let memPrompt = "";
+        try {
+          const stm = await getStmData(aiToReply.id);
+          if (stm && stm.entries.length > 0) memPrompt += `\n【短期记忆】\n${stm.entries.map(e=>e.content).join('\n')}`;
+          const ltm = await window.storage.getItem(`LTM_${aiToReply.id}`);
+          if (ltm) {
+            const entries = typeof ltm === 'string' ? JSON.parse(ltm) : ltm;
+            memPrompt += `\n【长期记忆】\n${entries.map(e=>e.content).join('\n')}`;
+          }
+        } catch(e) {}
 
+        const wbPrompt = await getContactWorldBookPrompt(aiToReply.id);
+        prompt = `你是${aiToReply.name}。在朋友圈里，发帖人是${moment.contactName}，内容是：“${moment.content}”。
+${replyTo === aiToReply.name ? '用户回复了你的评论' : '用户回复了路人 '+replyTo+' 的评论'}，对你说：“${content}”。
+请**严格扮演**你的人设进行回复。${memPrompt}
+${wbPrompt}
 要求：
 1. **必须完全符合你的人设设定**（包括性格、说话方式、口癖等），绝对不能偏离人设。
 2. 回复简短自然（20字以内），像真人在聊天。
@@ -10384,19 +11271,25 @@ ${aiToReply.persona}
     } else if (!replyTo && moment.contactId !== 'user_self') {
       aiToReply = contacts.find(c => c.id === moment.contactId);
       if (aiToReply) {
+        // 提取记忆
+        let memPrompt = "";
+        try {
+          const stm = await getStmData(aiToReply.id);
+          if (stm && stm.entries.length > 0) memPrompt += `\n【短期记忆】\n${stm.entries.map(e=>e.content).join('\n')}`;
+        } catch(e) {}
+
+        const wbPrompt = await getContactWorldBookPrompt(aiToReply.id);
         prompt = `你是${moment.contactName}。你刚发了朋友圈内容为：“${moment.content}”。
 你的好友（用户）评论说：“${content}”。
-请**严格扮演**你的人设进行回复。
-【你的人设设定】
-${moment.contactPersona}
-
+请**严格扮演**你的人设进行回复。${memPrompt}
+${wbPrompt}
 要求：
 1. **必须完全符合你的人设设定**（包括性格、说话方式、口癖等），绝对不能偏离人设。
 2. 回复简短自然（20字以内），像真人在聊天。
 3. 只返回回复内容，不要带引号。`;
       }
     }
-    
+
     if (aiToReply && prompt) {
       try {
         const res = await fetch(`${cfg.url}/chat/completions`, {

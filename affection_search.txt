@@ -1,0 +1,83 @@
+﻿Line 2083:           <!-- 板块3: 心声 -->
+Line 2085:             <div style="font-size:11px; color:rgba(255,255,255,0.7); margin-bottom:6px;">💭 心声</div>
+Line 2088:           <!-- 板块4: 好感度 -->
+Line 2091:               <div style="font-size:11px; color:rgba(255,255,255,0.7);">💚 好感度</div>
+Line 2092:               <div onclick="resetFavor()" style="cursor:pointer; font-size:11px; color:rgba(255,255,255,0.9); padding:3px 10px; background:rgba(255,255,255,0.2); border-radius:6px; white-space:nowrap; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">清零</div>
+Line 2096:                 <div id="status-favor" style="width:0%; height:100%; background:linear-gradient(90deg, rgba(255,182,193,0.9), rgba(255,105,180,0.9)); transition:width 0.3s;"></div>
+Line 2098:               <div id="status-favor-text" style="font-size:13px; color:rgba(255,255,255,0.95); font-weight:500; min-width:40px; text-align:right;">0%</div>
+Line 2253:           <div class="setting-desc">设定你们目前的情感状态、所在地点和时空背景。如果设定中包含“两人初始”或“刚认识”等词，好感度将自动重置为0。</div>
+Line 2338:           <div style="font-size: 13px; color: var(--text-light); margin-bottom: 30px;">好感度达到90%即可向TA求婚，步入婚姻殿堂</div>
+Line 4679:           <div class="bc-status-item thoughts"><div class="bc-label">💭 心声</div><div class="bc-val">${(statusData?.thoughts || '没有想法').substring(0,10)}</div></div>
+Line 4682:           <div class="bc-status-item favor"><div class="bc-label">💚 好感度</div><div class="bc-val">${statusData?.favor || 0}%</div></div>
+Line 5056:   // 获取当前好感度
+Line 5057:   let currentFavor = 0;
+Line 5062:       currentFavor = status.favor || 0;
+Line 5066:   const favorRules = `
+Line 5067: 【好感度调控规则】
+Line 5068: 当前好感度为：${currentFavor}%。
+Line 5069: 请根据剧情发展自然更新好感度，但必须严格遵守以下限制：
+Line 5070: 1. 维持不变：如果当前回合只是普通的日常交流（如吃饭、闲聊等），没有明显的能提升或降低好感度的互动，好感度应保持不变。
+Line 5071: 2. 增加限制：如果对方有让你开心、心动或有好感的行为，一次对话最多只能增加1%到5%的好感度。
+Line 5072: 3. 下降限制：如果对方做了让你反感、讨厌、愤怒的事，一次对话最多只能下降1%到15%的好感度。`;
+Line 5080: 心声：[内容必须反映角色内心最真实的潜意识想法，必须包含角色真实的情感波动、隐秘的欲望或对用户的真实评价，10字以内]
+Line 5081: 好感度：[0-100的数字，反映对用户的好感程度]`;
+Line 5092: 【心声生成准则】
+Line 5093: 1. 真实性：心声必须反映角色内心最真实、最私密的潜意识想法，即使与表面的言语完全相反。
+Line 5096: 4. 深度：挖掘角色性格深处的动机，心声是角色灵魂的独白。`;
+Line 5129: ${favorRules}
+Line 5169: ${favorRules}
+Line 5287:       const thoughtsMatch = statusContent.match(/心声[：:]\s*([^\n]+)/);
+Line 5288:       const favorMatch = statusContent.match(/好感度[：:]\s*(\d+)/);
+Line 5292:       // 获取旧的好感度用于限制增减幅度
+Line 5293:       let oldFavor = 0;
+Line 5298:           oldFavor = status.favor || 0;
+Line 5302:       let newFavor = favorMatch ? parseInt(favorMatch[1]) : 0;
+Line 5304:       // 限制好感度增减幅度：最多加5，最多扣15
+Line 5305:       if (newFavor > oldFavor) {
+Line 5306:         newFavor = Math.min(newFavor, oldFavor + 5);
+Line 5307:       } else if (newFavor < oldFavor) {
+Line 5308:         newFavor = Math.max(newFavor, oldFavor - 15);
+Line 5316:         favor: newFavor
+Line 5323:       let favorValue = parsedStatusData.favor;
+Line 5329:           favorValue = 0;
+Line 5330:           parsedStatusData.favor = 0;
+Line 5339:         document.getElementById('status-favor').style.width = favorValue + '%';
+Line 5340:         document.getElementById('status-favor-text').textContent = favorValue + '%';
+Line 5359:         favor: favorValue
+Line 5895:     status.favor = Math.max(0, (status.favor || 0) - 50); // 好感度大幅下降
+Line 5898:     const favorBar = document.getElementById('status-favor');
+Line 5899:     const favorText = document.getElementById('status-favor-text');
+Line 5900:     if (favorBar) favorBar.style.width = status.favor + '%';
+Line 5901:     if (favorText) favorText.textContent = status.favor + '%';
+Line 5921:   let favor = 0;
+Line 5924:     favor = status.favor || 0;
+Line 5927:   if (favor < 90) {
+Line 5928:     showToast('好感度不足90%，TA还不想考虑这件事哦~');
+Line 5943: 【系统提示：玩家刚刚向你求婚了！当前好感度已达90%以上。】
+Line 6487:   // 检查是否包含"两人初始"或"刚认识"等词以重置好感度
+Line 6492:       status.favor = 0;
+Line 6495:       const favorBar = document.getElementById('status-favor');
+Line 6496:       const favorText = document.getElementById('status-favor-text');
+Line 6497:       if (favorBar) favorBar.style.width = '0%';
+Line 6498:       if (favorText) favorText.textContent = '0%';
+Line 6500:       // 即使之前没有状态，也创建一个初始状态并设好感度为0
+Line 6501:       const status = { location: '未知', mood: '平静', thoughts: '暂无数据', favor: 0 };
+Line 6611:   // 3. 重置状态(好感度等)
+Line 6612:   const status = { location: '未知', mood: '平静', thoughts: '暂无数据', favor: 0 };
+Line 6616:   const favorBar = document.getElementById('status-favor');
+Line 6617:   const favorText = document.getElementById('status-favor-text');
+Line 6618:   if (favorBar) favorBar.style.width = '0%';
+Line 6619:   if (favorText) favorText.textContent = '0%';
+Line 7312:     if (status.favor !== undefined) {
+Line 7313:       document.getElementById('status-favor').style.width = status.favor + '%';
+Line 7314:       document.getElementById('status-favor-text').textContent = status.favor + '%';
+Line 7321:     document.getElementById('status-favor').style.width = '0%';
+Line 7322:     document.getElementById('status-favor-text').textContent = '0%';
+Line 7390: // 好感度清零功能
+Line 7391: async function resetFavor() {
+Line 7393:   if (!confirm('确定要将好感度清零吗？')) return;
+Line 7398:     status.favor = 0;
+Line 7402:   document.getElementById('status-favor').style.width = '0%';
+Line 7403:   document.getElementById('status-favor-text').textContent = '0%';
+Line 7404:   showToast('✅ 好感度已清零');
+Line 7599:   // 保存每个联系人的状态（地点/心情/心声/好感度）
