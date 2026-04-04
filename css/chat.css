@@ -247,28 +247,29 @@
   width: 40px; 
   height: 40px; 
   border-radius: 50%; 
-  background: rgba(240, 184, 200, 0.85); 
+  background: var(--main-pink); 
   backdrop-filter: blur(10px); 
   -webkit-backdrop-filter: blur(10px); 
   color: #fff; 
   border: 1px solid rgba(255,255,255,0.4); 
   cursor: pointer; 
   font-size: 16px; 
-  box-shadow: 0 2px 8px rgba(240, 184, 200, 0.3); 
+  box-shadow: 0 2px 8px var(--main-pink); 
 }
 
 .chat-ai-reply-btn { 
   width: 40px; 
   height: 40px; 
   border-radius: 50%; 
-  background: rgba(168, 216, 255, 0.85); 
+  background: transparent; 
   backdrop-filter: blur(10px); 
   -webkit-backdrop-filter: blur(10px); 
   color: #fff; 
-  border: 1px solid rgba(255,255,255,0.4); 
+  border: none; 
   cursor: pointer; 
   font-size: 16px; 
-  box-shadow: 0 2px 8px rgba(168, 216, 255, 0.3); 
+  box-shadow: none; 
+  opacity: 0.8;
 }
 
 .emoji-panel { 

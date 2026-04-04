@@ -483,8 +483,8 @@ body {
 .chat-input { width: 100%; height: 40px; padding: 10px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.5); outline: none; font-size: 16px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); resize: none; line-height: 20px; font-family: inherit; overflow-y: auto; box-sizing: border-box; -ms-overflow-style: none; scrollbar-width: none; }
 .chat-input::-webkit-scrollbar { display: none; }
 .chat-btn-group { display: flex; gap: 8px; }
-.chat-send-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(240, 184, 200, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(240, 184, 200, 0.3); }
-.chat-ai-reply-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(106, 184, 212, 0.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.5); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px rgba(80, 160, 200, 0.35); display: flex; align-items: center; justify-content: center; }
+.chat-send-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--main-pink); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; font-size: 16px; box-shadow: 0 2px 8px var(--main-pink); }
+.chat-ai-reply-btn { width: 40px; height: 40px; border-radius: 50%; background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; border: none; cursor: pointer; font-size: 16px; box-shadow: none; display: flex; align-items: center; justify-content: center; opacity: 0.8; }
 
 .attach-panel { position: absolute; bottom: 60px; left: 0; width: 100%; background: #fff; border-radius: 16px 16px 0 0; padding: 20px 15px; box-shadow: 0 -2px 8px rgba(0,0,0,0.05); display: none; z-index: 99; }
 .attach-grid { display: grid; grid-template-columns: repeat(4, 1fr); row-gap: 20px; column-gap: 15px; }

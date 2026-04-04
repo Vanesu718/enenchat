@@ -1768,6 +1768,194 @@ ${wbPrompt}
   }
 }
 
+// 智能跨频道记忆检索函数
+function searchCrossChatMemory(contactId, userMessage) {
+  if (!userMessage || typeof userMessage !== 'string' || userMessage.trim().length < 2) return null;
+
+  // 1. 简单的分词和提取有意义的词（过滤掉常见的无意义虚词和代词）
+  const stopWords = ['的', '了', '呢', '啊', '哦', '吧', '是', '在', '我', '你', '他', '她', '它', '我们', '你们', '他们', '就', '也', '还', '又', '刚刚', '刚才', '刚才在', '什么', '怎么', '为什么', '那个', '这个', '这么', '那么', '讲了', '说了', '一个', '一下', '记得', '吗'];
+  const singleCharStopWords = ['的', '了', '呢', '啊', '哦', '吧', '是', '在', '我', '你', '他', '她', '它', '就', '也', '还', '又', '吗', '什', '么', '怎', '那', '这', '一', '个', '有', '没', '会', '不', '可', '以', '能', '要', '说', '讲', '记', '得', '和', '跟', '与', '给', '对', '把', '被', '让', '向', '往', '从', '到', '比', '去', '来', '做', '干', '当', '成', '为', '只', '才', '都', '总', '很', '太', '真', '挺', '越', '更', '最', '刚', '已', '经', '并', '非', '但', '却', '而', '且', '或', '者', '虽', '然', '如', '果', '因', '所', '之', '前', '后', '里', '外', '中', '上', '下', '多', '少', '好', '坏', '些', '点', '次', '遍', '回', '件', '条', '本', '名', '位', '句', '段', '篇', '章'];
+  
+  const isMeaningless = (str) => {
+      if (stopWords.includes(str)) return true;
+      for (let char of str) {
+          if (!singleCharStopWords.includes(char)) return false;
+      }
+      return true;
+  };
+
+  // 按两个字或更多的片段去分词（简单的滑动窗口分词法，避免需要引入分词库）
+  let extractKeywords = [];
+  let cleanedMsg = userMessage.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, ''); // 移除标点
+  for (let i = 0; i < cleanedMsg.length - 1; i++) {
+      let biGram = cleanedMsg.substring(i, i + 2);
+      let triGram = i < cleanedMsg.length - 2 ? cleanedMsg.substring(i, i + 3) : '';
+      
+      if (triGram && !isMeaningless(triGram)) extractKeywords.push(triGram);
+      if (!isMeaningless(biGram)) extractKeywords.push(biGram);
+  }
+  
+  // 如果没有提取出有效的词组，退回到单字提取
+  if (extractKeywords.length === 0) {
+      extractKeywords = cleanedMsg.split('').filter(k => k.trim() && !isMeaningless(k) && /[a-zA-Z0-9\u4e00-\u9fa5]/.test(k));
+  }
+  
+  // 去重
+  const keywords = [...new Set(extractKeywords)];
+  if (keywords.length === 0) return null;
+
+    console.log(`[跨频道检索] 提取的关键词:`, keywords);
+    console.log('[记忆互通] 提取到的关键词:', keywords);
+
+    const isMatch = (text) => {
+    if (!text || typeof text !== 'string') return false;
+    // 只要有一个长度>=2的关键词匹配上，就认为可能相关；或者如果都是单字，需要匹配两个以上
+    let matchCount = 0;
+    for (const kw of keywords) {
+      if (text.includes(kw)) {
+          if (kw.length >= 2) return true;
+          matchCount++;
+      }
+    }
+    return matchCount >= 2;
+  };
+
+  // 当前私聊没找到近期上下文（已被移除私聊拦截逻辑），遍历所有该联系人所在的群聊
+  let foundMemory = '';
+  const groupIds = contacts.filter(c => c.isGroup && c.members && c.members.includes(contactId)).map(g => g.id);
+  console.log('[记忆互通] 正在搜索联系人所在的群聊ID:', groupIds);
+  for (const group of contacts.filter(c => c.isGroup)) {
+    if (group.members && group.members.includes(contactId)) {
+      const groupRecs = (chatRecords[group.id] || []).slice(-500); // 限制搜索深度
+      let foundIndex = -1;
+      
+      for (let i = groupRecs.length - 1; i >= 0; i--) {
+        const rec = groupRecs[i];
+        // 任何人在群里发的消息只要匹配上了都可以
+        if (isMatch(rec.content)) {
+          foundIndex = i;
+          break;
+        }
+      }
+      
+      if (foundIndex !== -1) {
+          // 找到了匹配的消息，提取它及其前后的上下文（前3条，后2条）
+          let startIndex = Math.max(0, foundIndex - 3);
+          let endIndex = Math.min(groupRecs.length - 1, foundIndex + 2);
+          
+          foundMemory += `【你回忆起了在群聊“${group.name}”里的以下对话场景】\n`;
+          for(let j = startIndex; j <= endIndex; j++) {
+              const r = groupRecs[j];
+              let senderName = r.side === 'right' ? '用户(我)' : '某个群员';
+              if (r.side === 'left') {
+                  if (r.senderId === contactId) {
+                      senderName = '你(AI)';
+                  } else {
+                      const senderInfo = contacts.find(x => x.id === r.senderId);
+                      if (senderInfo) senderName = senderInfo.name;
+                  }
+              }
+              
+              let contentSnippet = r.content;
+              if (contentSnippet.length > 100) contentSnippet = contentSnippet.substring(0, 100) + '...';
+              foundMemory += `${senderName}: ${contentSnippet}\n`;
+          }
+          foundMemory += '\n';
+          // 找到一个群就足够了，提供最近的上下文
+          break;
+      }
+    }
+  }
+
+  if (foundMemory) {
+    if (foundMemory.length > 500) foundMemory = foundMemory.substring(0, 500) + '...\n';
+    return foundMemory.trim();
+  }
+  return null;
+}
+
+// 从群聊检索私聊记忆逻辑
+function searchPrivateMemoryForGroup(contactId, userMessage) {
+  if (!userMessage || typeof userMessage !== 'string' || userMessage.trim().length < 2) return null;
+
+  // 1. 简单的分词和提取有意义的词（过滤掉常见的无意义虚词和代词）
+  const stopWords = ['的', '了', '呢', '啊', '哦', '吧', '是', '在', '我', '你', '他', '她', '它', '我们', '你们', '他们', '就', '也', '还', '又', '刚刚', '刚才', '刚才在', '什么', '怎么', '为什么', '那个', '这个', '这么', '那么', '讲了', '说了', '一个', '一下', '记得', '吗'];
+  const singleCharStopWords = ['的', '了', '呢', '啊', '哦', '吧', '是', '在', '我', '你', '他', '她', '它', '就', '也', '还', '又', '吗', '什', '么', '怎', '那', '这', '一', '个', '有', '没', '会', '不', '可', '以', '能', '要', '说', '讲', '记', '得', '和', '跟', '与', '给', '对', '把', '被', '让', '向', '往', '从', '到', '比', '去', '来', '做', '干', '当', '成', '为', '只', '才', '都', '总', '很', '太', '真', '挺', '越', '更', '最', '刚', '已', '经', '并', '非', '但', '却', '而', '且', '或', '者', '虽', '然', '如', '果', '因', '所', '之', '前', '后', '里', '外', '中', '上', '下', '多', '少', '好', '坏', '些', '点', '次', '遍', '回', '件', '条', '本', '名', '位', '句', '段', '篇', '章'];
+  
+  const isMeaningless = (str) => {
+      if (stopWords.includes(str)) return true;
+      for (let char of str) {
+          if (!singleCharStopWords.includes(char)) return false;
+      }
+      return true;
+  };
+
+  let extractKeywords = [];
+  let cleanedMsg = userMessage.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '');
+  for (let i = 0; i < cleanedMsg.length - 1; i++) {
+      let biGram = cleanedMsg.substring(i, i + 2);
+      let triGram = i < cleanedMsg.length - 2 ? cleanedMsg.substring(i, i + 3) : '';
+      
+      if (triGram && !isMeaningless(triGram)) extractKeywords.push(triGram);
+      if (!isMeaningless(biGram)) extractKeywords.push(biGram);
+  }
+  
+  if (extractKeywords.length === 0) {
+      extractKeywords = cleanedMsg.split('').filter(k => k.trim() && !isMeaningless(k) && /[a-zA-Z0-9\u4e00-\u9fa5]/.test(k));
+  }
+  
+  const keywords = [...new Set(extractKeywords)];
+  if (keywords.length === 0) return null;
+
+  console.log('[群聊检私聊] 提取到的关键词:', keywords);
+
+  const isMatch = (text) => {
+    if (!text || typeof text !== 'string') return false;
+    let matchCount = 0;
+    for (const kw of keywords) {
+      if (text.includes(kw)) {
+          if (kw.length >= 2) return true;
+          matchCount++;
+      }
+    }
+    return matchCount >= 2;
+  };
+
+  let foundMemory = '';
+  const privateRecs = (chatRecords[contactId] || []).slice(-500);
+  let foundIndex = -1;
+  
+  for (let i = privateRecs.length - 1; i >= 0; i--) {
+    const rec = privateRecs[i];
+    if (isMatch(rec.content)) {
+      foundIndex = i;
+      break;
+    }
+  }
+  
+  if (foundIndex !== -1) {
+      let startIndex = Math.max(0, foundIndex - 3);
+      let endIndex = Math.min(privateRecs.length - 1, foundIndex + 2);
+      
+      foundMemory += `【你回忆起了与用户的以下私聊场景】\n`;
+      for(let j = startIndex; j <= endIndex; j++) {
+          const r = privateRecs[j];
+          let senderName = r.side === 'right' ? '用户(我)' : '你(AI)';
+          
+          let contentSnippet = r.content;
+          if (contentSnippet.length > 100) contentSnippet = contentSnippet.substring(0, 100) + '...';
+          foundMemory += `${senderName}: ${contentSnippet}\n`;
+      }
+      foundMemory += '\n';
+  }
+
+  if (foundMemory) {
+    if (foundMemory.length > 500) foundMemory = foundMemory.substring(0, 500) + '...\n';
+    return foundMemory.trim();
+  }
+  return null;
+}
+
 async function triggerAIReply() {
   if (!currentContactId) { alert('请先选联系人'); return; }
   if (activeAIRequests.has(currentContactId)) { return; }
@@ -1870,15 +2058,60 @@ ${c.members.map(id => {
     if (stmData && stmData.entries && stmData.entries.length > 0) {
       stmContent = stmData.entries.map((e, i) => `${i+1}. ${e.content}`).join('\n');
     }
+
+    if (c.isGroup && chatSettings.memoryInterconnect && currentSpeaker && currentSpeaker.id !== c.id) {
+      const privateStmData = await getStmData(currentSpeaker.id);
+      if (privateStmData && privateStmData.entries && privateStmData.entries.length > 0) {
+        stmContent += (stmContent ? '\n\n' : '') + '【与你的私聊近期记忆】\n' + privateStmData.entries.map((e, i) => `${i+1}. ${e.content}`).join('\n');
+      }
+      const privateSettingsStr = await getFromStorage(`CHAT_SETTINGS_${currentSpeaker.id}`);
+      const privateSettings = privateSettingsStr ? (typeof privateSettingsStr === 'string' ? JSON.parse(privateSettingsStr) : privateSettingsStr) : {};
+      if (privateSettings.selectedWorldBooks && privateSettings.selectedWorldBooks.length > 0) {
+        const privateEntries = worldBookEntries.filter(e => privateSettings.selectedWorldBooks.includes(e.id) && e.category === '记忆总结');
+        if (privateEntries.length > 0) {
+          ltmContent += `\n【与你的私聊长期记忆】\n` + privateEntries.map(e => `[${e.name}]\n${e.content}`).join('\n\n') + `\n\n`;
+        }
+      }
+    }
   } catch(e) { console.error('读取STM失败', e); }
 
-  // 3. 按优先级拼接 Prompt (世界书 -> 人设 -> LTM -> STM)
+  // ================= 智能跨频道回溯检索逻辑 =================
+  const rawRecs = chatRecords[currentContactId] || [];
+  let crossChatMemoryPrompt = '';
+  // 提取用户最新发的一条文本消息作为检索源
+  const latestRecallMsg = rawRecs.length > 0 ? [...rawRecs].reverse().find(r => r.side === 'right') : null;
+  if (latestRecallMsg && typeof latestRecallMsg.content === 'string' && latestRecallMsg.content.trim().length > 0) {
+    // 如果这不是群聊，且存在最新的一条私聊消息，尝试启动跨频道检索
+    if (!c.isGroup) {
+        console.log('[记忆互通] 开始检索，关键词:', latestRecallMsg.content);
+        const foundMemory = searchCrossChatMemory(currentSpeaker.id, latestRecallMsg.content);
+        if (foundMemory) {
+          crossChatMemoryPrompt = `\n【系统记忆浮现：用户刚刚提到的话题，你在你们共同的群聊中找到了对应的场景】\n${foundMemory}\n请结合这段记忆，自然地接着用户的话茬回应，表现出你完全记得并在关注群里的动向。\n`;
+          console.log(`[跨频道检索] 成功带入群聊记忆`);
+        }
+    } else {
+        // 在群聊中
+        console.log('[记忆互通] 群聊中开始检索私聊记忆，关键词:', latestRecallMsg.content);
+        const foundPrivateMemory = searchPrivateMemoryForGroup(currentSpeaker.id, latestRecallMsg.content);
+        if (foundPrivateMemory) {
+          crossChatMemoryPrompt = `\n【系统记忆浮现：用户刚刚提到的话题，你在你们的私聊中找到了对应的场景】\n${foundPrivateMemory}\n请结合这段记忆，自然地接着用户的话茬回应，表现出你完全记得你们私下的约定或经历。\n`;
+          console.log(`[跨频道检索] 成功带入私聊记忆`);
+        }
+    }
+  }
+
+  // 3. 按优先级拼接 Prompt (世界书 -> 人设 -> LTM -> 跨频道回忆 -> STM)
   if (activeWorldBooks.length > 0) {
     systemPrompt += `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n以下是当前绑定的【世界书/背景设定】：\n${activeWorldBooks.join('\n\n')}\n`;
   }
 
   if (ltmContent) {
     systemPrompt += `\n【长期记忆 (LTM)】\n${ltmContent.trim()}\n`;
+  }
+
+  if (crossChatMemoryPrompt) {
+    console.log('[记忆互通] 准备注入的跨频道记忆:', crossChatMemoryPrompt);
+    systemPrompt += crossChatMemoryPrompt;
   }
 
   if (stmContent) {
@@ -2024,11 +2257,10 @@ ${statusRules}
 ${favorRules}
 ${statusRules}
 
-请根据剧情发展自然更新这些状态信息。`;
+  请根据剧情发展自然更新这些状态信息。`;
   }
-  
+
     const messages = [{ role: 'system', content: systemPrompt }];
-    const rawRecs = chatRecords[currentContactId] || [];
     const recs = rawRecs.slice(-60); // 获取更多气泡用于合并
     const mergedMessages = [];
     let currentMsg = null;
@@ -2094,8 +2326,8 @@ ${statusRules}
   activeAIRequests.add(requestContactId);
 
   // 检查是否在聊天中提醒了看朋友圈
-  const latestUserMsg = [...rawRecs].reverse().find(r => r.side === 'right');
-  if (latestUserMsg && typeof latestUserMsg.content === 'string' && /朋友圈|动态|点赞|评论|回复|去看看/.test(latestUserMsg.content)) {
+  const latestMomentMsg = [...rawRecs].reverse().find(r => r.side === 'right');
+  if (latestMomentMsg && typeof latestMomentMsg.content === 'string' && /朋友圈|动态|点赞|评论|回复|去看看/.test(latestMomentMsg.content)) {
     const visibleMoments = moments.filter(m => m.contactId === 'user_self' && checkVisibilityForContact(m, currentContactId));
     if (visibleMoments.length > 0) {
       const latestMoment = visibleMoments[0];
@@ -2110,6 +2342,7 @@ ${statusRules}
     showLoading();
     document.getElementById('typingStatus').style.display = 'inline';
   }
+  console.log('[记忆互通] 完整的messages数组:', JSON.stringify(messages, null, 2));
   try {
     const res = await fetch(`${cfg.url}/chat/completions`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
@@ -2645,7 +2878,273 @@ function jumpToChatRecord(targetIdx) {
 // ========== 聊天设置核心功能 ==========
 function openChatSettings() {
   toggleChatMenu(); // 先关闭弹出的菜单
-  openSub('chat-settings-page'); // 打开聊天设置页面
+  
+  const currentContact = contacts.find(c => c.id === currentContactId);
+  if (currentContact && currentContact.isGroup) {
+    openSub('group-chat-settings-page'); // 打开群聊设置页面
+    initGroupChatSettingsPage(currentContact);
+  } else {
+    openSub('chat-settings-page'); // 打开聊天设置页面
+  }
+}
+
+// ========== 群聊设置核心功能 ==========
+function initGroupChatSettingsPage(contact) {
+  if (!contact || !contact.isGroup) return;
+
+  // 填充用户面具下拉菜单
+  const maskSelect = document.getElementById('groupChatUserMaskSelect');
+  if (maskSelect) {
+    maskSelect.innerHTML = '<option value="">--选择用户面具--</option>';
+    userMasks.forEach(mask => {
+      const opt = document.createElement('option');
+      opt.value = mask.id;
+      opt.textContent = mask.idName;
+      maskSelect.appendChild(opt);
+    });
+  }
+
+  // 记忆互通开关
+  const memorySyncToggle = document.getElementById('group-memory-sync-toggle');
+  if (memorySyncToggle) {
+    if (chatSettings.memoryInterconnect) {
+      memorySyncToggle.classList.add('active');
+    } else {
+      memorySyncToggle.classList.remove('active');
+    }
+  }
+
+  // 聊天背景
+  const bgPreview = document.getElementById('groupChatBgPreview');
+  if (bgPreview) {
+    if (chatSettings.chatBg) {
+      bgPreview.style.backgroundImage = chatSettings.chatBg;
+      bgPreview.style.backgroundSize = 'cover';
+      bgPreview.style.backgroundPosition = 'center';
+      bgPreview.style.display = 'block';
+    } else {
+      bgPreview.style.backgroundImage = 'none';
+      bgPreview.style.background = 'var(--bg-cream)';
+    }
+  }
+
+  // 我的头像
+  const avatarPreview = document.getElementById('groupChatUserAvatarPreview');
+  if (avatarPreview) {
+    if (chatSettings.chatUserAvatar) {
+      avatarPreview.innerHTML = `<img src="${chatSettings.chatUserAvatar}">`;
+    } else {
+      avatarPreview.innerHTML = `<img src="${userAvatar}">`;
+    }
+  }
+
+  // 我的聊天昵称
+  const nicknameInput = document.getElementById('groupChatNicknameInput');
+  if (nicknameInput) {
+    nicknameInput.value = chatSettings.chatNickname || '';
+  }
+
+  // 场景设定和用户人设
+  const maskTextarea = document.getElementById('groupUserMaskTextarea');
+  if (maskTextarea) {
+    maskTextarea.value = chatSettings.userMask || '';
+  }
+  const sceneTextarea = document.getElementById('groupSceneSettingTextarea');
+  if (sceneTextarea) {
+    sceneTextarea.value = chatSettings.sceneSetting || '';
+  }
+
+  // 关联世界书列表
+  renderGroupWorldBookCheckboxes();
+}
+
+function toggleGroupMemorySync() {
+  const toggle = document.getElementById('group-memory-sync-toggle');
+  if (toggle) {
+    toggle.classList.toggle('active');
+    chatSettings.memoryInterconnect = toggle.classList.contains('active');
+    if (currentContactId) {
+      saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+    }
+  }
+}
+
+function previewGroupChatBgFile(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      chatSettings.chatBg = `url(${e.target.result})`;
+      const bgPreview = document.getElementById('groupChatBgPreview');
+      if (bgPreview) {
+        bgPreview.style.backgroundImage = chatSettings.chatBg;
+        bgPreview.style.backgroundSize = 'cover';
+        bgPreview.style.backgroundPosition = 'center';
+        bgPreview.style.display = 'block';
+      }
+      applyChatBackground();
+      if (currentContactId) saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+    }
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function resetGroupChatBackground() {
+  chatSettings.chatBg = '';
+  const bgPreview = document.getElementById('groupChatBgPreview');
+  if (bgPreview) {
+    bgPreview.style.backgroundImage = 'none';
+    bgPreview.style.background = 'var(--bg-cream)';
+  }
+  applyChatBackground();
+  if (currentContactId) saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+}
+
+function previewGroupChatUserAvatarFile(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      chatSettings.chatUserAvatar = e.target.result;
+      const preview = document.getElementById('groupChatUserAvatarPreview');
+      if (preview) {
+        preview.innerHTML = `<img src="${e.target.result}">`;
+      }
+      updateChatUserAvatar();
+      if (currentContactId) saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+    }
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function resetGroupChatUserAvatar() {
+  chatSettings.chatUserAvatar = '';
+  const preview = document.getElementById('groupChatUserAvatarPreview');
+  if (preview) {
+    preview.innerHTML = `<img src="${userAvatar}">`;
+  }
+  updateChatUserAvatar();
+  if (currentContactId) saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+}
+
+function applySelectedGroupUserMask() {
+  const maskId = document.getElementById('groupChatUserMaskSelect').value;
+  if (!maskId) return;
+  const mask = userMasks.find(m => m.id === maskId);
+  if (mask) {
+    const nicknameInput = document.getElementById('groupChatNicknameInput');
+    if (nicknameInput) nicknameInput.value = mask.idName;
+    const maskTextarea = document.getElementById('groupUserMaskTextarea');
+    if (maskTextarea) maskTextarea.value = mask.persona || '';
+    
+    chatSettings.chatNickname = mask.idName;
+    chatSettings.userMask = mask.persona || '';
+
+    if (mask.avatar) {
+      chatSettings.chatUserAvatar = mask.avatar;
+      const preview = document.getElementById('groupChatUserAvatarPreview');
+      if (preview) {
+        preview.innerHTML = `<img src="${mask.avatar}">`;
+      }
+    } else {
+      chatSettings.chatUserAvatar = '';
+      const preview = document.getElementById('groupChatUserAvatarPreview');
+      if (preview) {
+        preview.innerHTML = `<img src="${userAvatar}">`;
+      }
+    }
+    updateChatUserAvatar();
+    if (currentContactId) saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+    showToast('已应用用户面具');
+  }
+}
+
+function renderGroupWorldBookCheckboxes() {
+  const listDiv = document.getElementById('group-worldbook-checkbox-list');
+  if (!listDiv) return;
+  listDiv.innerHTML = '';
+  if (!worldBookEntries || worldBookEntries.length === 0) {
+    listDiv.innerHTML = '<div style="color:var(--text-light); font-size:12px; padding:10px; text-align:center;">暂无世界书条目，请在“更多-世界书”中添加。</div>';
+    return;
+  }
+
+  const selectedIds = chatSettings.selectedWorldBooks || [];
+  
+  // 按类别分组
+  const categories = {};
+  worldBookEntries.forEach((entry) => {
+    const cat = entry.category || '未分类';
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push(entry);
+  });
+
+  // 按类别渲染
+  Object.keys(categories).forEach(cat => {
+    // 类别标题
+    const catHeader = document.createElement('div');
+    catHeader.style.cssText = 'padding:6px 0 4px; font-size:12px; color:var(--main-pink); font-weight:600; border-bottom:1px solid var(--light-pink); margin-top:6px;';
+    catHeader.textContent = cat;
+    listDiv.appendChild(catHeader);
+
+    categories[cat].forEach(entry => {
+      const isChecked = selectedIds.includes(entry.id);
+      const itemDiv = document.createElement('div');
+      itemDiv.style.cssText = 'display:flex; align-items:center; padding:8px 0; border-bottom:1px solid #f0e8df;';
+      
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.id = 'group_wb_cb_' + entry.id;
+      cb.value = entry.id;
+      cb.checked = isChecked;
+      cb.style.cssText = 'width:18px; height:18px; margin-right:10px; cursor:pointer;';
+      cb.onchange = () => toggleGroupWorldBookSelection(entry.id);
+      
+      const lbl = document.createElement('label');
+      lbl.htmlFor = 'group_wb_cb_' + entry.id;
+      lbl.style.cssText = 'flex:1; cursor:pointer; font-size:14px; color:var(--text-dark);';
+      lbl.innerHTML = `<div style="font-weight:500;">${entry.name}</div><div style="font-size:11px; color:var(--text-light); margin-top:2px;">分类：${entry.category}</div>`;
+      
+      itemDiv.appendChild(cb);
+      itemDiv.appendChild(lbl);
+      listDiv.appendChild(itemDiv);
+    });
+  });
+}
+
+function toggleGroupWorldBookSelection(entryId) {
+  if (!chatSettings.selectedWorldBooks) {
+    chatSettings.selectedWorldBooks = [];
+  }
+  
+  const index = chatSettings.selectedWorldBooks.indexOf(entryId);
+  if (index > -1) {
+    chatSettings.selectedWorldBooks.splice(index, 1);
+  } else {
+    chatSettings.selectedWorldBooks.push(entryId);
+  }
+  chatSettings.useWorldBook = chatSettings.selectedWorldBooks.length > 0;
+  if (currentContactId) saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+}
+
+async function saveAllGroupChatSettings() {
+  if (!currentContactId) return;
+
+  // 获取昵称
+  const nicknameInput = document.getElementById('groupChatNicknameInput');
+  if (nicknameInput) chatSettings.chatNickname = nicknameInput.value.trim();
+
+  // 获取人设
+  const maskTextarea = document.getElementById('groupUserMaskTextarea');
+  if (maskTextarea) chatSettings.userMask = maskTextarea.value.trim();
+
+  // 获取场景
+  const sceneTextarea = document.getElementById('groupSceneSettingTextarea');
+  if (sceneTextarea) chatSettings.sceneSetting = sceneTextarea.value.trim();
+
+  chatSettings.useWorldBook = chatSettings.selectedWorldBooks && chatSettings.selectedWorldBooks.length > 0;
+
+  await saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+  
+  showToast('群聊设置已保存');
+  closeSub('group-chat-settings-page');
 }
 
 // ========== 情侣空间功能 ==========

@@ -1,5 +1,4 @@
-﻿<html lang="zh-CN">
-<head>
+﻿<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -169,9 +168,21 @@
         <div class="page-title">美化设置</div>
       </div>
       <div class="page-body">
-        <div class="menu-item" onclick="openSub('theme-bubble-setting')" style="padding:16px; margin-bottom:0;">
+        <div class="menu-item" onclick="openSub('main-page-setting')" style="padding:16px; margin-bottom:0;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:500;">主题/气泡调色盘</span>
+            <span style="font-weight:500;">主页面设置</span>
+            <span style="color:var(--text-light);">></span>
+          </div>
+        </div>
+        <div class="menu-item" onclick="openSub('theme-color-setting')" style="padding:16px; margin-top:12px; margin-bottom:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:500;">主题调色盘</span>
+            <span style="color:var(--text-light);">></span>
+          </div>
+        </div>
+        <div class="menu-item" onclick="openSub('theme-bubble-setting')" style="padding:16px; margin-top:12px; margin-bottom:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:500;">气泡调色盘</span>
             <span style="color:var(--text-light);">></span>
           </div>
         </div>
@@ -181,7 +192,15 @@
             <span style="color:var(--text-light);">></span>
           </div>
         </div>
-        <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
+      </div>
+    </div>
+
+    <div class="sub-page" id="main-page-setting">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('main-page-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">主页面设置</div>
+      </div>
+      <div class="page-body">
         <div class="form-section">
           <div class="form-label">用户ID (昵称)</div>
           <input class="form-input" id="themeNickname" placeholder="输入你的昵称" oninput="syncNickname(this.value)">
@@ -241,18 +260,6 @@
         <div class="page-title">叙事美化</div>
       </div>
       <div class="page-body">
-        <div class="form-section">
-          <div class="form-label" style="font-size:14px; color:var(--main-pink); margin-bottom:8px;">选择主题</div>
-          <div class="menu-item" onclick="selectTheme('')" style="display:flex; justify-content:space-between; align-items:center;">默认粉色 <span class="theme-check" id="theme-check-default" style="color:var(--main-pink); display:none; font-weight:bold;">✓</span></div>
-          <div class="menu-item" onclick="selectTheme('theme-blue')" style="display:flex; flex-direction:column; justify-content:center; align-items:flex-start;">
-            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-              线下简约 <span class="theme-check" id="theme-check-blue" style="color:var(--main-pink); display:none; font-weight:bold;">✓</span>
-            </div>
-            <div style="font-size:12px; color:var(--text-light); margin-top:4px;">（此模式只有线下模式。无法更改线上。）</div>
-          </div>
-          <div class="menu-item" onclick="selectTheme('theme-dark')" style="display:flex; justify-content:space-between; align-items:center;">暗黑模式 <span class="theme-check" id="theme-check-dark" style="color:var(--main-pink); display:none; font-weight:bold;">✓</span></div>
-        </div>
-
         <div class="setting-desc" style="margin-bottom:15px;">支持针对普通正文以及被 {}、“” 或 "" 包裹的文字分别设置样式。</div>
         
         <div class="form-section">
@@ -375,12 +382,24 @@
     </div>
 
 
-    <div class="sub-page" id="theme-bubble-setting">
+    <div class="sub-page" id="theme-color-setting">
       <div class="page-header">
-        <div class="page-back" onclick="closeSub('theme-bubble-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="page-title">主题/气泡调色盘</div>
+        <div class="page-back" onclick="closeSub('theme-color-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">主题配色调整</div>
       </div>
       <div class="page-body">
+        <div class="form-section" style="margin-bottom:15px;">
+          <div class="form-label" style="font-size:14px; color:var(--main-pink); margin-bottom:8px;">选择主题</div>
+          <div class="menu-item" onclick="selectTheme('')" style="display:flex; justify-content:space-between; align-items:center;">默认粉色 <span class="theme-check" id="theme-check-default" style="color:var(--main-pink); display:none; font-weight:bold;">✓</span></div>
+          <div class="menu-item" onclick="selectTheme('theme-blue')" style="display:flex; flex-direction:column; justify-content:center; align-items:flex-start;">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+              线下简约 <span class="theme-check" id="theme-check-blue" style="color:var(--main-pink); display:none; font-weight:bold;">✓</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-light); margin-top:4px;">（此模式只有线下模式。无法更改线上。）</div>
+          </div>
+          <div class="menu-item" onclick="selectTheme('theme-dark')" style="display:flex; justify-content:space-between; align-items:center;">暗黑模式 <span class="theme-check" id="theme-check-dark" style="color:var(--main-pink); display:none; font-weight:bold;">✓</span></div>
+        </div>
+
         <div class="form-label">主题调色盘</div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;">
           <div onclick="applyThemeColor('#f0b8c8','#f8d7e0','#fffbf9')" style="width:36px;height:36px;border-radius:50%;background:#f0b8c8;cursor:pointer;border:3px solid transparent;" class="color-dot"></div>
@@ -397,8 +416,15 @@
             <input type="text" id="customThemeColorHex" value="#f0b8c8" onchange="document.getElementById('customThemeColor').value=this.value; applyCustomColor(this.value)" style="width:80px;height:36px;border:1px solid var(--light-pink);border-radius:8px;padding:0 10px;font-size:14px;outline:none;" placeholder="#HEX">
           </div>
         </div>
-        
-        <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
+      </div>
+    </div>
+
+    <div class="sub-page" id="theme-bubble-setting">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('theme-bubble-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">气泡调色盘</div>
+      </div>
+      <div class="page-body">
         
         <div class="form-label">气泡调色盘</div>
         <div class="setting-desc" style="margin-top:6px;margin-bottom:12px;">调整聊天气泡的颜色、透明度和圆角。</div>
@@ -431,6 +457,15 @@
             </div>
           </div>
         </div>
+
+        <div style="margin-top:15px;">
+          <div style="font-size:13px; color:var(--text-main); margin-bottom:8px; font-weight:500;">气泡角度 <span id="bubbleRadiusValue">12</span>px</div>
+          <input type="range" id="bubbleRadius" min="0" max="30" step="1" value="12" oninput="applyBubbleSettings(); updateBubblePreview();" style="width:100%;">
+        </div>
+        <div style="margin-top:15px; margin-bottom:20px;">
+          <div style="font-size:13px; color:var(--text-main); margin-bottom:8px; font-weight:500;">透明度 <span id="bubbleOpacityValue">1.0</span></div>
+          <input type="range" id="bubbleOpacity" min="0.1" max="1" step="0.1" value="1.0" oninput="applyBubbleSettings(); updateBubblePreview();" style="width:100%;">
+        </div>
         
         <div class="form-section">
           <div class="form-label" style="font-size:13px;">对方气泡装饰</div>
@@ -452,11 +487,11 @@
           <div style="margin-top:5px; display:flex; gap:10px;">
             <div style="flex:1;">
               <div style="font-size:12px; color:var(--text-light);">垂直偏移 <span id="leftDecYValue">-10</span>px</div>
-              <input type="range" id="leftDecY" min="-50" max="50" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
+              <input type="range" id="leftDecY" min="-15" max="15" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
             </div>
             <div style="flex:1;">
               <div style="font-size:12px; color:var(--text-light);">水平偏移 <span id="leftDecXValue">-5</span>px</div>
-              <input type="range" id="leftDecX" min="-50" max="50" step="1" value="-5" oninput="applyBubbleDecSettings()" style="width:100%;">
+              <input type="range" id="leftDecX" min="-15" max="15" step="1" value="-5" oninput="applyBubbleDecSettings()" style="width:100%;">
             </div>
           </div>
         </div>
@@ -481,11 +516,11 @@
           <div style="margin-top:5px; display:flex; gap:10px;">
             <div style="flex:1;">
               <div style="font-size:12px; color:var(--text-light);">垂直偏移 <span id="rightDecYValue">-10</span>px</div>
-              <input type="range" id="rightDecY" min="-50" max="50" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
+              <input type="range" id="rightDecY" min="-15" max="15" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
             </div>
             <div style="flex:1;">
               <div style="font-size:12px; color:var(--text-light);">水平偏移 <span id="rightDecXValue">-10</span>px</div>
-              <input type="range" id="rightDecX" min="-50" max="50" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
+              <input type="range" id="rightDecX" min="-15" max="15" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
             </div>
           </div>
         </div>
@@ -968,7 +1003,7 @@
       </div>
       <div class="chat-input-area">
         <div class="chat-func-btn-group">
-          <button class="chat-func-btn" onclick="toggleAttachPanel()">📎</button>
+          <button class="chat-func-btn" onclick="toggleAttachPanel()"><img src="ICON/附件.png" style="width: 20px; height: 20px; object-fit: contain; vertical-align: middle;" alt="附件"></button>
         </div>
         <div class="chat-input-container">
           <div class="reply-tip" id="replyTip">
@@ -978,30 +1013,22 @@
           <textarea class="chat-input" id="chatInput" placeholder="输入消息..." autocomplete="off" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendMsg();}" rows="1"></textarea>
         </div>
         <div class="chat-btn-group">
-          <button class="chat-send-btn" onclick="sendMsg()">✓</button>
+          <button class="chat-send-btn" onclick="sendMsg()"><img src="ICON/纸飞机,折纸,发送.png" style="width: 20px; height: 20px; object-fit: contain; vertical-align: middle;" alt="发送"></button>
           <button class="chat-ai-reply-btn" onclick="triggerAIReply()" title="AI回复">
-            <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- 猫爪掌心 - 大的豆子形 -->
-              <ellipse cx="50" cy="68" rx="24" ry="20" fill="white"/>
-              <!-- 4个圆润小趾垫 排成弧形 -->
-              <ellipse cx="20" cy="47" rx="10" ry="11" fill="white"/>
-              <ellipse cx="38" cy="33" rx="10" ry="11" fill="white"/>
-              <ellipse cx="62" cy="33" rx="10" ry="11" fill="white"/>
-              <ellipse cx="80" cy="47" rx="10" ry="11" fill="white"/>
-            </svg>
+            <img src="ICON/AI回复按钮图标.png" style="width:30px; height:30px; object-fit:contain;" alt="AI回复">
           </button>
         </div>
       </div>
       <div class="attach-panel" id="attachPanel">
         <div class="attach-grid">
-          <div class="attach-item" onclick="selectFile('emoji')"><div class="attach-icon">😀</div><span>表情</span></div>
-          <div class="attach-item" onclick="selectFile('image')"><div class="attach-icon">🖼️</div><span>图片</span></div>
-          <div class="attach-item" onclick="selectFile('image_text')"><div class="attach-icon">📝</div><span>图片(文字)</span></div>
-          <div class="attach-item" onclick="selectFile('audio')"><div class="attach-icon">🎙️</div><span>语音</span></div>
-          <div class="attach-item" onclick="selectFile('red_packet')"><div class="attach-icon">🧧</div><span>红包</span></div>
-          <div class="attach-item" onclick="selectFile('transfer')"><div class="attach-icon">💸</div><span>转账</span></div>
-          <div class="attach-item"><div class="attach-icon">✨</div><span>空白</span></div>
-          <div class="attach-item"><div class="attach-icon">✨</div><span>空白</span></div>
+          <div class="attach-item" onclick="selectFile('emoji')"><div class="attach-icon"><img src="ICON/表情.png" style="width:30px; height:30px; object-fit:contain;"></div><span>表情</span></div>
+          <div class="attach-item" onclick="selectFile('image')"><div class="attach-icon"><img src="ICON/图片.png" style="width:30px; height:30px; object-fit:contain;"></div><span>图片</span></div>
+          <div class="attach-item" onclick="selectFile('image_text')"><div class="attach-icon"><img src="ICON/图片文字识别.png" style="width:30px; height:30px; object-fit:contain;"></div><span>图片(文字)</span></div>
+          <div class="attach-item" onclick="selectFile('audio')"><div class="attach-icon"><img src="ICON/语音.png" style="width:30px; height:30px; object-fit:contain;"></div><span>语音</span></div>
+          <div class="attach-item" onclick="selectFile('red_packet')"><div class="attach-icon"><img src="ICON/红包.png" style="width:30px; height:30px; object-fit:contain;"></div><span>红包</span></div>
+          <div class="attach-item" onclick="selectFile('transfer')"><div class="attach-icon"><img src="ICON/转账.png" style="width:30px; height:30px; object-fit:contain;"></div><span>转账</span></div>
+          <div class="attach-item"><div class="attach-icon"><img src="ICON/视频 (1).png" style="width:30px; height:30px; object-fit:contain;"></div><span>视频</span></div>
+          <div class="attach-item"><div class="attach-icon"><img src="ICON/更多.png" style="width:30px; height:30px; object-fit:contain;"></div><span>更多</span></div>
         </div>
       </div>
     </div>
@@ -1147,6 +1174,102 @@
       </div>
     </div>
 
+    <!-- 群聊设置页面 -->
+    <div class="sub-page" id="group-chat-settings-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('group-chat-settings-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">群聊设置</div>
+      </div>
+      <div class="page-body">
+        
+        <!-- 私聊/群聊记忆互通 -->
+        <div class="setting-section">
+          <div class="setting-section-title">记忆互通设置</div>
+          <div class="switch-row">
+            <div class="switch-label">开启私聊/群聊记忆互通</div>
+            <div class="switch-toggle" id="group-memory-sync-toggle" onclick="toggleGroupMemorySync()"></div>
+          </div>
+          <div class="setting-desc">开启后，群聊将能获取与各个角色的私聊记忆，实现更好的互动。</div>
+        </div>
+
+        <!-- 个性化聊天背景 -->
+        <div class="setting-section">
+          <div class="setting-section-title">个性化聊天背景</div>
+          <div class="setting-desc">为你们的聊天设置一张专属壁纸。</div>
+          <div class="chat-bg-preview" id="groupChatBgPreview"></div>
+          <div class="bg-btn-group">
+            <label class="setting-btn">
+              <span>🖼️</span> 上传背景
+              <input type="file" id="group-chat-bg-file" accept="image/*" onchange="previewGroupChatBgFile(this)" class="hidden-file">
+            </label>
+            <button class="setting-btn secondary" onclick="resetGroupChatBackground()">
+              <span>♻️</span> 恢复默认
+            </button>
+          </div>
+        </div>
+
+        <!-- 自定义我的头像 -->
+        <div class="setting-section">
+          <div class="setting-section-title">自定义我的头像</div>
+          <div class="setting-desc">仅在此聊天中，将“我”的头像显示为特定样式。</div>
+          <div class="avatar-preview-small" id="groupChatUserAvatarPreview">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><circle cx='30' cy='30' r='28' fill='%23f0b8c8'/><text x='30' y='35' text-anchor='middle' font-size='16' fill='white'>我</text></svg>">
+          </div>
+          <div class="bg-btn-group">
+            <label class="setting-btn">
+              <span>🖼️</span> 上传头像
+              <input type="file" id="group-chat-user-avatar-file" accept="image/*" onchange="previewGroupChatUserAvatarFile(this)" class="hidden-file">
+            </label>
+            <button class="setting-btn secondary" onclick="resetGroupChatUserAvatar()">
+              <span>♻️</span> 恢复默认
+            </button>
+          </div>
+        </div>
+
+        <!-- 用户面具选择 -->
+        <div class="setting-section">
+          <div class="setting-section-title">用户面具选择</div>
+          <div class="setting-desc">快速应用已保存的用户面具，自动替换头像、昵称和人设。</div>
+          <select class="form-select" id="groupChatUserMaskSelect" onchange="applySelectedGroupUserMask()" style="margin-top:10px;">
+            <option value="">--选择用户面具--</option>
+          </select>
+        </div>
+
+        <!-- 我的聊天昵称 -->
+        <div class="setting-section">
+          <div class="setting-section-title">我的聊天昵称</div>
+          <div class="setting-desc">设置一个只在当前聊天中显示的昵称。如果留空，将使用你的全局昵称。</div>
+          <input type="text" class="nickname-input" id="groupChatNicknameInput" placeholder="输入聊天昵称">
+        </div>
+
+        <!-- 用户人设设定 -->
+        <div class="setting-section">
+          <div class="setting-section-title">用户人设设定</div>
+          <div class="setting-desc">设置用户的角色面具描述，会影响AI的回复逻辑。</div>
+          <textarea class="mask-textarea" id="groupUserMaskTextarea" placeholder="输入用户面具描述..."></textarea>
+        </div>
+
+        <!-- 场景设定 -->
+        <div class="setting-section">
+          <div class="setting-section-title">场景设定</div>
+          <div class="setting-desc">设定你们目前的情感状态、所在地点和时空背景。如果设定中包含“两人初始”或“刚认识”等词，好感度将自动重置为0。</div>
+          <textarea class="mask-textarea" id="groupSceneSettingTextarea" placeholder="例如：我们正坐在午后的咖啡馆里..."></textarea>
+        </div>
+
+        <!-- 关联世界书设置 -->
+        <div class="setting-section">
+          <div class="setting-section-title">关联世界书（用于聊天）</div>
+          <div class="setting-desc">勾选你想在此聊天中使用的世界书条目。可以多选。</div>
+          <div id="group-worldbook-checkbox-list" style="max-height:200px; overflow-y:auto;">
+            <!-- 动态生成的世界书多选框 -->
+          </div>
+        </div>
+
+        <!-- 保存按钮 -->
+        <button class="save-btn" onclick="saveAllGroupChatSettings()">保存群聊设置</button>
+      </div>
+    </div>
+
     <!-- 情侣空间页面 -->
     <div class="sub-page" id="couple-space-page">
       <div class="page-header">
@@ -1238,9 +1361,12 @@
           <div class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
             <span>发布面具</span>
           </div>
-          <select class="form-select" id="postMomentMaskSelect">
-            <option value="">--默认面具--</option>
-          </select>
+          <div style="position: relative; display: flex; align-items: center; margin-top: 10px;">
+            <img id="postMomentMaskIcon" src="ICON/论坛面具图标.png" style="width:36px; height:36px; cursor:pointer;" onclick="togglePostMomentMaskSelect()" alt="选择身份" />
+            <select id="postMomentMaskSelect" style="position: absolute; top: 100%; left: 0; margin-top: 5px; display: none; padding:8px; border-radius:10px; border:1px solid #eee; outline:none; font-size:14px; background:#fff; color:#333; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 150px; z-index: 100;" onchange="updatePostMomentMaskIcon()">
+              <option value="">--默认面具--</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-section">
@@ -1529,11 +1655,14 @@
         <div id="forumCommentList" style="background:#fff; padding-bottom:80px;"></div>
       </div>
       <!-- 底部评论输入框 -->
-      <div id="forumCommentInputContainer" style="position:absolute; bottom:0; left:0; width:100%; padding:10px 15px; background:#fff; border-top:1px solid #eee; display:flex; gap:10px; align-items:center; z-index:10;">
-        <select id="forumCommentMaskSelect" style="padding:8px; border-radius:15px; border:1px solid #eee; outline:none; font-size:12px; background:#f5f5f5; color:#333; max-width:80px;"></select>
-        <input type="text" id="forumCommentInput" placeholder="写下你的评论..." style="flex:1; padding:10px 15px; border-radius:20px; border:1px solid #eee; outline:none; font-size:14px; background:#f5f5f5; color:#333;">
-        <button id="forumCommentSubmitBtn" onclick="submitForumComment()" style="background:var(--main-pink); color:white; border:none; padding:8px 15px; border-radius:15px; font-size:14px; font-weight:500;">发送</button>
-      </div>
+        <div id="forumCommentInputContainer" style="position:absolute; bottom:0; left:0; width:100%; padding:10px 15px; background:#fff; border-top:1px solid #eee; display:flex; gap:10px; align-items:center; z-index:10;">
+          <div style="position: relative; display: flex; align-items: center;">
+            <img id="forumCommentMaskIcon" src="ICON/论坛面具图标.png" style="width:24px; height:24px; cursor:pointer;" onclick="toggleForumCommentMaskSelect()" alt="选择身份" />
+            <select id="forumCommentMaskSelect" style="position: absolute; bottom: 100%; left: 0; margin-bottom: 5px; display: none; padding:8px; border-radius:10px; border:1px solid #eee; outline:none; font-size:12px; background:#fff; color:#333; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 120px;" onchange="updateForumMaskIcon()"></select>
+          </div>
+          <input type="text" id="forumCommentInput" placeholder="写下你的评论..." style="flex:1; padding:10px 15px; border-radius:20px; border:1px solid #eee; outline:none; font-size:14px; background:#f5f5f5; color:#333;">
+          <button id="forumCommentSubmitBtn" onclick="submitForumComment()" style="background:var(--main-pink); color:white; border:none; padding:8px 15px; border-radius:15px; font-size:14px; font-weight:500;">发送</button>
+        </div>
     </div>
 
     <!-- 发帖页面（三板块共用） -->
