@@ -1,0 +1,99 @@
+/* 新增的 CSS，支持表情选择和预览界面样式 */
+
+/* 表情管理页面 */
+#emojiListContainer .empty-tip {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 14px;
+    padding: 20px;
+    background: #fff8fa;
+    border-radius: 12px;
+}
+
+.emoji-group-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid var(--light-pink);
+}
+
+.emoji-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    border-bottom: 1px dashed var(--light-pink);
+    padding-bottom: 8px;
+}
+
+.emoji-group-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--main-pink);
+}
+
+.emoji-group-delete {
+    font-size: 12px;
+    color: #ff4757;
+    cursor: pointer;
+    background: rgba(255, 71, 87, 0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.emoji-grid-preview {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.emoji-preview-item {
+    width: 100%;
+    aspect-ratio: 1;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* 聊天表情面板 */
+.emoji-tab-item {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    color: var(--text-light);
+    background: #f0f0f0;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.emoji-tab-item.active {
+    background: var(--main-pink);
+    color: white;
+}
+
+.emoji-picker-img {
+    width: 100%;
+    aspect-ratio: 1;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.1s;
+}
+
+.emoji-picker-img:active {
+    transform: scale(0.9);
+}
+
+.emoji-msg-img {
+    max-width: 120px;
+    max-height: 120px;
+    border-radius: 8px;
+    display: block;
+    object-fit: contain;
+}

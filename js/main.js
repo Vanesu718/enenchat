@@ -1634,7 +1634,56 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
       bubbleWrapper.appendChild(nameEl);
     }
     bubbleWrapper.appendChild(bubble);
-    
+
+    // 如果有多个roll版本，在气泡正下方追加切换控件（线下蓝卡模式）
+    // 只在该回合最后一条气泡下显示计数器
+    {
+      const recNow2 = chatRecords[currentContactId] || [];
+      // 找到该回合第一条消息（持有 alternatives）
+      let firstAltIdx2 = idx;
+      let msgDataNow2 = recNow2[idx];
+      // 如果当前消息没有 alternatives，向前查找持有 alternatives 的首条消息
+      if ((!msgDataNow2 || !msgDataNow2.alternatives) && side === 'left') {
+        for (let si = idx - 1; si >= 0; si--) {
+          if (recNow2[si] && recNow2[si].side === 'left' && recNow2[si].senderId === (recNow2[idx] && recNow2[idx].senderId)) {
+            if (recNow2[si].alternatives) { firstAltIdx2 = si; msgDataNow2 = recNow2[si]; break; }
+          } else { break; }
+        }
+      }
+      if (msgDataNow2 && msgDataNow2.alternatives && msgDataNow2.alternatives.length > 1 && side === 'left') {
+        // 找该回合最后一条气泡的 idx
+        const firstSenderId2 = recNow2[firstAltIdx2] && recNow2[firstAltIdx2].senderId;
+        let lastAltIdx2 = firstAltIdx2;
+        for (let li = firstAltIdx2 + 1; li < recNow2.length; li++) {
+          if (recNow2[li] && recNow2[li].side === 'left' && recNow2[li].senderId === firstSenderId2 && !recNow2[li].alternatives) {
+            lastAltIdx2 = li;
+          } else { break; }
+        }
+        // 只在最后一条气泡上渲染计数器
+        if (idx === lastAltIdx2) {
+          const altCount2 = msgDataNow2.alternatives.length;
+          const altCur2 = (msgDataNow2.currentIndex !== undefined ? msgDataNow2.currentIndex : altCount2 - 1) + 1;
+          const switcherDiv2 = document.createElement('div');
+          switcherDiv2.style.cssText = 'display:flex; align-items:center; justify-content:flex-start; gap:0; margin-top:2px; margin-left:4px; padding:0; user-select:none;';
+          const prevBtn2 = document.createElement('span');
+          prevBtn2.textContent = '<';
+          prevBtn2.style.cssText = 'font-size:12px; color:var(--text-light); cursor:pointer; padding:0 4px;';
+          prevBtn2.onclick = (e) => { e.stopPropagation(); switchMsgAlternative(firstAltIdx2, 'prev'); };
+          const indexSpan2 = document.createElement('span');
+          indexSpan2.textContent = altCur2 + '/' + altCount2;
+          indexSpan2.style.cssText = 'font-size:12px; color:var(--text-light);';
+          const nextBtn2 = document.createElement('span');
+          nextBtn2.textContent = '>';
+          nextBtn2.style.cssText = 'font-size:12px; color:var(--text-light); cursor:pointer; padding:0 4px;';
+          nextBtn2.onclick = (e) => { e.stopPropagation(); switchMsgAlternative(firstAltIdx2, 'next'); };
+          switcherDiv2.appendChild(prevBtn2);
+          switcherDiv2.appendChild(indexSpan2);
+          switcherDiv2.appendChild(nextBtn2);
+          bubbleWrapper.appendChild(switcherDiv2);
+        }
+      }
+    }
+
     div.innerHTML = `
       <div class="check-icon">?</div>
       <div class="msg-menu" onclick="event.stopPropagation();"><div class="msg-menu-item" onclick="replyToMsg(decodeURIComponent(this.dataset.replyText), this)" data-reply-text="${replyText}">回复</div></div>
@@ -1666,13 +1715,61 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
       bubbleWrapper.appendChild(nameEl);
     }
     bubbleWrapper.appendChild(bubble);
+    // 判断是否有多个roll版本，在气泡正下方追加切换控件（普通模式）
+    // 只在该回合最后一条气泡下显示计数器
+    {
+      const recNow3 = chatRecords[currentContactId] || [];
+      // 找到该回合第一条消息（持有 alternatives）
+      let firstAltIdx3 = idx;
+      let msgDataNow3 = recNow3[idx];
+      // 如果当前消息没有 alternatives，向前查找持有 alternatives 的首条消息
+      if ((!msgDataNow3 || !msgDataNow3.alternatives) && side === 'left') {
+        for (let si = idx - 1; si >= 0; si--) {
+          if (recNow3[si] && recNow3[si].side === 'left' && recNow3[si].senderId === (recNow3[idx] && recNow3[idx].senderId)) {
+            if (recNow3[si].alternatives) { firstAltIdx3 = si; msgDataNow3 = recNow3[si]; break; }
+          } else { break; }
+        }
+      }
+      if (msgDataNow3 && msgDataNow3.alternatives && msgDataNow3.alternatives.length > 1 && side === 'left') {
+        // 找该回合最后一条气泡的 idx
+        const firstSenderId3 = recNow3[firstAltIdx3] && recNow3[firstAltIdx3].senderId;
+        let lastAltIdx3 = firstAltIdx3;
+        for (let li = firstAltIdx3 + 1; li < recNow3.length; li++) {
+          if (recNow3[li] && recNow3[li].side === 'left' && recNow3[li].senderId === firstSenderId3 && !recNow3[li].alternatives) {
+            lastAltIdx3 = li;
+          } else { break; }
+        }
+        // 只在最后一条气泡上渲染计数器
+        if (idx === lastAltIdx3) {
+          const altCount3 = msgDataNow3.alternatives.length;
+          const altCur3 = (msgDataNow3.currentIndex !== undefined ? msgDataNow3.currentIndex : altCount3 - 1) + 1;
+          const switcherDiv3 = document.createElement('div');
+          switcherDiv3.style.cssText = 'display:flex; align-items:center; justify-content:flex-start; gap:0; margin-top:2px; margin-left:4px; padding:0; user-select:none;';
+          const prevBtn3 = document.createElement('span');
+          prevBtn3.textContent = '<';
+          prevBtn3.style.cssText = 'font-size:12px; color:var(--text-light); cursor:pointer; padding:0 4px;';
+          prevBtn3.onclick = (e) => { e.stopPropagation(); switchMsgAlternative(firstAltIdx3, 'prev'); };
+          const indexSpan3 = document.createElement('span');
+          indexSpan3.textContent = altCur3 + '/' + altCount3;
+          indexSpan3.style.cssText = 'font-size:12px; color:var(--text-light);';
+          const nextBtn3 = document.createElement('span');
+          nextBtn3.textContent = '>';
+          nextBtn3.style.cssText = 'font-size:12px; color:var(--text-light); cursor:pointer; padding:0 4px;';
+          nextBtn3.onclick = (e) => { e.stopPropagation(); switchMsgAlternative(firstAltIdx3, 'next'); };
+          switcherDiv3.appendChild(prevBtn3);
+          switcherDiv3.appendChild(indexSpan3);
+          switcherDiv3.appendChild(nextBtn3);
+          bubbleWrapper.appendChild(switcherDiv3);
+        }
+      }
+    }
 
     let avatarHtml = `<div class="msg-avatar${ringClass}"><img src="${avatar}"></div>`;
 
     div.innerHTML = `
       <div class="check-icon">?</div>
       ${avatarHtml}
-      <div class="msg-menu" onclick="event.stopPropagation();"><div class="msg-menu-item" onclick="replyToMsg(decodeURIComponent(this.dataset.replyText), this)" data-reply-text="${replyText}">回复</div></div>
+      <div class="msg-menu" onclick="event.stopPropagation();"><div class="msg-menu-item" onclick="replyToMsg(decodeURIComponent(this.dataset.replyText), this)" data-reply-text="${replyText}">�ظ�</div></div>
     `;
     const menuEl = div.querySelector('.msg-menu');
     div.insertBefore(bubbleWrapper, menuEl);
@@ -1691,6 +1788,26 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
   };
   
   return div;
+}
+
+function switchMsgAlternative(idx, direction) {
+  if (!currentContactId) return;
+  const rec = chatRecords[currentContactId];
+  if (!rec || !rec[idx]) return;
+  const msg = rec[idx];
+  if (!msg.alternatives || msg.alternatives.length <= 1) return;
+  const maxIndex = msg.alternatives.length - 1;
+  if (direction === 'prev') {
+    msg.currentIndex = (msg.currentIndex > 0) ? msg.currentIndex - 1 : maxIndex;
+  } else {
+    msg.currentIndex = (msg.currentIndex < maxIndex) ? msg.currentIndex + 1 : 0;
+  }
+  const chosen = msg.alternatives[msg.currentIndex];
+  msg.content = chosen.content;
+  if (chosen.statusData) msg.statusData = chosen.statusData;
+  saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords)).then(() => {
+    renderChat();
+  });
 }
 
 function addMsgToUI(content, side, avatar, quote, idx, type, skipScroll = false, senderName = null, statusData = null) {
@@ -1741,6 +1858,22 @@ async function sendMsg() {
   const ipt = document.getElementById('chatInput');
   const t = ipt.value.trim();
   if (!t || !currentContactId) return;
+
+  // 锁死并清空当前聊天列表最后一条AI消息的多余重roll版本
+  if (chatRecords[currentContactId] && chatRecords[currentContactId].length > 0) {
+    let lastMsg = chatRecords[currentContactId][chatRecords[currentContactId].length - 1];
+    if (lastMsg.side === 'left' && lastMsg.alternatives && lastMsg.alternatives.length > 0) {
+      lastMsg.content = lastMsg.alternatives[lastMsg.currentIndex || 0].content;
+      if (lastMsg.alternatives[lastMsg.currentIndex || 0].statusData) {
+        lastMsg.statusData = lastMsg.alternatives[lastMsg.currentIndex || 0].statusData;
+      }
+      delete lastMsg.alternatives;
+      delete lastMsg.currentIndex;
+      // 重新渲染UI以隐藏气泡上的切换按钮
+      renderChat();
+    }
+  }
+
   const q = replyMsg ? replyMsg.shortContent : null;
   addMsgToUI(t, 'right', chatSettings.chatUserAvatar || userAvatar, q);
   if (!chatRecords[currentContactId]) chatRecords[currentContactId] = [];
@@ -2025,7 +2158,7 @@ function searchPrivateMemoryForGroup(contactId, userMessage) {
   return null;
 }
 
-async function triggerAIReply() {
+async function triggerAIReply(isReRoll = false) {
   if (!currentContactId) { alert('请先选联系人'); return; }
   if (activeAIRequests.has(currentContactId)) { return; }
   const c = contacts.find(x => x.id === currentContactId);
@@ -2360,6 +2493,10 @@ ${statusRules}
 请根据剧情发展自然更新这些状态信息。`;
   }
 
+    // Inject AI Emoji prompt addon if enabled
+    if (typeof getAiEmojiPromptAddon === 'function') {
+        systemPrompt += getAiEmojiPromptAddon();
+    }
     const messages = [{ role: 'system', content: systemPrompt }];
     const recs = rawRecs.slice(-60); // 获取更多气泡用于合并
     const mergedMessages = [];
@@ -2643,29 +2780,53 @@ ${statusRules}
     // 从显示文本中移除状态标签
     displayText = txt.replace(/<STATUS>[\s\S]*?<\/STATUS>/, '').trim();
   
-    // 线上模式：将回复按换行符拆分为多条独立消息（泡泡）
-    if (!isOfflineMode) {
-      const lines = displayText.split('\n').filter(l => l.trim() !== '');
-      // 强制限制最多 5 条，防止 AI 话痨
-      const limitedLines = lines.slice(0, 5);
-      
-      limitedLines.forEach(line => {
+    // 检查是否是重roll模式
+    const pendingReRoll = window._pendingReRoll;
+    const isThisReRoll = isReRoll && pendingReRoll && pendingReRoll.contactId === requestContactId;
+
+    if (isThisReRoll) {
+      // 重roll模式：追加到alternatives，不新增消息
+      const rec = chatRecords[requestContactId] || [];
+      const firstAiMsg = rec[pendingReRoll.msgIdx];
+      if (firstAiMsg && firstAiMsg.alternatives) {
+        const newVersion = {
+          content: displayText,
+          statusData: parsedStatusData
+        };
+        firstAiMsg.alternatives.push(newVersion);
+        firstAiMsg.currentIndex = firstAiMsg.alternatives.length - 1;
+        firstAiMsg.content = displayText;
+        firstAiMsg.statusData = parsedStatusData;
+        window._pendingReRoll = null;
+
+        await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+        if (isCurrentContact) renderChat();
+      }
+    } else {
+      // 线上模式：将回复按换行符拆分为多条独立消息（泡泡）
+      if (!isOfflineMode) {
+        const lines = displayText.split('\n').filter(l => l.trim() !== '');
+        // 强制限制最多 5 条，防止 AI 话痨
+        const limitedLines = lines.slice(0, 5);
+
+        limitedLines.forEach(line => {
+          if (isCurrentContact) {
+            addMsgToUI(line, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData);
+          }
+          if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
+          chatRecords[requestContactId].push({ side: 'left', content: line, time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData });
+        });
+      } else {
+        // 线下模式：保持原样，整段发送
         if (isCurrentContact) {
-          addMsgToUI(line, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData);
+          addMsgToUI(displayText, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData);
         }
         if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
-        chatRecords[requestContactId].push({ side: 'left', content: line, time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData });
-      });
-    } else {
-      // 线下模式：保持原样，整段发送
-      if (isCurrentContact) {
-        addMsgToUI(displayText, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData);
+        chatRecords[requestContactId].push({ side: 'left', content: displayText, time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData });
       }
-      if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
-      chatRecords[requestContactId].push({ side: 'left', content: displayText, time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData });
+
+      await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
     }
-    
-    await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
     
   // 恢复群聊有序发言功能
   if (c.isGroup && isCurrentContact) {
@@ -4173,17 +4334,38 @@ async function quickReRoll() {
   const rec = chatRecords[currentContactId] || [];
   if (rec.length < 2) { alert('暂无消息可重roll'); return; }
   if (rec[rec.length-1].side !== 'left') { alert('最后一条不是AI回复'); return; }
-  
+
   // 获取最后一条消息的发送者
   const lastSenderId = rec[rec.length-1].senderId;
-  
-  // 线上模式AI一次回复多条，需循环删除末尾所有属于同一个发送者的AI消息
-  while (rec.length > 0 && rec[rec.length - 1].side === 'left' && rec[rec.length - 1].senderId === lastSenderId) {
-    rec.pop();
-  }
-  
+
   const c = contacts.find(x => x.id === currentContactId);
-  // 如果是群聊，我们需要把发言人切回到刚才被删除消息的那个发送者
+
+  // 收集末尾连续的同一发送者的AI消息
+  const lastAiMsgs = [];
+  for (let i = rec.length - 1; i >= 0; i--) {
+    if (rec[i].side === 'left' && rec[i].senderId === lastSenderId) {
+      lastAiMsgs.unshift(rec[i]);
+    } else {
+      break;
+    }
+  }
+
+  if (lastAiMsgs.length === 0) { alert('最后一条不是AI回复'); return; }
+
+  // 找到第一条AI消息的索引（多气泡的首条）
+  const firstAiIdx = rec.length - lastAiMsgs.length;
+  const firstAiMsg = rec[firstAiIdx];
+
+  // 初始化 alternatives 数组（存放多个roll版本）
+  if (!firstAiMsg.alternatives) {
+    firstAiMsg.alternatives = [{
+      content: lastAiMsgs.map(m => m.content).join('\n'),
+      statusData: lastAiMsgs[lastAiMsgs.length - 1].statusData || null
+    }];
+    firstAiMsg.currentIndex = 0;
+  }
+
+  // 如果是群聊，切回发言人
   if (c && c.isGroup && lastSenderId) {
     const validMembers = c.members.map(id => contacts.find(x => x.id === id)).filter(Boolean);
     const lastIndex = validMembers.findIndex(x => x.id === lastSenderId);
@@ -4192,10 +4374,16 @@ async function quickReRoll() {
       window.groupSpeakerIndices[c.id] = lastIndex;
     }
   }
-  
+
+  // 暂存 pending reroll 信息
+  window._pendingReRoll = {
+    contactId: currentContactId,
+    msgIdx: firstAiIdx
+  };
+
   await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
   renderChat();
-  await triggerAIReply(false);
+  await triggerAIReply(true); // isReRoll=true，AI回复后追加到alternatives
 }
 function batchDeleteMsg() {
   toggleChatMenu();
