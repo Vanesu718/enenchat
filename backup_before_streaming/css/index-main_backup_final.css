@@ -1179,10 +1179,3 @@ body {
     left: 15px;
     top: 12px;
   }
-
-/* Chat Settings Tabs */
-.chat-settings-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
-.settings-tab-btn { flex: 1; padding: 10px; background: none; border: none; cursor: pointer; color: var(--text-color); opacity: 0.7; transition: all 0.3s; font-size: 14px; }
-.settings-tab-btn.active { opacity: 1; font-weight: bold; border-bottom: 2px solid var(--primary-color); color: var(--primary-color); }
-.settings-tab-content { display: none; }
-.settings-tab-content.active { display: block; }

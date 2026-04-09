@@ -1600,10 +1600,10 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
       <div class="blue-card-top">
         <div class="blue-card-avatar${ringClass}"><img src="${avatar}"></div>
           <div class="blue-card-status">
-            <div class="bc-status-item thoughts"><div class="bc-label"><img src="ICON/心声.png" style="width:14px; height:14px; margin-right:2px; vertical-align:-0.15em; filter: opacity(0.7);"> 心声</div><div class="bc-val">${(statusData?.thoughts || '没有想法').substring(0,15)}</div></div>
-            <div class="bc-status-item"><div class="bc-label"><img src="ICON/地点.png" style="width:14px; height:14px; margin-right:2px; vertical-align:-0.15em; filter: opacity(0.7);"> 地点</div><div class="bc-val">${statusData?.location || '未知'}</div></div>
-            <div class="bc-status-item"><div class="bc-label"><img src="ICON/心情.png" style="width:14px; height:14px; margin-right:2px; vertical-align:-0.15em; filter: opacity(0.7);"> 心情</div><div class="bc-val">${(statusData?.mood || '平静').substring(0,15)}</div></div>
-            <div class="bc-status-item favor"><div class="bc-label"><img src="ICON/好感阶段.png" style="width:14px; height:14px; margin-right:2px; vertical-align:-0.15em; filter: opacity(0.7);"> 好感度</div><div class="bc-val">${statusData?.favor || 0}%</div></div>
+            <div class="bc-status-item thoughts"><div class="bc-label"><svg class="icon" aria-hidden="true" style="font-size:14px; margin-right:2px; vertical-align:-0.15em;"><use xlink:href="#icon-xinsheng"></use></svg> 心声</div><div class="bc-val">${(statusData?.thoughts || '没有想法').substring(0,15)}</div></div>
+            <div class="bc-status-item"><div class="bc-label">📌 地点</div><div class="bc-val">${statusData?.location || '未知'}</div></div>
+            <div class="bc-status-item"><div class="bc-label">🎭 心情</div><div class="bc-val">${(statusData?.mood || '平静').substring(0,15)}</div></div>
+            <div class="bc-status-item favor"><div class="bc-label"><span style="font-size:14px;margin-right:2px;vertical-align:middle;">💚</span> 好感度</div><div class="bc-val">${statusData?.favor || 0}%</div></div>
           </div>
       </div>
       ${statusData && statusData.physiological ? `
@@ -3066,33 +3066,8 @@ function jumpToChatRecord(targetIdx) {
 }
 
 // ========== 聊天设置核心功能 ==========
-function switchChatSettingsTab(tabName) {
-  // 隐藏所有内容区域
-  document.querySelectorAll('.settings-tab-content').forEach(el => {
-    el.classList.remove('active');
-  });
-  // 取消所有按钮激活状态
-  document.querySelectorAll('.settings-tab-btn').forEach(el => {
-    el.classList.remove('active');
-  });
-  
-  // 激活指定的tab
-  if (tabName === 'basic') {
-    document.getElementById('chat-settings-tab-basic').classList.add('active');
-    document.getElementById('chat-settings-tab-basic-2').classList.add('active');
-    document.querySelector('.settings-tab-btn[onclick="switchChatSettingsTab(\'basic\')"]').classList.add('active');
-  } else if (tabName === 'role') {
-    document.getElementById('chat-settings-tab-role').classList.add('active');
-    document.querySelector('.settings-tab-btn[onclick="switchChatSettingsTab(\'role\')"]').classList.add('active');
-  } else if (tabName === 'memory') {
-    document.getElementById('chat-settings-tab-memory').classList.add('active');
-    document.querySelector('.settings-tab-btn[onclick="switchChatSettingsTab(\'memory\')"]').classList.add('active');
-  }
-}
-
 function openChatSettings() {
   toggleChatMenu(); // 先关闭弹出的菜单
-  switchChatSettingsTab('basic'); // 默认打开基础功能Tab
   
   const currentContact = contacts.find(c => c.id === currentContactId);
     if (currentContact && currentContact.isGroup) {
@@ -3773,7 +3748,8 @@ function initChatSettingsPage() {
   // 加载聊天昵称
   document.getElementById('chatNicknameInput').value = chatSettings.chatNickname || '';
   
-  // 加载用户面具和联系人面具
+  // 加载场景设定、用户面具和联系人面具
+  document.getElementById('sceneSettingTextarea').value = chatSettings.sceneSetting || '';
   document.getElementById('userMaskTextarea').value = chatSettings.userMask || '';
   // 联系人设定：优先使用已保存的设定，若为空则回退到创建联系人时输入的人设
   const currentContact = contacts.find(c => c.id === currentContactId);
@@ -4055,34 +4031,26 @@ async function saveAllChatSettings() {
   
   // 获取表单值
   chatSettings.chatNickname = document.getElementById('chatNicknameInput').value.trim();
+  chatSettings.sceneSetting = document.getElementById('sceneSettingTextarea').value.trim();
   chatSettings.userMask = document.getElementById('userMaskTextarea').value.trim();
   chatSettings.contactMask = document.getElementById('contactMaskTextarea').value.trim();
   chatSettings.contactMemo = document.getElementById('chatContactMemo').value ? document.getElementById('chatContactMemo').value.trim() : '';
   
-  // 检查是否包含特定词以重置好感度（现绑定到 contactMemo）
-  let newFavor = null;
-  if (chatSettings.contactMemo) {
-    if (chatSettings.contactMemo.includes('两人初始') || chatSettings.contactMemo.includes('刚认识') || chatSettings.contactMemo.includes('初次见面') || chatSettings.contactMemo.includes('第一天')) {
-      newFavor = 0;
-    } else if (chatSettings.contactMemo.includes('恋人') || chatSettings.contactMemo.includes('已婚') || chatSettings.contactMemo.includes('交往')) {
-      newFavor = 60;
-    }
-  }
-
-  if (newFavor !== null) {
+  // 检查是否包含"两人初始"或"刚认识"等词以重置好感度
+  if (chatSettings.sceneSetting && (chatSettings.sceneSetting.includes('两人初始') || chatSettings.sceneSetting.includes('刚认识') || chatSettings.sceneSetting.includes('初次见面') || chatSettings.sceneSetting.includes('第一天'))) {
     const savedStatus = await getFromStorage(`STATUS_${currentContactId}`);
     if (savedStatus) {
       const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
-      status.favor = newFavor;
+      status.favor = 0;
       await saveToStorage(`STATUS_${currentContactId}`, JSON.stringify(status));
       // 如果当前状态卡片打开，更新UI
       const favorBar = document.getElementById('status-favor');
       const favorText = document.getElementById('status-favor-text');
-      if (favorBar) favorBar.style.width = `${newFavor}%`;
-      if (favorText) favorText.textContent = `${newFavor}%`;
+      if (favorBar) favorBar.style.width = '0%';
+      if (favorText) favorText.textContent = '0%';
     } else {
-      // 即使之前没有状态，也创建一个初始状态并设好感度为新值
-      const status = { location: '未知', mood: '平静', thoughts: '暂无数据', favor: newFavor };
+      // 即使之前没有状态，也创建一个初始状态并设好感度为0
+      const status = { location: '未知', mood: '平静', thoughts: '暂无数据', favor: 0 };
       await saveToStorage(`STATUS_${currentContactId}`, JSON.stringify(status));
     }
   }
@@ -4233,20 +4201,15 @@ async function clearChatRecord() {
   // 2. 清空短期记忆 (STM)
   await window.storage.removeItem(`STM_${currentContactId}`);
   
-    // 3. 重置状态(好感度等)
-    let initialFavor = 0;
-    const memo = contacts[currentContactId]?.memo || '';
-    if (memo.includes('恋人') || memo.includes('已婚') || memo.includes('交往')) {
-      initialFavor = 60;
-    }
-    const status = { location: '未知', mood: '平静', thoughts: '发呆中...', favor: initialFavor };
-    await saveToStorage(`STATUS_${currentContactId}`, JSON.stringify(status));
-    
-    // 如果状态卡片打开，更新UI
-    const favorBar = document.getElementById('status-favor');
-    const favorText = document.getElementById('status-favor-text');
-    if (favorBar) favorBar.style.width = `${initialFavor}%`;
-    if (favorText) favorText.textContent = `${initialFavor}%`;
+  // 3. 重置状态(好感度等)
+  const status = { location: '未知', mood: '平静', thoughts: '暂无数据', favor: 0 };
+  await saveToStorage(`STATUS_${currentContactId}`, JSON.stringify(status));
+  
+  // 如果状态卡片打开，更新UI
+  const favorBar = document.getElementById('status-favor');
+  const favorText = document.getElementById('status-favor-text');
+  if (favorBar) favorBar.style.width = '0%';
+  if (favorText) favorText.textContent = '0%';
   const locEl = document.getElementById('status-location');
   if (locEl) locEl.textContent = '未知';
   const moodEl = document.getElementById('status-mood');
