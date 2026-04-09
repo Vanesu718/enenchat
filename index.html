@@ -55,6 +55,9 @@
 </head>
 <body>
 
+<!-- 加载遮罩：隐藏页面直到主题/背景加载完毕，防止闪烁 -->
+<div id="app-loading-mask" style="position:fixed; inset:0; background:var(--bg-cream, #fffbf9); z-index:9999999; transition:opacity 0.3s ease;"></div>
+
 <div class="phone-case">
   <div class="island" id="dynamic-island"></div>
     <div class="screen">

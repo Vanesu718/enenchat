@@ -1594,7 +1594,11 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
 
   if (isBlueOfflineCard) {
     bubble.className = 'msg-blue-card';
-    const parsedContent = type === 'image' ? `<img src="${content}" style="max-width:180px; max-height:180px; border-radius:10px; display:block; cursor:zoom-in; object-fit:cover;" onclick="event.stopPropagation(); viewFullImage('${content}')">` : parseTextBeautify(content);
+    let parsedContent = type === 'image' ? `<img src="${content}" style="max-width:180px; max-height:180px; border-radius:10px; display:block; cursor:zoom-in; object-fit:cover;" onclick="event.stopPropagation(); viewFullImage('${content}')">` : parseTextBeautify(content);
+    // AI表情包替换：蓝色卡片模式也需要处理
+    if (type !== 'image' && typeof processAiEmojiInMessage === 'function') {
+      parsedContent = processAiEmojiInMessage(parsedContent);
+    }
     
     bubble.innerHTML = `
       <div class="blue-card-top">
@@ -1702,7 +1706,11 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
       imgEl.onclick = (e) => { e.stopPropagation(); viewFullImage(content); };
       bubble.appendChild(imgEl);
     } else {
-      const parsedContent = parseTextBeautify(content);
+      let parsedContent = parseTextBeautify(content);
+      // AI表情包替换：在parseTextBeautify之后执行，因为[]不会被转义
+      if (typeof processAiEmojiInMessage === 'function') {
+        parsedContent = processAiEmojiInMessage(parsedContent);
+      }
       bubble.innerHTML = `${qhtml}${parsedContent}`;
     }
 
@@ -1811,6 +1819,8 @@ function switchMsgAlternative(idx, direction) {
 }
 
 function addMsgToUI(content, side, avatar, quote, idx, type, skipScroll = false, senderName = null, statusData = null) {
+  // 注意：表情包处理已移到 createMsgElement -> parseTextBeautify 之后执行
+  // 避免 <img> 标签被 parseTextBeautify 的 HTML 转义所破坏
   const el = document.getElementById('chatContent');
   const div = createMsgElement(content, side, avatar, quote, idx, type, senderName, statusData);
   el.appendChild(div);
@@ -2493,9 +2503,9 @@ ${statusRules}
 请根据剧情发展自然更新这些状态信息。`;
   }
 
-    // Inject AI Emoji prompt addon if enabled
+    // Inject AI Emoji prompt addon if enabled (异步版本)
     if (typeof getAiEmojiPromptAddon === 'function') {
-        systemPrompt += getAiEmojiPromptAddon();
+        systemPrompt += await getAiEmojiPromptAddon();
     }
     const messages = [{ role: 'system', content: systemPrompt }];
     const recs = rawRecs.slice(-60); // 获取更多气泡用于合并
@@ -2639,7 +2649,7 @@ ${statusRules}
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
           buffer += chunk;
-          const lines = buffer.split('\\n');
+          const lines = buffer.split('\n');
           buffer = lines.pop();
           for (const line of lines) {
             if (line.startsWith('data: ') && line !== 'data: [DONE]') {
@@ -2803,19 +2813,27 @@ ${statusRules}
         if (isCurrentContact) renderChat();
       }
     } else {
-      // 线上模式：将回复按换行符拆分为多条独立消息（泡泡）
+      // 线上模式：将回复按换行符拆分为多条独立消息（泡泡），逐条延迟显示
       if (!isOfflineMode) {
         const lines = displayText.split('\n').filter(l => l.trim() !== '');
         // 强制限制最多 5 条，防止 AI 话痨
         const limitedLines = lines.slice(0, 5);
 
+        // 先将所有消息存入记录
+        if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
         limitedLines.forEach(line => {
-          if (isCurrentContact) {
-            addMsgToUI(line, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData);
-          }
-          if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
           chatRecords[requestContactId].push({ side: 'left', content: line, time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData });
         });
+
+        // 逐条延迟添加到 UI，每条间隔 600ms，模拟真实聊天节奏
+        if (isCurrentContact) {
+          for (let i = 0; i < limitedLines.length; i++) {
+            if (i > 0) {
+              await new Promise(resolve => setTimeout(resolve, 600));
+            }
+            addMsgToUI(limitedLines[i], 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData);
+          }
+        }
       } else {
         // 线下模式：保持原样，整段发送
         if (isCurrentContact) {
@@ -6980,16 +6998,14 @@ window.onload = async () => {
   } catch(e) {
     console.error('❌ 初始化过程中发生错误:', e);
   } finally {
-    // 启动屏已在HTML中移除，保留此注释以备查
-    // const splash = document.getElementById('app-splash');
-    // if (splash) {
-    //   splash.style.opacity = '0';
-    //   setTimeout(() => {
-    //     if (splash && splash.parentNode) {
-    //       splash.remove();
-    //     }
-    //   }, 0);
-    // }
+    // 移除加载遮罩，所有主题/背景/图片已加载完毕
+    const loadingMask = document.getElementById('app-loading-mask');
+    if (loadingMask) {
+      loadingMask.style.opacity = '0';
+      setTimeout(() => {
+        if (loadingMask.parentNode) loadingMask.remove();
+      }, 350);
+    }
   }
 };
 
