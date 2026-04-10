@@ -1442,6 +1442,7 @@ function renderChat(forceStartIdx) {
   }
 
   displayRecords.forEach((m, idx) => {
+    if (m.isHidden) return;
     let ava = chatSettings.chatUserAvatar || userAvatar;
     let sName = null;
     if (m.side === 'left') {
@@ -1477,6 +1478,7 @@ function renderChat(forceStartIdx) {
     // 插入消息
     const fragment = document.createDocumentFragment();
       messagesToLoad.forEach((m, idx) => {
+        if (m.isHidden) return;
         let ava = chatSettings.chatUserAvatar || userAvatar;
         let sName = null;
         const c = contacts.find(x => x.id === currentContactId);
@@ -2878,6 +2880,7 @@ ${statusRules}
         firstAiMsg.currentIndex = firstAiMsg.alternatives.length - 1;
         firstAiMsg.content = displayText;
         firstAiMsg.statusData = parsedStatusData;
+        delete firstAiMsg.isHidden;
         window._pendingReRoll = null;
 
         await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
@@ -2947,7 +2950,14 @@ ${statusRules}
     
   } catch (e) { 
       activeAIRequests.delete(requestContactId);
-    const isCurrentContact = (requestContactId === currentContactId);
+      const pendingReRoll = window._pendingReRoll;
+      if (isReRoll && pendingReRoll && pendingReRoll.contactId === requestContactId) {
+        const rec = chatRecords[requestContactId] || [];
+        const firstAiMsg = rec[pendingReRoll.msgIdx];
+        if (firstAiMsg) delete firstAiMsg.isHidden;
+        window._pendingReRoll = null;
+      }
+      const isCurrentContact = (requestContactId === currentContactId);
       if (isCurrentContact) {
         document.getElementById('typingStatus').style.display = 'none';
         hideLoading(); 
@@ -2956,6 +2966,7 @@ ${statusRules}
       if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
       chatRecords[requestContactId].push({ side: 'left', content: '请求失败：' + e.message, time: Date.now(), senderId: c.isGroup ? currentSpeaker.id : null });
       await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+      if (isCurrentContact) renderChat();
       renderContactList();
     }
 }
@@ -4442,6 +4453,10 @@ async function quickReRoll() {
       window.groupSpeakerIndices[c.id] = lastIndex;
     }
   }
+
+  // 移除多余的AI消息气泡，只保留第一条并隐藏
+  rec.splice(firstAiIdx + 1, lastAiMsgs.length - 1);
+  firstAiMsg.isHidden = true;
 
   // 暂存 pending reroll 信息
   window._pendingReRoll = {
