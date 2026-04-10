@@ -2484,11 +2484,13 @@ ${statusRules}
 请根据剧情发展自然更新这些状态信息。`;
   } else {
     let onlinePrompt = `【场景设定：线上网络聊天】
-严禁描写动作/神态/环境。每次回复按换行符（\\n）自动拆分为1-5个聊天气泡，每行一个。
+禁止出现：动作（笑了笑/耸肩/点头）、神态（眼神/表情）、心理（心想/暗道）、环境描写。
+每次回复按换行符拆分为1-5个纯文字气泡。
 `;
     if (c.isGroup) {
       onlinePrompt = `【场景设定：线上网络聊天 - 群聊】
-你们此刻在一个名为“${c.name}”的群里聊天。严禁描写动作/神态/环境。每次回复按换行符（\\n）自动拆分为1-5个聊天气泡，每行一个。
+你们此刻在一个名为“${c.name}”的群里聊天。禁止出现：动作（笑了笑/耸肩/点头）、神态（眼神/表情）、心理（心想/暗道）、环境描写。
+每次回复按换行符拆分为1-5个纯文字气泡。
 `;
     }
 
@@ -2900,55 +2902,34 @@ async function checkAndTriggerStmForContact(contactId) {
   stm.roundCount = (stm.roundCount || 0) + 1;
 
   const interval = memSettings.stmWindowSize || 10;
-
   const rec = chatRecords[contactId] || [];
-  let unsummarizedCount = rec.length - (stm.lastSummarizedIndex || 0);
 
-  // 如果积累的未总结消息超过了 interval，说明可能之前关闭了自动总结，现在开启了。我们需要追溯总结。
-  if (unsummarizedCount >= interval) {
-    console.log(`[STM自检] 发现未总结消息 ${unsummarizedCount} 条，开始追溯总结...`);
+  // 正常流程：当回合数达到设定的阈值时触发总结
+  if (stm.roundCount >= interval) {
+    const startIndex = stm.lastSummarizedIndex || 0;
+    const batchRecs = rec.slice(startIndex); // 提取从上次总结到现在的全部消息（完美囊括这10个回合的所有消息）
     
-    // 循环处理所有未总结的批次
-    while (unsummarizedCount >= interval) {
-      const startIndex = stm.lastSummarizedIndex || 0;
-      const batchRecs = rec.slice(startIndex, startIndex + interval);
-      
-      // 生成这批记录的总结
+    if (batchRecs.length > 0) {
+      // 生成新的STM条目
       await generateStmEntryForBatch(contactId, stm, batchRecs);
       
-      // 更新已总结的索引
-      stm.lastSummarizedIndex = startIndex + interval;
-      unsummarizedCount = rec.length - stm.lastSummarizedIndex;
-      
-      // 如果达到10条，归档
-      if (stm.entries.length >= 10) {
-        await archiveStmToWorldBook(contactId, stm);
-        stm.entries = [];
-      }
-    }
-    
-    // 剩余不足 interval 的部分，作为当前的 roundCount
-    stm.roundCount = unsummarizedCount;
-    await saveStmData(contactId, stm);
-  } else {
-    // 正常流程
-    if (stm.roundCount >= interval) {
-      stm.roundCount = 0;
+      // 更新已总结的索引和回合数
       stm.lastSummarizedIndex = rec.length;
+      stm.roundCount = 0;
       await saveStmData(contactId, stm);
 
       // 如果已有10条STM，先归档到世界书
       if (stm.entries.length >= 10) {
         await archiveStmToWorldBook(contactId, stm);
         stm.entries = [];
+        await saveStmData(contactId, stm);
       }
-
-      // 生成新的STM条目
-      const batchRecs = rec.slice(-interval);
-      await generateStmEntryForBatch(contactId, stm, batchRecs);
     } else {
+      stm.roundCount = 0;
       await saveStmData(contactId, stm);
     }
+  } else {
+    await saveStmData(contactId, stm);
   }
 }
 
@@ -10140,7 +10121,8 @@ async function checkAndTriggerStm() {
   if (!memSettings.stmAutoEnabled) return;
   
   const stm = await getStmData(currentContactId);
-  stm.roundCount = (stm.roundCount || 0) + 1;
+  // roundCount 已经在 checkAndTriggerStmForContact 中增加过了，这里不需要再加
+  // stm.roundCount = (stm.roundCount || 0) + 1;
   
   const interval = memSettings.stmWindowSize || 10;
   
@@ -10165,8 +10147,10 @@ async function checkAndTriggerStm() {
 async function generateStmEntry(contactId, stm) {
   const rec = chatRecords[contactId] || [];
   const interval = 10;
-  const batchRecs = rec.slice(-interval);
+  const startIndex = stm.lastSummarizedIndex || 0;
+  const batchRecs = rec.slice(startIndex);
   await generateStmEntryForBatch(contactId, stm, batchRecs);
+  stm.lastSummarizedIndex = rec.length;
 }
 
 // STM批量删除相关变量

@@ -1,11 +1,12 @@
 const fs = require('fs');
-const content = fs.readFileSync('js/main.js', 'utf8');
-const lines = content.split('\n');
+const lines = fs.readFileSync('js/main.js', 'utf8').split('
+');
 
-for (let i = 0; i < lines.length; i++) {
-    if (lines[i].includes('function editCurrentContact') || lines[i].includes('function showContactDetail') || lines[i].includes('function editContact')) {
-        console.log("Found:", lines[i]);
-        console.log(lines.slice(i, i+30).join('\n'));
-        console.log("------");
+lines.forEach((line, i) => {
+    if (line.includes('stm.roundCount = (stm.roundCount || 0) + 1;')) {
+        console.log(`Line ${i + 1}:`);
+        console.log(lines.slice(Math.max(0, i - 5), Math.min(lines.length, i + 6)).join('
+'));
+        console.log('---');
     }
-}
+});
