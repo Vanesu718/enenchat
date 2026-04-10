@@ -2342,11 +2342,41 @@ ${c.members.map(id => {
       if (chatSettings.memoryInterconnect) {
         // 如果这不是群聊，且存在最新的一条私聊消息，尝试启动跨频道检索
         if (!c.isGroup) {
-            console.log('[记忆互通] 权限已开启，开始检索...');
-            const foundMemory = searchCrossChatMemory(currentSpeaker.id, latestRecallMsg.content);
-            if (foundMemory) {
-              crossChatMemoryPrompt = `\n【系统记忆浮现：用户刚刚提到的话题，你在你们共同的群聊中找到了对应的场景】\n${foundMemory}\n请结合这段记忆，自然地接着用户的话茬回应，表现出你完全记得并在关注群里的动向。\n`;
-              console.log(`[跨频道检索] 成功带入群聊记忆`);
+            // 1. 先检查该联系人是否加入了任何群组
+            const joinedGroups = contacts.filter(group => 
+                group.isGroup && 
+                group.members && 
+                group.members.includes(currentSpeaker.id)
+            );
+            
+            if (joinedGroups.length === 0) {
+                console.log('[记忆互通] 该联系人未加入任何群组，跳过跨群搜索');
+                // 跳过，继续正常流程
+            } else {
+                // 2. 检查加入的群组是否有开启记忆互通的
+                let hasMemoryInterconnectGroup = false;
+                for (const group of joinedGroups) {
+                    const groupSettingsStr = await getFromStorage(`CHAT_SETTINGS_${group.id}`);
+                    const groupSettings = groupSettingsStr ? (typeof groupSettingsStr === 'string' ? JSON.parse(groupSettingsStr) : groupSettingsStr) : {};
+                    if (groupSettings && groupSettings.memoryInterconnect) {
+                        hasMemoryInterconnectGroup = true;
+                        break;
+                    }
+                }
+                
+                if (!hasMemoryInterconnectGroup) {
+                    console.log('[记忆互通] 所有群组都未开启记忆互通，跳过跨群搜索');
+                    // 跳过，继续正常流程
+                } else {
+                    // 3. 检查当前记忆是否已经足够（这里可以根据需要添加判断逻辑）
+                    // 只有在当前记忆不足时，才进行跨群搜索
+                    console.log('[记忆互通] 开始跨群搜索...');
+                    const foundMemory = searchCrossChatMemory(currentSpeaker.id, latestRecallMsg.content);
+                    if (foundMemory) {
+                        crossChatMemoryPrompt = `\n【系统记忆浮现：用户刚刚提到的话题，你在你们共同的群聊中找到了对应的场景】\n${foundMemory}\n请结合这段记忆，自然地接着用户的话茬回应，表现出你完全记得并在关注群里的动向。\n`;
+                        console.log(`[跨频道检索] 成功带入群聊记忆`);
+                    }
+                }
             }
         } else {
             // 在群聊中
