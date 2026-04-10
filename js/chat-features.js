@@ -310,6 +310,10 @@ window.renderEmojiPickerItems = function(groupName) {
 
 // Send Emoji Message
 window.sendEmoji = function(url) {
+    if (typeof isOnlineMode !== 'undefined' && !isOnlineMode) {
+        if (typeof showToast === 'function') showToast('表情功能仅限线上聊天使用');
+        return;
+    }
     const contactId = typeof currentContactId !== 'undefined' ? currentContactId : (window.currentContactId || null);
     if (!contactId) return;
 

@@ -1980,12 +1980,11 @@ ${wbPrompt}
   }
 }
 
-// ================= 跨频道记忆回溯辅助逻辑 =================
+// 智能跨频道记忆检索函数
+function searchCrossChatMemory(contactId, userMessage) {
+  if (!userMessage || typeof userMessage !== 'string' || userMessage.trim().length < 2) return null;
 
-// 提取检索关键词
-function extractSearchKeywords(text) {
-  if (!text || typeof text !== 'string' || text.trim().length < 2) return [];
-
+  // 1. 简单的分词和提取有意义的词（过滤掉常见的无意义虚词和代词）
   const stopWords = ['的', '了', '呢', '啊', '哦', '吧', '是', '在', '我', '你', '他', '她', '它', '我们', '你们', '他们', '就', '也', '还', '又', '刚刚', '刚才', '刚才在', '什么', '怎么', '为什么', '那个', '这个', '这么', '那么', '讲了', '说了', '一个', '一下', '记得', '吗'];
   const singleCharStopWords = ['的', '了', '呢', '啊', '哦', '吧', '是', '在', '我', '你', '他', '她', '它', '就', '也', '还', '又', '吗', '什', '么', '怎', '那', '这', '一', '个', '有', '没', '会', '不', '可', '以', '能', '要', '说', '讲', '记', '得', '和', '跟', '与', '给', '对', '把', '被', '让', '向', '往', '从', '到', '比', '去', '来', '做', '干', '当', '成', '为', '只', '才', '都', '总', '很', '太', '真', '挺', '越', '更', '最', '刚', '已', '经', '并', '非', '但', '却', '而', '且', '或', '者', '虽', '然', '如', '果', '因', '所', '之', '前', '后', '里', '外', '中', '上', '下', '多', '少', '好', '坏', '些', '点', '次', '遍', '回', '件', '条', '本', '名', '位', '句', '段', '篇', '章'];
   
@@ -1997,8 +1996,9 @@ function extractSearchKeywords(text) {
       return true;
   };
 
+  // 按两个字或更多的片段去分词（简单的滑动窗口分词法，避免需要引入分词库）
   let extractKeywords = [];
-  let cleanedMsg = text.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '');
+  let cleanedMsg = userMessage.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, ''); // 移除标点
   for (let i = 0; i < cleanedMsg.length - 1; i++) {
       let biGram = cleanedMsg.substring(i, i + 2);
       let triGram = i < cleanedMsg.length - 2 ? cleanedMsg.substring(i, i + 3) : '';
@@ -2007,86 +2007,44 @@ function extractSearchKeywords(text) {
       if (!isMeaningless(biGram)) extractKeywords.push(biGram);
   }
   
+  // 如果没有提取出有效的词组，退回到单字提取
   if (extractKeywords.length === 0) {
       extractKeywords = cleanedMsg.split('').filter(k => k.trim() && !isMeaningless(k) && /[a-zA-Z0-9\u4e00-\u9fa5]/.test(k));
   }
   
-  return [...new Set(extractKeywords)];
-}
+  // 去重
+  const keywords = [...new Set(extractKeywords)];
+  if (keywords.length === 0) return null;
 
-// 关键词匹配逻辑
-function isKeywordsMatch(text, keywords) {
-  if (!text || typeof text !== 'string' || !keywords || keywords.length === 0) return false;
-  let matchCount = 0;
-  for (const kw of keywords) {
+    console.log(`[跨频道检索] 提取的关键词:`, keywords);
+    console.log('[记忆互通] 提取到的关键词:', keywords);
+
+    const isMatch = (text) => {
+    if (!text || typeof text !== 'string') return false;
+    // 只要有一个长度>=2的关键词匹配上，就认为可能相关；或者如果都是单字，需要匹配两个以上
+    let matchCount = 0;
+    for (const kw of keywords) {
       if (text.includes(kw)) {
           if (kw.length >= 2) return true;
           matchCount++;
       }
-  }
-  return matchCount >= 2;
-}
-
-// 获取聊天设置
-async function getChatSettings(id) {
-  const s = await getFromStorage(`CHAT_SETTINGS_${id}`);
-  return s ? (typeof s === 'string' ? JSON.parse(s) : s) : {};
-}
-
-// 检查关键词是否在本地上下文中已存在 (最近20条/STM/LTM)
-async function isKeywordFoundInLocalContext(contactId, keywords, providedStmText = null, providedLtmText = null) {
-  if (!keywords || keywords.length === 0) return false;
-
-  // 1. 最近 20 条私聊记录
-  const recentRecs = (chatRecords[contactId] || []).slice(-20).map(r => r.content).join('\n');
-  if (isKeywordsMatch(recentRecs, keywords)) return true;
-
-  // 2. 短期记忆 (STM)
-  let stmText = providedStmText;
-  if (stmText === null) {
-    const stm = await getStmData(contactId);
-    if (stm && stm.entries) {
-      stmText = stm.entries.map(e => e.content).join('\n');
     }
-  }
-  if (stmText && isKeywordsMatch(stmText, keywords)) return true;
+    return matchCount >= 2;
+  };
 
-  // 3. 长期记忆 (LTM)
-  let ltmText = providedLtmText;
-  if (ltmText === null) {
-    const settings = await getChatSettings(contactId);
-    if (settings.selectedWorldBooks && settings.selectedWorldBooks.length > 0) {
-      const selectedEntries = worldBookEntries.filter(e => settings.selectedWorldBooks.includes(e.id) && e.category === '记忆总结');
-      ltmText = selectedEntries.map(e => e.content).join('\n');
-    }
-  }
-  if (ltmText && isKeywordsMatch(ltmText, keywords)) return true;
-
-  return false;
-}
-
-// 智能跨频道记忆检索函数
-async function searchCrossChatMemory(contactId, userMessage) {
-  const keywords = extractSearchKeywords(userMessage);
-  if (keywords.length === 0) return null;
-
-  console.log('[记忆互通] 提取到的关键词:', keywords);
-
-  // 遍历所有该联系人所在的群聊
+  // 当前私聊没找到近期上下文（已被移除私聊拦截逻辑），遍历所有该联系人所在的群聊
   let foundMemory = '';
-  const eligibleGroups = contacts.filter(c => c.isGroup && c.members && c.members.includes(contactId));
-  
-  for (const group of eligibleGroups) {
-      // 检查该群是否开启了互通
-      const gSettings = await getChatSettings(group.id);
-      if (!gSettings.memoryInterconnect) continue;
-
+  const groupIds = contacts.filter(c => c.isGroup && c.members && c.members.includes(contactId)).map(g => g.id);
+  console.log('[记忆互通] 正在搜索联系人所在的群聊ID:', groupIds);
+  for (const group of contacts.filter(c => c.isGroup)) {
+    if (group.members && group.members.includes(contactId)) {
       const groupRecs = (chatRecords[group.id] || []).slice(-500); // 限制搜索深度
       let foundIndex = -1;
       
       for (let i = groupRecs.length - 1; i >= 0; i--) {
         const rec = groupRecs[i];
-        if (isKeywordsMatch(rec.content, keywords)) {
+        // 任何人在群里发的消息只要匹配上了都可以
+        if (isMatch(rec.content)) {
           foundIndex = i;
           break;
         }
@@ -2114,13 +2072,14 @@ async function searchCrossChatMemory(contactId, userMessage) {
               if (contentSnippet.length > 100) contentSnippet = contentSnippet.substring(0, 100) + '...';
               foundMemory += `${senderName}: ${contentSnippet}\n`;
           }
-            foundMemory += '\n';
-            // ҵһȺ㹻ˣṩ
-            break;
-        }
+          foundMemory += '\n';
+          // 找到一个群就足够了，提供最近的上下文
+          break;
       }
+    }
+  }
 
-    if (foundMemory) {
+  if (foundMemory) {
     if (foundMemory.length > 500) foundMemory = foundMemory.substring(0, 500) + '...\n';
     return foundMemory.trim();
   }
@@ -2378,56 +2337,58 @@ ${c.members.map(id => {
   const rawRecs = chatRecords[currentContactId] || [];
   let crossChatMemoryPrompt = '';
   // 提取用户最新发的一条文本消息作为检索源
-  const latestRecallMsg = rawRecs.length > 0 ? [...rawRecs].reverse().find(r => r.side === 'right') : null;
-
-  // 最终确认逻辑流程：
-  if (latestRecallMsg && typeof latestRecallMsg.content === 'string' && latestRecallMsg.content.trim().length > 0) {
-    const userMsg = latestRecallMsg.content;
-    let shouldSearch = false;
-    
-    // 1. 检查是否有互通权限
-    let hasInterconnectPermission = false;
-    if (c.isGroup) {
-      hasInterconnectPermission = !!chatSettings.memoryInterconnect;
-    } else {
-      // 私聊：检查联系人所在的群是否有开启互通的
-      const eligibleGroups = contacts.filter(group => group.isGroup && group.members && group.members.includes(c.id));
-      for (const group of eligibleGroups) {
-        const gSettings = await getChatSettings(group.id);
-        if (gSettings.memoryInterconnect) {
-          hasInterconnectPermission = true;
-          break;
+    const latestRecallMsg = rawRecs.length > 0 ? [...rawRecs].reverse().find(r => r.side === 'right') : null;
+    if (latestRecallMsg && typeof latestRecallMsg.content === 'string' && latestRecallMsg.content.trim().length > 0) {
+      if (chatSettings.memoryInterconnect) {
+        // 如果这不是群聊，且存在最新的一条私聊消息，尝试启动跨频道检索
+        if (!c.isGroup) {
+            // 1. 先检查该联系人是否加入了任何群组
+            const joinedGroups = contacts.filter(group => 
+                group.isGroup && 
+                group.members && 
+                group.members.includes(currentSpeaker.id)
+            );
+            
+            if (joinedGroups.length === 0) {
+                console.log('[记忆互通] 该联系人未加入任何群组，跳过跨群搜索');
+                // 跳过，继续正常流程
+            } else {
+                // 2. 检查加入的群组是否有开启记忆互通的
+                let hasMemoryInterconnectGroup = false;
+                for (const group of joinedGroups) {
+                    const groupSettingsStr = await getFromStorage(`CHAT_SETTINGS_${group.id}`);
+                    const groupSettings = groupSettingsStr ? (typeof groupSettingsStr === 'string' ? JSON.parse(groupSettingsStr) : groupSettingsStr) : {};
+                    if (groupSettings && groupSettings.memoryInterconnect) {
+                        hasMemoryInterconnectGroup = true;
+                        break;
+                    }
+                }
+                
+                if (!hasMemoryInterconnectGroup) {
+                    console.log('[记忆互通] 所有群组都未开启记忆互通，跳过跨群搜索');
+                    // 跳过，继续正常流程
+                } else {
+                    // 3. 检查当前记忆是否已经足够（这里可以根据需要添加判断逻辑）
+                    // 只有在当前记忆不足时，才进行跨群搜索
+                    console.log('[记忆互通] 开始跨群搜索...');
+                    const foundMemory = searchCrossChatMemory(currentSpeaker.id, latestRecallMsg.content);
+                    if (foundMemory) {
+                        crossChatMemoryPrompt = `\n【系统记忆浮现：用户刚刚提到的话题，你在你们共同的群聊中找到了对应的场景】\n${foundMemory}\n请结合这段记忆，自然地接着用户的话茬回应，表现出你完全记得并在关注群里的动向。\n`;
+                        console.log(`[跨频道检索] 成功带入群聊记忆`);
+                    }
+                }
+            }
+        } else {
+            // 在群聊中
+            console.log('[记忆互通] 权限已开启，开始检索...');
+            const foundPrivateMemory = searchPrivateMemoryForGroup(currentSpeaker.id, latestRecallMsg.content);
+            if (foundPrivateMemory) {
+              crossChatMemoryPrompt = `\n【系统记忆浮现：用户刚刚提到的话题，你在你们的私聊中找到了对应的场景】\n${foundPrivateMemory}\n请结合这段记忆，自然地接着用户的话茬回应，表现出你完全记得你们私下的约定或经历。\n`;
+              console.log(`[跨频道检索] 成功带入私聊记忆`);
+            }
         }
       }
     }
-
-    if (hasInterconnectPermission) {
-      // 2. 触发搜索条件判断
-      if (userMsg.includes('群')) {
-        console.log('[跨频互通] 显式触发：用户消息包含“群”字，开始执行群搜索...');
-        shouldSearch = true;
-      } else {
-        // B. 保底触发：检查本地上下文（最近20条、STM、LTM）是否包含相关内容
-        const keywords = extractSearchKeywords(userMsg);
-        if (keywords.length > 0) {
-          const foundInLocal = await isKeywordFoundInLocalContext(c.id, keywords, stmContent, ltmContent);
-          if (!foundInLocal) {
-            console.log('[跨频互通] 保底触发：本地上下文未找到相关内容，尝试执行群搜索...');
-            shouldSearch = true;
-          }
-        }
-      }
-
-      if (shouldSearch) {
-        // 3. 最终行动：执行群聊搜索
-        const foundMemory = await searchCrossChatMemory(currentSpeaker.id, userMsg);
-        if (foundMemory) {
-          crossChatMemoryPrompt = `\n【系统记忆浮现：用户刚刚提到的话题，你在你们共同的群聊中找到了对应的场景】\n${foundMemory}\n请结合这段记忆，自然地接着用户的话茬回应，表现出你完全记得并在关注群里的动向。\n`;
-          console.log(`[跨频道检索] 成功带入群聊记忆`);
-        }
-      }
-    }
-  }
 
   // 3. 按优先级拼接 Prompt (世界书 -> 人设 -> LTM -> 跨频道回忆 -> STM)
   if (activeWorldBooks.length > 0) {
