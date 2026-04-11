@@ -331,13 +331,19 @@ let chatSettings = {
 let isOfflineMode = false;
 let activeAIRequests = new Set();
 
-function isCurrentChatBlueMinimalEnabled() {
+function isCurrentChatBlueMinimalEnabled(isOfflineMsg, statusData) {
   const currentContact = contacts.find(x => x.id === currentContactId);
+  let effectiveOfflineMode = false;
+  if (isOfflineMsg !== undefined) {
+    effectiveOfflineMode = isOfflineMsg;
+  } else if (statusData) {
+    effectiveOfflineMode = true;
+  }
   return !!(
     currentContactId &&
     currentContact &&
     !currentContact.isGroup &&
-    isOfflineMode &&
+    effectiveOfflineMode &&
     document.body.classList.contains('theme-blue')
   );
 }
@@ -1459,7 +1465,7 @@ function renderChat(forceStartIdx) {
         if (c.isGroup) sName = c.name; // fallback
       }
     }
-    const div = createMsgElement(m.content, m.side, ava, m.quote, startIdx + idx, m.type, sName, m.statusData);
+    const div = createMsgElement(m.content, m.side, ava, m.quote, startIdx + idx, m.type, sName, m.statusData, m.isOfflineMsg);
     fragment.appendChild(div);
   });
   
@@ -1495,7 +1501,7 @@ function renderChat(forceStartIdx) {
           if (c.isGroup) sName = c.name;
         }
         
-        const div = createMsgElement(m.content, m.side, ava, m.quote, startIdx + idx, m.type, sName, m.statusData);
+        const div = createMsgElement(m.content, m.side, ava, m.quote, startIdx + idx, m.type, sName, m.statusData, m.isOfflineMsg);
       fragment.appendChild(div);
     });
     el.insertBefore(fragment, el.firstChild);
@@ -1563,14 +1569,14 @@ function parseTextBeautify(text) {
   return `<span class='text-normal'>${html}</span>`;
 }
 
-function createMsgElement(content, side, avatar, quote, idx, type, senderName, statusData) {
+function createMsgElement(content, side, avatar, quote, idx, type, senderName, statusData, isOfflineMsg) {
   if (idx === undefined) {
     const rec = chatRecords[currentContactId] || [];
     idx = rec.length;
   }
 
-  const div = document.createElement('div');
-  const isBlueOfflineCard = isCurrentChatBlueMinimalEnabled() && side === 'left';
+    const div = document.createElement('div');
+    const isBlueOfflineCard = isCurrentChatBlueMinimalEnabled(isOfflineMsg, statusData) && side === 'left';
   
   if (isBlueOfflineCard) {
     div.className = `msg-item ${side} blue-offline-mode`;
@@ -1820,11 +1826,11 @@ function switchMsgAlternative(idx, direction) {
   });
 }
 
-function addMsgToUI(content, side, avatar, quote, idx, type, skipScroll = false, senderName = null, statusData = null) {
+function addMsgToUI(content, side, avatar, quote, idx, type, skipScroll = false, senderName = null, statusData = null, isOfflineMsg = undefined) {
   // 注意：表情包处理已移到 createMsgElement -> parseTextBeautify 之后执行
   // 避免 <img> 标签被 parseTextBeautify 的 HTML 转义所破坏
   const el = document.getElementById('chatContent');
-  const div = createMsgElement(content, side, avatar, quote, idx, type, senderName, statusData);
+  const div = createMsgElement(content, side, avatar, quote, idx, type, senderName, statusData, isOfflineMsg);
   el.appendChild(div);
   
   if (!skipScroll) {
@@ -2692,7 +2698,7 @@ ${statusRules}
 
       if (requestContactId === currentContactId) {
         const tempIdx = chatRecords[requestContactId] ? chatRecords[requestContactId].length : 0;
-        msgDiv = createMsgElement('', 'left', currentSpeaker.avatar, null, tempIdx, undefined, c.isGroup ? currentSpeaker.name : null, null);
+        msgDiv = createMsgElement('', 'left', currentSpeaker.avatar, null, tempIdx, undefined, c.isGroup ? currentSpeaker.name : null, null, isOfflineMode);
         document.getElementById('chatContent').appendChild(msgDiv);
         document.getElementById('chatContent').scrollTop = document.getElementById('chatContent').scrollHeight;
         bubbleEl = msgDiv.querySelector('.msg-bubble') || msgDiv.querySelector('.blue-card-bottom');
@@ -2905,16 +2911,16 @@ ${statusRules}
             if (i > 0) {
               await new Promise(resolve => setTimeout(resolve, 600));
             }
-            addMsgToUI(limitedLines[i], 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData);
+            addMsgToUI(limitedLines[i], 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData, false);
           }
         }
       } else {
         // 线下模式：保持原样，整段发送
         if (isCurrentContact) {
-          addMsgToUI(displayText, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData);
+          addMsgToUI(displayText, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData, true);
         }
         if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
-        chatRecords[requestContactId].push({ side: 'left', content: displayText, time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData });
+        chatRecords[requestContactId].push({ side: 'left', content: displayText, time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData, isOfflineMsg: true });
       }
 
       await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));

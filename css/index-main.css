@@ -1207,3 +1207,50 @@ body.theme-blue .screen {
   clip-path: none !important;
   height: 100% !important;
 }
+
+/* 移除所有子页面的圆角和裁剪，并修复底部留白 */
+body.theme-blue .sub-page {
+  border-radius: 0 !important;
+  clip-path: none !important;
+  height: 100% !important;
+}
+
+/* 移除聊天页面的顶部圆角 */
+body.theme-blue .chat-page {
+  border-radius: 0 !important;
+}
+
+/* 简约模式下，让聊天页面的上下栏半透明纯色，无毛玻璃效果，提升性能 */
+body.theme-blue .chat-header {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+}
+
+/* 简约模式下，聊天标题和返回按钮颜色自动反转（深色背景变白，浅色背景变黑） */
+body.theme-blue .chat-header .page-title,
+body.theme-blue .chat-header .page-back svg {
+  mix-blend-mode: difference;
+  color: #ffffff !important; /* 基础色设为白色，与深色背景差值后保持白色，与浅色背景差值后变黑 */
+  stroke: #ffffff !important;
+}
+
+body.theme-blue .chat-input-area {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-top: none !important;
+}
+
+/* 调整页面底部的 padding，防止背景无法覆盖 */
+body.theme-blue .page {
+  padding-bottom: 0 !important;
+}
+
+/* 确保背景图片覆盖全屏 */
+body.theme-blue #user-bg,
+body.theme-blue .me-bg-container {
+  height: 100vh !important;
+  height: calc(var(--vh, 1vh) * 100) !important;
+}
