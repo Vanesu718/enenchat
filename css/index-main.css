@@ -1,7 +1,7 @@
 :root { 
-  --main-pink: #f0b8c8; 
-  --bg-cream: #fffbf9;
-  --light-pink: #f8d7e0;
+  --main-pink: #333333; 
+  --bg-cream: #ffffff;
+  --light-pink: #e0e0e0;
   --text-dark: #333333;
   --text-light: #777777;
   --setting-green: var(--main-pink); /* 设置页主调已改为粉色 */
@@ -84,7 +84,7 @@ body {
 .dock-btn {
   width: 48px;
   height: 48px;
-  background: white;
+  background: #f5f5f5;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -265,7 +265,7 @@ body {
   border-radius: 50%;
   overflow: hidden;
   margin-right: 12px;
-  border: 2px solid var(--light-pink);
+  border: 2px solid #e0e0e0;
   flex-shrink: 0;
 }
 .contact-avatar img {
@@ -386,7 +386,7 @@ body {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  border: 2px solid var(--light-pink);
+  border: 2px solid #e0e0e0;
   overflow: hidden;
   margin: 10px 0;
 }
@@ -422,7 +422,7 @@ body {
 }
 
 .avatar-upload { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
-.avatar-preview { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--light-pink); overflow: hidden; margin-bottom: 15px; background: var(--light-pink); }
+.avatar-preview { width: 80px; height: 80px; border-radius: 50%; border: 2px solid #e0e0e0; overflow: hidden; margin-bottom: 15px; background: #e0e0e0; }
 .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
 .upload-options { display: flex; gap: 10px; }
 #avatar-file, #user-avatar-file { display: none; }
@@ -433,13 +433,13 @@ body {
 .chat-header { height: 50px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #f0e8df; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); }
 .chat-header .page-back { background: none; width: auto; height: auto; padding: 4px 6px; }
 .chat-header .page-back:active { background: none; }
-.chat-header-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; margin-right: 10px; border: 1px solid var(--light-pink); }
+.chat-header-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; margin-right: 10px; border: 1px solid #e0e0e0; }
 .chat-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .chat-content { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 .msg-item { display: flex; max-width: 85%; position: relative; }
 .msg-item.left { align-self: flex-start; }
 .msg-item.right { align-self: flex-end; flex-direction: row-reverse; }
-.msg-avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid var(--light-pink); margin: 0 8px; }
+.msg-avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid #e0e0e0; margin: 0 8px; }
 .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .msg-bubble { position: relative; padding: 10px 14px; border-radius: var(--bubble-radius, 18px); line-height: 1.4; font-size: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
 .chat-content { touch-action: manipulation; }
@@ -514,7 +514,7 @@ body {
 #user-bg { 
   width: 100%;
   height: 100%;
-  background-color: #e8d5c8;
+  background-color: #e0e0e0;
   background-image: none;
   background-size: cover;
   background-position: center;
@@ -782,7 +782,7 @@ body {
   border-radius: 50%;
   margin-right: 10px;
   object-fit: cover;
-  border: 2px solid var(--light-pink);
+  border: 2px solid #e0e0e0;
 }
 .forum-post-info {
   flex: 1;
@@ -828,7 +828,7 @@ body {
   height: 40px;
   border-radius: 50%;
   margin-right: 10px;
-  border: 2px solid var(--light-pink);
+  border: 2px solid #e0e0e0;
   flex-shrink: 0;
 }
 .moment-avatar img {
@@ -1191,16 +1191,19 @@ body {
 body.theme-blue .phone-case {
   width: 100vw !important;
   height: 100vh !important;
+  height: calc(var(--vh, 1vh) * 100) !important;
   border-radius: 0 !important;
-  padding: 0 !important;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0) !important;
   border: none !important;
   box-shadow: none !important;
-  background: transparent !important;
+  background: var(--bg-cream) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  box-sizing: border-box !important;
 }
 
 body.theme-blue .screen {
   border-radius: 0 !important;
   clip-path: none !important;
+  height: 100% !important;
 }

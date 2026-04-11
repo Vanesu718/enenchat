@@ -1,10 +1,10 @@
 /* 默认主题 (Pink) */
 :root.theme-pink {
-  --main-pink: #f0b8c8;
-  --bg-cream: #fffbf9;
-  --light-pink: #f8d7e0;
-  --text-dark: #444;
-  --text-light: #888;
+  --main-pink: #333333;
+  --bg-cream: #ffffff;
+  --light-pink: #e0e0e0;
+  --text-dark: #333333;
+  --text-light: #777777;
 }
 
 /* 蓝色主题 (Blue) */

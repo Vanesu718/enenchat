@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>验证码生成器</title>
+    <script src="https://cdn.jsdelivr.net/npm/hydrogen-js-sdk/dist/Bmob-2.5.1.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 5px;
+            display: none;
+        }
+        .result.error {
+            background-color: #ffebee;
+            border-color: #ffcdd2;
+            color: #c62828;
+        }
+        .code-display {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            color: #2e7d32;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+        .copy-btn {
+            background-color: #2196F3;
+            margin-top: 10px;
+        }
+        .copy-btn:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>验证码生成器</h1>
+    <div class="form-group">
+        <label for="qq">请输入QQ号：</label>
+        <input type="text" id="qq" placeholder="例如：123456789">
+    </div>
+    <button id="generateBtn">生成并上传</button>
+
+    <div id="resultArea" class="result">
+        <div id="resultMessage">生成成功！验证码为：</div>
+        <div id="codeDisplay" class="code-display"></div>
+        <button id="copyBtn" class="copy-btn">复制验证码</button>
+    </div>
+</div>
+
+<script>
+    // 初始化 Bmob
+    Bmob.initialize("373cc21c1e33386c", "vanes13674535005");
+
+    const generateBtn = document.getElementById('generateBtn');
+    const qqInput = document.getElementById('qq');
+    const resultArea = document.getElementById('resultArea');
+    const resultMessage = document.getElementById('resultMessage');
+    const codeDisplay = document.getElementById('codeDisplay');
+    const copyBtn = document.getElementById('copyBtn');
+
+    // 生成随机6位字母数字组合
+    function generateRandomCode(length = 6) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    generateBtn.addEventListener('click', async () => {
+        const qq = qqInput.value.trim();
+        
+        if (!qq) {
+            alert('请输入QQ号！');
+            return;
+        }
+
+        // 禁用按钮，防止重复点击
+        generateBtn.disabled = true;
+        generateBtn.textContent = '正在生成并上传...';
+        resultArea.style.display = 'none';
+        resultArea.className = 'result';
+
+        try {
+            // 1. 生成验证码
+            const code = generateRandomCode();
+            
+            // 2. 上传到 Bmob
+            const query = Bmob.Query('activation_code');
+            query.set("qq", qq);
+            query.set("code", code);
+            query.set("isUsed", false);
+            
+            await query.save();
+
+            // 3. 显示结果
+            resultArea.style.display = 'block';
+            resultMessage.textContent = '生成并上传成功！验证码为：';
+            codeDisplay.textContent = code;
+            
+            // 清空输入框
+            qqInput.value = '';
+
+        } catch (error) {
+            console.error('上传失败:', error);
+            resultArea.style.display = 'block';
+            resultArea.className = 'result error';
+            resultMessage.textContent = '上传失败，请检查网络或控制台错误信息。';
+            codeDisplay.textContent = '';
+        } finally {
+            // 恢复按钮状态
+            generateBtn.disabled = false;
+            generateBtn.textContent = '生成并上传';
+        }
+    });
+
+    // 复制功能
+    copyBtn.addEventListener('click', () => {
+        const code = codeDisplay.textContent;
+        if (code) {
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '已复制！';
+                copyBtn.style.backgroundColor = '#4CAF50';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.backgroundColor = '#2196F3';
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                alert('复制失败，请手动复制。');
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
