@@ -58,6 +58,21 @@
 <!-- 加载遮罩：隐藏页面直到主题/背景加载完毕，防止闪烁 -->
 <div id="app-loading-mask" style="position:fixed; inset:0; background:var(--bg-cream, #fffbf9); z-index:9999999; transition:opacity 0.3s ease;"></div>
 
+<!-- 激活页面 -->
+<div id="activation-page" style="display:none; position:fixed; inset:0; background:var(--bg-cream, #fffbf9); z-index:9999998; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.4s ease;">
+  <img src="haibaologo.png?v=2" alt="OHO Logo" style="width:120px; height:120px; object-fit:contain; border-radius:24px; margin-bottom: 40px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+  <div style="width: 80%; max-width: 300px; display: flex; flex-direction: column; gap: 15px;">
+    <input type="text" id="activation-qq" placeholder="请输入QQ号" style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--light-pink); outline: none; font-size: 15px; background: rgba(255,255,255,0.8); box-sizing: border-box;">
+    <input type="text" id="activation-code" placeholder="请输入验证码" style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--light-pink); outline: none; font-size: 15px; background: rgba(255,255,255,0.8); box-sizing: border-box;">
+    <button id="activation-btn" style="width: 100%; padding: 12px; border-radius: 12px; border: none; background: var(--main-pink); color: white; font-size: 16px; font-weight: 500; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(240, 184, 200, 0.4);">激活进入</button>
+  </div>
+</div>
+
+<!-- 过渡动画页面 -->
+<div id="splash-page" style="display:none; position:fixed; inset:0; background:var(--bg-cream, #fffbf9); z-index:9999998; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.4s ease;">
+  <img src="haibaologo.png?v=2" alt="OHO Logo" style="width:120px; height:120px; object-fit:contain; border-radius:24px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+</div>
+
 <div class="phone-case">
   <div class="island" id="dynamic-island"></div>
     <div class="screen">
@@ -416,7 +431,7 @@
       <div class="page-body">
         <div class="form-section" style="margin-bottom:15px;">
           <div class="form-label" style="font-size:14px; color:var(--main-pink); margin-bottom:8px;">选择主题</div>
-          <div class="menu-item" onclick="selectTheme('')" style="display:flex; justify-content:space-between; align-items:center;">默认粉色 <span class="theme-check" id="theme-check-default" style="color:var(--main-pink); display:none; font-weight:bold;">✓</span></div>
+          <div class="menu-item" onclick="selectTheme('')" style="display:flex; justify-content:space-between; align-items:center;">默认主题 <span class="theme-check" id="theme-check-default" style="color:var(--main-pink); display:none; font-weight:bold;">✓</span></div>
           <div class="menu-item" onclick="selectTheme('theme-blue')" style="display:flex; flex-direction:column; justify-content:center; align-items:flex-start;">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
               线下简约 <span class="theme-check" id="theme-check-blue" style="color:var(--main-pink); display:none; font-weight:bold;">✓</span>
@@ -647,7 +662,7 @@
         </div>
         <div class="form-section">
           <div class="form-label">名称</div>
-          <input class="form-input" id="writing-style-name" placeholder="输入文风名称" oninput="saveWritingStyleDraft()">
+          <input class="form-input" id="writing-style-name" placeholder="输入文风名称">
         </div>
         <div class="form-section" style="display:none;">
           <div class="form-label">分类</div>
@@ -656,8 +671,8 @@
           </select>
         </div>
         <div class="form-section">
-          <div class="form-label">文风设定内容</div>
-          <textarea class="form-textarea" id="writing-style-content" placeholder="输入详细的文风设定内容，字数不限，AI将自动为您提炼压缩..." oninput="saveWritingStyleDraft()" style="min-height: 150px;"></textarea>
+          <div class="form-label">文风设定详情</div>
+          <textarea class="form-textarea" id="writing-style-content" placeholder="填写详细的文风设定内容，保存时，AI会自动为您提炼..." style="min-height: 150px;"></textarea>
             <div style="margin-top:10px;">
               <label class="upload-btn" style="display:inline-block; margin:0;">
                 📁 导入文档 (支持txt/docx, 1M以内)
@@ -668,10 +683,13 @@
           </div>
           <div class="form-section">
           <div class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
-            <span>✅ AI 提炼预览</span>
+            <span>🤖 AI 提炼预览</span>
             <span style="font-size:12px; color:var(--main-pink); cursor:pointer; background:rgba(255, 192, 203, 0.15); padding:4px 8px; border-radius:8px;" onclick="manualAiCompress()">✨ 一键提取</span>
           </div>
-          <textarea class="form-textarea" id="writing-style-compressed" placeholder="AI 提炼后的精简内容将显示在此处，你也可以手动修改..." style="min-height: 100px; background: rgba(255, 192, 203, 0.05);"></textarea>
+          <div style="font-size:12px; color:var(--text-light); margin-bottom:8px; line-height:1.4;">
+            💡 提示：每次保存时，若未提取过或修改了长文，系统会自动提取一次以节省后续聊天Token。
+          </div>
+          <textarea class="form-textarea" id="writing-style-compressed" placeholder="AI 提炼后的精简内容将显示在此处，您也可以手动修改..." style="min-height: 100px; background: rgba(255, 192, 203, 0.05);"></textarea>
         </div>
         <button class="save-btn" onclick="saveWritingStyleEntry()">保存</button>
       </div>
@@ -1973,10 +1991,12 @@
   </div>
 </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/hydrogen-js-sdk/dist/Bmob-2.5.1.min.js"></script>
   <script src="js/pako.min.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/indexedDB.js"></script>
   <script src="js/backup-system.js"></script>
+  <script src="js/activation.js"></script>
   <script src="js/main.js"></script>
   <script src="js/chat-features.js"></script>
 </body>

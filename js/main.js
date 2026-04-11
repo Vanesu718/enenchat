@@ -4893,32 +4893,50 @@ ${content}
 
 async function saveWritingStyleEntry() {
   const name = document.getElementById('writing-style-name').value.trim();
-  const category = document.getElementById('writing-style-category').value.trim();
+  // 分类下拉框被隐藏，默认使用'文风'
+  const category = (document.getElementById('writing-style-category')?.value || '文风').trim();
   const content = document.getElementById('writing-style-content').value.trim();
   const userCompressed = document.getElementById('writing-style-compressed').value.trim();
-  
+
   if (!name) { showToast('请输入名称'); return; }
-  if (!category) { showToast('请输入分类'); return; }
   if (!content) { showToast('请输入文风设定内容'); return; }
-  
-  // 如果是新建或者内容有修改，强制尝试进行AI压缩
+
+  const saveBtn = document.querySelector('#add-writing-style .save-btn');
+  const originalBtnText = saveBtn ? saveBtn.textContent : '保存';
+
+  // 避免在没有修改长内容时重复提炼，强制重新提炼交给AI提取按钮
   let compressedContent = userCompressed;
-  if (window._isEditingWs && window._editingWsId) {
+  let needsCompress = false;
+  
+  if (!userCompressed) {
+      // 如果没有提炼内容，总是需要提炼
+      needsCompress = true;
+  } else if (window._isEditingWs && window._editingWsId) {
     const idx = writingStyles.findIndex(s => s.id === window._editingWsId);
-    if (idx > -1) {
-      if (writingStyles[idx].content === content && writingStyles[idx].compressedContent) {
-        // 内容未变且已有压缩版本，保留原样
-        compressedContent = userCompressed || writingStyles[idx].compressedContent;
-      } else {
-        // 内容有变，重新压缩
-        compressedContent = await aiCompressWritingStyle(content) || userCompressed || '';
-      }
-    } else {
-      compressedContent = await aiCompressWritingStyle(content) || userCompressed || '';
+    if (idx > -1 && writingStyles[idx].content !== content) {
+      // 内容有修改，重新提炼
+      needsCompress = true;
     }
-  } else {
-    // 新建，强制压缩
-    compressedContent = await aiCompressWritingStyle(content) || userCompressed || '';
+  } else if (!window._isEditingWs) {
+      // 新建且下方提炼框有内容的情况，理论上由用户自己提炼或编写了，就不覆盖了
+      needsCompress = false;
+  }
+
+  if (needsCompress) {
+      if (saveBtn) {
+          saveBtn.textContent = '自动提炼并保存中...';
+          saveBtn.disabled = true;
+      }
+      try {
+          const apiCompressed = await aiCompressWritingStyle(content);
+          compressedContent = apiCompressed || userCompressed || '';
+          if (apiCompressed) {
+             document.getElementById('writing-style-compressed').value = apiCompressed;
+          }
+      } catch (e) {
+          console.error("提炼失败", e);
+          compressedContent = userCompressed || '';
+      }
   }
 
   if (window._isEditingWs && window._editingWsId) {
@@ -4942,8 +4960,16 @@ async function saveWritingStyleEntry() {
     
     closeSub('add-writing-style');
     renderWritingStyleList();
+    if (saveBtn) {
+        saveBtn.textContent = originalBtnText;
+        saveBtn.disabled = false;
+    }
     showToast('✅ 文风设定已保存！');
   } else {
+    if (saveBtn) {
+        saveBtn.textContent = originalBtnText;
+        saveBtn.disabled = false;
+    }
     showToast('保存失败，请检查浏览器存储设置。');
   }
 }

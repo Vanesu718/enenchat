@@ -310,7 +310,7 @@ window.renderEmojiPickerItems = function(groupName) {
 
 // Send Emoji Message
 window.sendEmoji = function(url) {
-    if (typeof isOnlineMode !== 'undefined' && !isOnlineMode) {
+    if (typeof isOfflineMode !== 'undefined' && isOfflineMode) {
         if (typeof showToast === 'function') showToast('表情功能仅限线上聊天使用');
         return;
     }
@@ -362,7 +362,7 @@ window.sendEmoji = function(url) {
     }
 
     // Trigger AI Reply if in online mode
-    if (typeof isOnlineMode !== 'undefined' && isOnlineMode) {
+    if (typeof isOfflineMode !== 'undefined' && !isOfflineMode) {
         setTimeout(function() {
             if (typeof triggerAIReply === 'function') {
                 triggerAIReply();
@@ -376,8 +376,12 @@ window.sendEmoji = function(url) {
 // Override selectFile to handle emoji type specifically
 ;(function() {
     const originalSelectFile = window.selectFile;
-    window.selectFile = function(type, event) {
+window.selectFile = function(type, event) {
         if (type === 'emoji') {
+            if (typeof isOfflineMode !== 'undefined' && isOfflineMode) {
+                if (typeof showToast === 'function') showToast('表情功能仅限线上聊天使用');
+                return;
+            }
             if (event) {
                 event.stopPropagation();
             }
@@ -431,6 +435,9 @@ window.updateAiEmojiUI = function() {
 
 // Helper to get emoji list for AI Prompt (异步版本，确保能从 IndexedDB 读到数据)
 window.getAiEmojiPromptAddon = async function() {
+    if (typeof isOfflineMode !== 'undefined' && isOfflineMode) {
+        return '';
+    }
     let settings = _cfGet('settings');
     if (!settings) settings = await _cfGetAsync('settings');
     if (!settings || !settings.enableAiEmoji) return '';
@@ -463,6 +470,7 @@ window.getAiEmojiPromptAddon = async function() {
 // Helper: 将AI回复中的 [表情名称] 替换为实际图片
 window.processAiEmojiInMessage = function(text) {
     if (!text) return text;
+    if (typeof isOfflineMode !== 'undefined' && isOfflineMode) return text;
     let settings = _cfGet('settings') || {};
     if (!settings.enableAiEmoji) return text;
 
