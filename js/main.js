@@ -1614,7 +1614,7 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
 
   if (isBlueOfflineCard) {
     bubble.className = 'msg-blue-card';
-    let parsedContent = type === 'image' ? `<img src="${content}" style="max-width:180px; max-height:180px; border-radius:10px; display:block; cursor:zoom-in; object-fit:cover;" onclick="event.stopPropagation(); viewFullImage('${content}')">` : parseTextBeautify(content);
+    let parsedContent = type === 'image' ? `<img src="${content}" style="max-width:180px; max-height:180px; border-radius:10px; display:block; cursor:zoom-in; object-fit:cover;" onclick="if(window.isBatchDeleteMode) return; event.stopPropagation(); viewFullImage('${content}')">` : parseTextBeautify(content);
     // AI表情包替换：蓝色卡片模式也需要处理
     if (type !== 'image' && typeof processAiEmojiInMessage === 'function') {
       parsedContent = processAiEmojiInMessage(parsedContent);
@@ -1721,7 +1721,7 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
         const imgEl = document.createElement('img');
         imgEl.src = content;
         imgEl.style.cssText = 'max-width:180px; max-height:180px; border-radius:10px; display:block; cursor:zoom-in; object-fit:cover;';
-        imgEl.onclick = (e) => { e.stopPropagation(); viewFullImage(content); };
+        imgEl.onclick = (e) => { if(window.isBatchDeleteMode) return; e.stopPropagation(); viewFullImage(content); };
         bubble.appendChild(imgEl);
       } else if (type === 'red_packet' || type === 'transfer') {
         bubble.style.cssText = 'padding: 0; background: transparent !important; border: none !important; box-shadow: none !important; margin-bottom: 5px; cursor: pointer;';
@@ -1847,17 +1847,42 @@ function switchMsgAlternative(idx, direction) {
   if (!currentContactId) return;
   const rec = chatRecords[currentContactId];
   if (!rec || !rec[idx]) return;
-  const msg = rec[idx];
-  if (!msg.alternatives || msg.alternatives.length <= 1) return;
-  const maxIndex = msg.alternatives.length - 1;
+  const firstMsg = rec[idx];
+  if (!firstMsg.alternatives || firstMsg.alternatives.length <= 1) return;
+  const maxIndex = firstMsg.alternatives.length - 1;
+  let newIdx = firstMsg.currentIndex;
   if (direction === 'prev') {
-    msg.currentIndex = (msg.currentIndex > 0) ? msg.currentIndex - 1 : maxIndex;
+    newIdx = (newIdx > 0) ? newIdx - 1 : maxIndex;
   } else {
-    msg.currentIndex = (msg.currentIndex < maxIndex) ? msg.currentIndex + 1 : 0;
+    newIdx = (newIdx < maxIndex) ? newIdx + 1 : 0;
   }
-  const chosen = msg.alternatives[msg.currentIndex];
-  msg.content = chosen.content;
-  if (chosen.statusData) msg.statusData = chosen.statusData;
+  const chosen = firstMsg.alternatives[newIdx];
+  
+  let senderId = firstMsg.senderId;
+  let seqCount = 0;
+  for (let i = idx; i < rec.length; i++) {
+    if (rec[i].side === 'left' && rec[i].senderId === senderId && (i === idx || !rec[i].alternatives)) seqCount++;
+    else break;
+  }
+  
+  let newMsgs = [];
+  let lines = chosen.contents || [chosen.content];
+  
+  lines.forEach((l, i) => {
+    newMsgs.push({
+      side: 'left',
+      content: l,
+      time: firstMsg.time || Date.now(),
+      senderId: senderId,
+      statusData: (i === lines.length - 1) ? chosen.statusData : null
+    });
+  });
+  
+  newMsgs[0].alternatives = firstMsg.alternatives;
+  newMsgs[0].currentIndex = newIdx;
+  
+  rec.splice(idx, seqCount, ...newMsgs);
+  
   saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords)).then(() => {
     renderChat();
   });
@@ -2420,7 +2445,10 @@ ${c.members.map(id => {
   } catch(e) { console.error('读取STM失败', e); }
 
   // ================= 智能跨频道回溯检索逻辑 =================
-  const rawRecs = chatRecords[currentContactId] || [];
+  let rawRecs = chatRecords[currentContactId] || [];
+  if (isReRoll && window._pendingReRoll && window._pendingReRoll.contactId === currentContactId) {
+    rawRecs = rawRecs.slice(0, window._pendingReRoll.msgIdx);
+  }
   let crossChatMemoryPrompt = '';
   // 提取用户最新发的一条文本消息作为检索源
   const latestRecallMsg = rawRecs.length > 0 ? [...rawRecs].reverse().find(r => r.side === 'right') : null;
@@ -2960,15 +2988,34 @@ ${statusRules}
       const rec = chatRecords[requestContactId] || [];
       const firstAiMsg = rec[pendingReRoll.msgIdx];
       if (firstAiMsg && firstAiMsg.alternatives) {
+        const lines = (!isOfflineMode) ? displayText.split('\n').filter(l => l.trim() !== '').slice(0,5) : [displayText];
         const newVersion = {
-          content: displayText,
+          contents: lines,
           statusData: parsedStatusData
         };
         firstAiMsg.alternatives.push(newVersion);
         firstAiMsg.currentIndex = firstAiMsg.alternatives.length - 1;
-        firstAiMsg.content = displayText;
-        firstAiMsg.statusData = parsedStatusData;
-        delete firstAiMsg.isHidden;
+        
+        let seqCount = 0;
+        let senderId = firstAiMsg.senderId;
+        for (let i = pendingReRoll.msgIdx; i < rec.length; i++) {
+          if (rec[i].side === 'left' && rec[i].senderId === senderId && (i === pendingReRoll.msgIdx || !rec[i].alternatives)) seqCount++;
+          else break;
+        }
+        
+        let newMsgs = lines.map((l, index) => ({
+           side: 'left', 
+           content: l, 
+           time: firstAiMsg.time || Date.now(),
+           senderId: senderId,
+           statusData: (index === lines.length - 1) ? parsedStatusData : null
+        }));
+        
+        newMsgs[0].alternatives = firstAiMsg.alternatives;
+        newMsgs[0].currentIndex = firstAiMsg.currentIndex;
+        
+        rec.splice(pendingReRoll.msgIdx, seqCount, ...newMsgs);
+
         window._pendingReRoll = null;
 
         await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
@@ -4563,7 +4610,7 @@ async function quickReRoll() {
   // 初始化 alternatives 数组（存放多个roll版本）
   if (!firstAiMsg.alternatives) {
     firstAiMsg.alternatives = [{
-      content: lastAiMsgs.map(m => m.content).join('\n'),
+      contents: lastAiMsgs.map(m => m.content),
       statusData: lastAiMsgs[lastAiMsgs.length - 1].statusData || null
     }];
     firstAiMsg.currentIndex = 0;
@@ -4596,6 +4643,7 @@ async function quickReRoll() {
 function batchDeleteMsg() {
   toggleChatMenu();
   isBatchDeleteMode = true;
+  window.isBatchDeleteMode = true;
   selectedMsgIndices = [];
   document.getElementById('batchDeleteBar').classList.add('show');
   updateSelectedCount();
@@ -4603,6 +4651,7 @@ function batchDeleteMsg() {
 }
 function exitBatchDelete() {
   isBatchDeleteMode = false;
+  window.isBatchDeleteMode = false;
   selectedMsgIndices = [];
   document.getElementById('batchDeleteBar').classList.remove('show');
   renderChat();
@@ -7498,13 +7547,28 @@ window.onload = async () => {
     
     // 核心修复：click 事件是 iOS Safari 上最可靠的 tap 检测方??
     // iOS Safari 即使在 touch-action: manipulation 下，click 事件也始终会触发
+    let clickTimeout = null;
     chatContent.addEventListener('click', function(e) {
       if (isBatchDeleteMode) return;
       
       const bubble = findBubble(e.target);
-      if (handleTap(bubble, 'click')) {
+      const isDoubleTap = handleTap(bubble, 'click');
+      
+      if (isDoubleTap) {
         e.preventDefault();
         e.stopPropagation();
+        if (clickTimeout) {
+          clearTimeout(clickTimeout);
+          clickTimeout = null;
+        }
+      } else {
+        if (e.target.tagName === 'IMG' && (e.target.classList.contains('zoomable-image') || e.target.classList.contains('ai-emoji') || e.target.style.cursor === 'zoom-in')) {
+          const src = e.target.dataset.src || e.target.src;
+          if (clickTimeout) clearTimeout(clickTimeout);
+          clickTimeout = setTimeout(() => {
+            viewFullImage(src);
+          }, 350);
+        }
       }
     });
     
