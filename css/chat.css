@@ -440,3 +440,12 @@
     -webkit-touch-callout: none;
   }
 }
+
+/* 背景亮度自适应 */
+.bg-dark {
+    color: #d1d5db !important;
+}
+.bg-light {
+    color: #374151 !important;
+}
+

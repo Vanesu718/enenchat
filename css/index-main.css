@@ -1394,3 +1394,8 @@ body.theme-blue .me-bg-container {
   border-radius:10px;cursor:pointer;
 }
 .rp-send-btn:hover{opacity:0.88;}
+
+body.bg-dark .blue-card-status { color: #d1d5db; }
+body.bg-light .blue-card-status { color: #374151; }
+#chat-win.bg-dark .blue-card-status .bc-val { color: #d1d5db !important; }
+#chat-win.bg-light .blue-card-status .bc-val { color: #374151 !important; }

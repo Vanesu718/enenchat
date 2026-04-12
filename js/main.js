@@ -1,4 +1,15 @@
-﻿function setVh() {
+﻿// 文本清洗函数，转义危险字符防止Prompt队列变形
+function sanitizeInput(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/```/g, '\\`\\`\\`') // 防止 Markdown 代码块被破坏
+            .replace(/###/g, '＃＃＃') // 防止与我们的界限符冲突
+            .replace(/\r\n/g, '\n') // 统一换行符
+            .replace(/\r/g, '\n')
+            .replace(/"/g, '\\"') // 转义双引号
+            .replace(/'/g, "\\'"); // 转义单引号
+}
+
+function setVh() {
   let vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
@@ -288,14 +299,14 @@ async function getContactWorldBookPrompt(contactId) {
 
   let activeWorldBooks = [];
   if (contactSettings.useWorldBook) {
-    if (worldBook) activeWorldBooks.push(`全局世界观：\n${worldBook}`);
+    if (worldBook) activeWorldBooks.push(`### 世界书设定开始 ###\n全局世界观：\n${sanitizeInput(worldBook)}\n### 世界书设定结束 ###`);
     if (contactSettings.selectedWorldBooks && contactSettings.selectedWorldBooks.length > 0) {
       const selectedEntries = worldBookEntries.filter(e => contactSettings.selectedWorldBooks.includes(e.id));
       selectedEntries.forEach(entry => {
         if (entry.category === '记忆总结') {
           activeWorldBooks.push(`[${entry.name}]\n${entry.content}`);
         } else if (entry.triggerType !== 'keyword') {
-          activeWorldBooks.push(`[${entry.name} - 设定]\n${entry.content}`);
+          activeWorldBooks.push(`### 世界书设定开始 ###\n[${entry.name} - 设定]\n${sanitizeInput(entry.content)}\n### 世界书设定结束 ###`);
         }
       });
     }
@@ -2388,7 +2399,7 @@ ${c.members.map(id => {
   // 1. 提取被选中的世界书（常驻 + 关键词触发）
   if (chatSettings.useWorldBook) {
     // 全局世界书（旧版兼容）
-    if (worldBook) activeWorldBooks.push(`全局世界观：\n${worldBook}`);
+    if (worldBook) activeWorldBooks.push(`### 世界书设定开始 ###\n全局世界观：\n${sanitizeInput(worldBook)}\n### 世界书设定结束 ###`);
 
     // 处理条目式世界书
     if (chatSettings.selectedWorldBooks && chatSettings.selectedWorldBooks.length > 0) {
@@ -2409,12 +2420,12 @@ ${c.members.map(id => {
             const keywords = entry.keywords.split(/[,，]/).map(k => k.trim()).filter(k => k);
             const isTriggered = keywords.some(kw => recentChatText.includes(kw));
             if (isTriggered) {
-              activeWorldBooks.push(`[${entry.name} - 设定]\n${entry.content}`);
+              activeWorldBooks.push(`### 世界书设定开始 ###\n[${entry.name} - 设定]\n${sanitizeInput(entry.content)}\n### 世界书设定结束 ###`);
               console.log(`[世界书触发] 关键词命中: ${entry.name}`);
             }
           } else {
             // 常驻触发
-            activeWorldBooks.push(`[${entry.name} - 设定]\n${entry.content}`);
+            activeWorldBooks.push(`### 世界书设定开始 ###\n[${entry.name} - 设定]\n${sanitizeInput(entry.content)}\n### 世界书设定结束 ###`);
           }
         }
       });
@@ -2527,9 +2538,11 @@ ${c.members.map(id => {
       // 强制使用精简版文风，如果异常没有精简版则截取原文前200字，避免占用大量Token分散注意力
       const activeWsContent = ws.compressedContent ? ws.compressedContent : (ws.content.length > 200 ? ws.content.substring(0, 200) + '...' : ws.content);
       systemPrompt += `
+### 文风设定开始 ###
 【全局文风规范】
-${activeWsContent}
+${sanitizeInput(activeWsContent)}
 请严格遵守以上文风特点进行回复。
+### 文风设定结束 ###
 `;
     }
   }
@@ -4369,9 +4382,11 @@ function applyChatBackground() {
       chatWin.style.backgroundSize = 'cover';
       chatWin.style.backgroundPosition = 'center';
       chatWin.style.backgroundRepeat = 'no-repeat';
+      if (typeof checkBgBrightness === 'function') checkBgBrightness(chatSettings.chatBg, chatWin);
     } else {
       chatWin.style.backgroundImage = 'none';
       chatWin.style.background = 'var(--bg-cream)';
+      if (typeof checkBgBrightness === 'function') checkBgBrightness(null, chatWin);
     }
   }
 }
@@ -5124,7 +5139,12 @@ async function saveWritingStyleEntry() {
     writingStyles.push({ id: Date.now().toString(), name, category, content, compressedContent });
   }
   
-  const saveSuccess = await saveToStorage('WRITING_STYLES', JSON.stringify(writingStyles));
+  let saveSuccess = false;
+  try {
+    saveSuccess = await saveToStorage('WRITING_STYLES', JSON.stringify(writingStyles));
+  } catch(e) {
+    console.error('强制固化文风失败:', e);
+  }
   
   if (saveSuccess) {
     document.getElementById('writing-style-name').value = '';
@@ -5415,7 +5435,11 @@ function toggleWbKeywordInput() {
         keywords
       });
     }
-    await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    try {
+      await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    } catch(e) {
+      console.error('强制固化世界书失败:', e);
+    }
 
   // 清除草稿（保存成功后清除，避免下次开启时误恢复旧内容）
   await saveToStorage('WORLDBOOK_DRAFT', '');
@@ -5458,20 +5482,32 @@ async function editWorldBookEntry(idx) {
   
   // 删除旧条目
   worldBookEntries.splice(idx, 1);
-  await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+  try {
+      await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    } catch(e) {
+      console.error('寮哄埗鍥哄寲涓栫晫涔﹀け璐?', e);
+    }
 }
 
 async function deleteWorldBookEntry(idx) {
   if (!confirm('确定删除这个世界书条目吗？')) return;
   worldBookEntries.splice(idx, 1);
-  await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+  try {
+      await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    } catch(e) {
+      console.error('寮哄埗鍥哄寲涓栫晫涔﹀け璐?', e);
+    }
   renderWorldBookList();
   alert('🗑️ 已删除！');
 }
 
 async function saveWorldBook() {
   worldBook = document.getElementById('worldBookContent').value.trim();
-  await saveToStorage('WORLD_BOOK', worldBook);
+  try {
+    await saveToStorage('WORLD_BOOK', worldBook);
+  } catch(e) {
+    console.error('强制固化全局世界书失败:', e);
+  }
   alert('保存成功');
 }
 
@@ -6211,11 +6247,19 @@ function importBackup(input) {
         // 恢复世界书
         if (backupData.worldBookEntries !== undefined) {
           worldBookEntries = backupData.worldBookEntries || [];
-          await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+          try {
+      await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    } catch(e) {
+      console.error('寮哄埗鍥哄寲涓栫晫涔﹀け璐?', e);
+    }
         }
         if (backupData.worldBook !== undefined) {
           worldBook = backupData.worldBook || '';
-          await saveToStorage('WORLD_BOOK', worldBook);
+          try {
+    await saveToStorage('WORLD_BOOK', worldBook);
+  } catch(e) {
+    console.error('Storage error', e);
+  }
         }
         
         // 恢复API配置
@@ -9561,14 +9605,14 @@ async function refreshMoments() {
       // 提取被选中的世界书（常驻 + 关键词触发）
       let activeWorldBooks = [];
       if (contactSettings.useWorldBook) {
-        if (worldBook) activeWorldBooks.push(`全局世界观：\n${worldBook}`);
+        if (worldBook) activeWorldBooks.push(`### 世界书设定开始 ###\n全局世界观：\n${sanitizeInput(worldBook)}\n### 世界书设定结束 ###`);
         if (contactSettings.selectedWorldBooks && contactSettings.selectedWorldBooks.length > 0) {
           const selectedEntries = worldBookEntries.filter(e => contactSettings.selectedWorldBooks.includes(e.id));
           selectedEntries.forEach(entry => {
             if (entry.category === '记忆总结') {
               activeWorldBooks.push(`[${entry.name}]\n${entry.content}`);
             } else if (entry.triggerType !== 'keyword') {
-              activeWorldBooks.push(`[${entry.name} - 设定]\n${entry.content}`);
+              activeWorldBooks.push(`### 世界书设定开始 ###\n[${entry.name} - 设定]\n${sanitizeInput(entry.content)}\n### 世界书设定结束 ###`);
             }
           });
         }
@@ -10436,7 +10480,11 @@ async function memorySummary() {
         const oldIdx = worldBookEntries.findIndex(e => e.id === oldest.id);
         if (oldIdx > -1) {
             worldBookEntries.splice(oldIdx, 1);
-            await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+            try {
+      await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    } catch(e) {
+      console.error('寮哄埗鍥哄寲涓栫晫涔﹀け璐?', e);
+    }
         }
       }
     
@@ -10448,7 +10496,11 @@ async function memorySummary() {
       content: summaryText
     });
     
-    await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    try {
+      await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    } catch(e) {
+      console.error('寮哄埗鍥哄寲涓栫晫涔﹀け璐?', e);
+    }
     renderWorldBookList();
     
     // 自动关联到当前聊天
@@ -10759,7 +10811,11 @@ async function archiveStmToWorldBook(contactId, stm) {
       });
     }
     
-    await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    try {
+      await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+    } catch(e) {
+      console.error('寮哄埗鍥哄寲涓栫晫涔﹀け璐?', e);
+    }
     renderWorldBookList();
     
     // 自动关联到聊天
@@ -10954,3 +11010,39 @@ function importThemeSettings(input) {
         }
     });
 })();
+
+function checkBgBrightness(bgImage, targetEl) {
+  targetEl.classList.remove('bg-dark', 'bg-light');
+  if (!bgImage || bgImage === 'none') {
+    targetEl.classList.add('bg-light');
+    return;
+  }
+  const urlMatch = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+  if (urlMatch && urlMatch[1]) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const size = 50;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, size, size);
+      try {
+        const imageData = ctx.getImageData(0, 0, size, size).data;
+        let totalBrightness = 0;
+        const pixelCount = size * size;
+        for (let i = 0; i < imageData.length; i += 4) {
+          totalBrightness += (imageData[i] * 299 + imageData[i+1] * 587 + imageData[i+2] * 114) / 1000;
+        }
+        const avgBrightness = totalBrightness / pixelCount;
+        targetEl.classList.add(avgBrightness < 128 ? 'bg-dark' : 'bg-light');
+      } catch(e) {
+        targetEl.classList.add('bg-light');
+      }
+    };
+    img.onerror = function() { targetEl.classList.add('bg-light'); };
+    img.src = urlMatch[1];
+  }
+}
+
