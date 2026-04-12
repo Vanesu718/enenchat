@@ -25,17 +25,12 @@ document.addEventListener('touchstart', function(event) {
   }
 }, { passive: false });
 
-// 禁用输入框聚焦时的自动放大 (某些安卓机型)，并处理键盘遮挡问题
+// 统一处理所有输入框的键盘遮挡问题 (iOS/Android/鸿蒙)
 document.addEventListener('focusin', function(e) {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
     setTimeout(() => {
-      document.body.scrollTop = document.body.scrollTop;
-      // 优化：仅在元素确实被遮挡时才滚动，且取消平滑滚动避免与系统键盘弹出动画冲突
-      const rect = e.target.getBoundingClientRect();
-      if (rect.bottom > window.innerHeight || rect.top < 0) {
-        e.target.scrollIntoView({ behavior: 'auto', block: 'nearest' });
-      }
-    }, 300); // 稍微增加延迟，等待键盘完全弹出
+      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150); // 短暂延迟等待软键盘动画展开
   }
 });
 
@@ -11001,14 +10996,6 @@ function importThemeSettings(input) {
         });
     }
     
-    // Focus scrollIntoView for inputs
-    document.addEventListener('focusin', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            setTimeout(function() {
-                e.target.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }, 300);
-        }
-    });
 })();
 
 function checkBgBrightness(bgImage, targetEl) {
