@@ -1,4 +1,4 @@
-/* 聊天页面样式 */
+﻿/* 聊天页面样式 */
 .chat-page { background: var(--bg-cream); }
 
 .chat-header { 
@@ -417,4 +417,26 @@
   z-index: 99999;
   align-items: center;
   justify-content: center;
+}
+
+
+
+/* ===== rp-notif notification card ===== */
+.rp-notif-card { display:flex; align-items:center; justify-content:center; gap:4px; margin:10px auto; padding:4px 12px; background:rgba(0,0,0,0.1); border:none; border-radius:4px; font-size:11px; color:rgba(255,255,255,0.9); max-width:80%; width:fit-content; text-align:center; align-self:center; }
+.rp-notif-card img { width:12px; height:14px; object-fit:contain; filter:drop-shadow(0 0 1px rgba(0,0,0,0.2)); opacity:0.8; }
+/* ===== end rp-notif ===== */
+
+/* 绉诲姩绔槻璇Е */
+@media (hover: none) and (pointer: coarse) {
+  .msg-menu {
+    display: none !important;
+  }
+  .msg-row {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  .msg-content {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
 }

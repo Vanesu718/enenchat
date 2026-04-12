@@ -330,7 +330,8 @@ window.sendEmoji = function(url) {
 
     // 1. UI display
     if (typeof addMsgToUI === 'function') {
-        const uAvatar = (typeof chatSettings !== 'undefined' && chatSettings.chatUserAvatar) ? chatSettings.chatUserAvatar : (typeof window.userAvatar !== 'undefined' ? window.userAvatar : '');
+        const uAvatar = (typeof chatSettings !== 'undefined' && chatSettings.chatUserAvatar) ? chatSettings.chatUserAvatar : (typeof userAvatar !== 'undefined' ? userAvatar : '');
+        console.log('当前表情包使用的头像:', uAvatar);
         addMsgToUI(msg.content, 'right', uAvatar, null, undefined, 'image');
     }
 
@@ -363,13 +364,15 @@ window.sendEmoji = function(url) {
 
     // Trigger AI Reply if in online mode
     if (typeof isOfflineMode !== 'undefined' && !isOfflineMode) {
-        setTimeout(function() {
-            if (typeof triggerAIReply === 'function') {
-                triggerAIReply();
-            } else if (typeof window.triggerAIReply === 'function') {
-                window.triggerAIReply();
-            }
-        }, 500);
+        if (typeof chatSettings !== 'undefined' && chatSettings.autoReply) {
+            setTimeout(function() {
+                if (typeof triggerAIReply === 'function') {
+                    triggerAIReply();
+                } else if (typeof window.triggerAIReply === 'function') {
+                    window.triggerAIReply();
+                }
+            }, 500);
+        }
     }
 }
 
@@ -517,4 +520,64 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (originalOpenSub) originalOpenSub(id);
     };
+});
+
+// ===== Red Packet Send Modal helpers =====
+function handleRpCover(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  if (!file.type.startsWith('image/')) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var wrap = document.getElementById('rpCoverPreview');
+    if (wrap) {
+      wrap.style.backgroundImage = 'url(' + e.target.result + ')';
+      var ph = wrap.querySelector('.rp-cover-placeholder');
+      if (ph) ph.style.display = 'none';
+      window._rpCoverDataUrl = e.target.result;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// patch sendRedPacket to read new field ids
+document.addEventListener('DOMContentLoaded', function() {
+  var origOpen = window.openRedPacketSendModal;
+  window._rpCoverDataUrl = null;
+  // Fix: openRedPacketModal should show newModal
+  var origOpenRP = window.openRedPacketModal;
+  if (typeof openRedPacketModal === 'function') {
+    // already defined, leave it
+  }
+  // Override sendRedPacket to use new field ids
+  if (typeof window.sendRedPacketOrig === 'undefined') {
+    window.sendRedPacketOrig = window.sendRedPacket;
+  }
+  window.sendRedPacket = function() {
+    var amtEl = document.getElementById('rpAmount');
+    var msgEl = document.getElementById('rpGreeting');
+    var amount = amtEl ? amtEl.value : null;
+    var msg = msgEl ? msgEl.value : '恭喜发财，大吉大利';
+    if (!amount || parseFloat(amount) <= 0) {
+      alert('请输入有效金额');
+      return;
+    }
+    var content = JSON.stringify({ amount: parseFloat(amount).toFixed(2), msg: msg, cover: window._rpCoverDataUrl || null });
+    if (typeof addMsgToUI === 'function') {
+      var ua = (typeof chatSettings !== 'undefined' && chatSettings.chatUserAvatar) || (typeof userAvatar !== 'undefined' ? userAvatar : '');
+      addMsgToUI(content, 'right', ua, null, undefined, 'red_packet');
+    }
+    if (typeof chatRecords !== 'undefined' && typeof currentContactId !== 'undefined') {
+      if (!chatRecords[currentContactId]) chatRecords[currentContactId] = [];
+      chatRecords[currentContactId].push({ side:'right', content:content, type:'red_packet', quote:null, time:Date.now() });
+      if (typeof saveToStorage === 'function') saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+    }
+    document.getElementById('redPacketSendModal').style.display = 'none';
+    if (amtEl) amtEl.value = '';
+    if (msgEl) msgEl.value = '恭喜发财，大吉大利';
+    window._rpCoverDataUrl = null;
+    var wrap = document.getElementById('rpCoverPreview');
+    if (wrap) { wrap.style.backgroundImage = ''; var ph=wrap.querySelector('.rp-cover-placeholder'); if(ph) ph.style.display='flex'; }
+    if (typeof renderContactList === 'function') renderContactList();
+  };
 });

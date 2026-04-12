@@ -1,3 +1,6 @@
+// 兜底：无论Bmob是否加载成功，4秒后强制移除遮罩
+setTimeout(function(){var m=document.getElementById('app-loading-mask');if(m&&m.style.display!='none'){m.style.display='none';var a=document.getElementById('activation-page');var sp=document.getElementById('splash-page');if(a&&(!a.style.display||a.style.display=='none')&&(!sp||!sp.style.display||sp.style.display=='none')){if(localStorage.getItem('OHO_ACTIVATED')==='true'){if(sp)sp.style.display='flex';}else{a.style.display='flex';}}}},4000);
+
 // Bmob 初始化
 Bmob.initialize("373cc21c1e33386c", "vanes13674535005");
 

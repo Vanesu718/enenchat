@@ -206,7 +206,7 @@ body {
   overflow-y: auto;
 }
 
-/* 联系人列表样式 */
+/* 联系人列表样�?*/
 .contact-list-header {
   height: 50px;
   display: flex;
@@ -291,7 +291,7 @@ body {
 /* 表单样式 */
 .form-section { margin-bottom: 20px; }
 .form-item { margin-bottom: 16px; }
-.form-label { font-size: 14px; color: var(--main-pink); margin-bottom: 8px; display: block; }
+.form-label { font-size: 14px; color: var(--theme-title-color, var(--main-pink)); margin-bottom: 8px; display: block; }
 .form-input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--light-pink); outline: none; font-size: 15px; background: #fff; }
 .form-textarea { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--light-pink); outline: none; font-size: 15px; background: #fff; min-height: 150px; resize: none; font-family: inherit; }
 .form-select { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--light-pink); background: #fff; outline: none; font-size: 15px; color: var(--text-dark); }
@@ -303,7 +303,7 @@ body {
 .preset-row { display: flex; align-items: center; justify-content: space-between; }
 .preset-select { flex: 1; }
 
-/* 设置项样式 */
+/* 设置项样�?*/
 .setting-section {
   background: #fff;
   border-radius: 16px;
@@ -314,7 +314,7 @@ body {
 
 .setting-section-title {
   font-size: 16px;
-  color: var(--main-pink);
+  color: var(--theme-title-color, var(--main-pink));
   font-weight: 600;
   margin-bottom: 12px;
 }
@@ -326,7 +326,7 @@ body {
   line-height: 1.4;
 }
 
-/* 开关样式 */
+/* 开关样�?*/
 .switch-toggle {
   width: 50px;
   height: 26px;
@@ -370,7 +370,7 @@ body {
   color: var(--text-dark);
 }
 
-/* 背景设置按钮组 */
+/* 背景设置按钮�?*/
 .bg-btn-group {
   display: flex;
   gap: 10px;
@@ -394,7 +394,7 @@ body {
 
 .setting-btn.secondary {
   background: var(--light-pink);
-  color: var(--main-pink);
+  color: var(--theme-title-color, var(--main-pink));
 }
 
 /* 头像预览样式 */
@@ -413,7 +413,7 @@ body {
   object-fit: cover;
 }
 
-/* 面具设置文本域样式 */
+/* 面具设置文本域样�?*/
 .mask-textarea {
   width: 100%;
   padding: 12px;
@@ -428,7 +428,7 @@ body {
   line-height: 1.5;
 }
 
-/* 昵称输入框样式 */
+/* 昵称输入框样�?*/
 .nickname-input {
   width: 100%;
   padding: 12px 14px;

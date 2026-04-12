@@ -116,46 +116,62 @@ class JsonStreamWriter {
 
 // ================== 浠呰亰澶╁浠?==================
 async function exportChatBackup(filename) {
-    updateBackupProgress('姝ｅ湪璇诲彇鑱旂郴浜轰笌鍩虹鏁版嵁...', 10);
+    updateBackupProgress('正在准备仅聊天备份...', 5);
     
-    const exportData = {
-        meta: {
-            version: '2.0',
-            type: 'chat_only',
-            exportTime: new Date().toISOString()
-        },
-        localStorage: {},
-        indexedDB: {}
-    };
+    const db = window.db;
+    if (!db) throw new Error('数据库尚未初始化');
 
-    // 1. 璇诲彇蹇呴』鐨?localStorage
-    const keysToExport = [
+    const writer = new JsonStreamWriter();
+    writer.startObject();
+    
+    // Meta
+    writer.addKeyValue('meta', {
+        version: '2.0',
+        type: 'chat_only',
+        exportTime: new Date().toISOString()
+    });
+
+    // LocalStorage
+    updateBackupProgress('正在读取基础数据与设置...', 10);
+    writer.startObject('localStorage');
+    
+    const baseKeys = [
         'userProfile', 'contacts', 'groups', 
         'chatRecords', 'chatSettings', 
         'worldBook', 'worldBookEntries',
-        'ltmAutoEnabled', 'stmAutoEnabled', 'stmWindowSize', 'ltmPrompt', 'stmPrompt'
+        'ltmAutoEnabled', 'stmAutoEnabled', 'stmWindowSize', 'ltmPrompt', 'stmPrompt',
+        'customEmojis', 'customWritingStyles', 'THEME_CLASS'
     ];
     
-    keysToExport.forEach(key => {
-        const val = localStorage.getItem(key);
-        if (val) {
-            exportData.localStorage[key] = val;
+    const keysToExport = new Set(baseKeys);
+    
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('CHAT_SETTINGS_') || key.startsWith('STATUS_') || key.startsWith('bg_') || key.startsWith('group_bg_'))) {
+            keysToExport.add(key);
         }
-    });
-
-    updateBackupProgress('姝ｅ湪澶勭悊 IndexedDB 璁板繂鏁版嵁...', 30);
-    // 2. 璇诲彇鍏宠仈鐨?IndexedDB
-    const db = window.db;
-    if (!db) {
-        throw new Error('鏁版嵁搴撳皻鏈垵濮嬪寲');
     }
 
-    const storesToExport = ['chatRecords', 'memory'];
+    for (const key of keysToExport) {
+        const val = localStorage.getItem(key);
+        if (val !== null) {
+            writer.addKeyValue(key, val);
+        }
+    }
+    writer.endObject();
+
+    // IndexedDB
+    updateBackupProgress('正在处理 IndexedDB 核心数据...', 30);
+    writer.startObject('indexedDB');
     
-    for (const storeName of storesToExport) {
+    const storesToExport = ['chatRecords', 'memory', 'settings', 'images', 'contacts', 'chats'];
+    
+    for (let i = 0; i < storesToExport.length; i++) {
+        const storeName = storesToExport[i];
         if (!db.objectStoreNames.contains(storeName)) continue;
         
-        exportData.indexedDB[storeName] = [];
+        writer.startArray(storeName);
+        
         await streamObjectStore(db, storeName, async (item, count, total) => {
             // 过滤图片，替换为提示文字
             if (storeName === 'chatRecords') {
@@ -164,18 +180,27 @@ async function exportChatBackup(filename) {
                     item.content = '[图片已在仅聊天备份中省略]';
                 }
             }
-            exportData.indexedDB[storeName].push(item);
+            writer.addValue(item);
             
             if (count % 50 === 0) {
-                const percent = 30 + (count / Math.max(total, 1)) * 40;
-                updateBackupProgress('正在处理 ' + count + '/' + total + '...', percent);
+                const basePercent = 30 + (i / storesToExport.length) * 50;
+                const subPercent = (count / Math.max(total, 1)) * (50 / storesToExport.length);
+                const percent = basePercent + subPercent;
+                updateBackupProgress('正在处理 ' + storeName + ' ' + count + '/' + total + '...', percent);
             }
         });
+        
+        writer.endArray();
     }
 
-    // 3. 压缩并下载
-    updateBackupProgress('正在压缩数据，请稍候...', 80);
-    const jsonStr = JSON.stringify(exportData);
+    writer.endObject(); // end indexedDB
+    writer.endObject(); // end root
+
+    // 压缩并下载
+    updateBackupProgress('正在组合并压缩数据，请稍候...', 80);
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    const jsonStr = writer.getChunks().join('');
     
     // 使用 pako 压缩
     let finalBlob;
@@ -320,7 +345,9 @@ async function performRestore(data, isFull) {
     // 鎭㈠ localStorage
     if (data.localStorage) {
         if (isFull) {
+            const ohoActivated = localStorage.getItem('OHO_ACTIVATED');
             localStorage.clear();
+            if (ohoActivated) localStorage.setItem('OHO_ACTIVATED', ohoActivated);
         }
         for (const [key, value] of Object.entries(data.localStorage)) {
             localStorage.setItem(key, value);
@@ -337,16 +364,20 @@ async function performRestore(data, isFull) {
             
             if (!window.db.objectStoreNames.contains(storeName)) continue;
             
-            updateBackupProgress(`正在清理 ${storeName} 表...`, 60 + (i / storeNames.length) * 10);
-            await clearObjectStore(window.db, storeName);
+            if (isFull || !['settings', 'images'].includes(storeName)) {
+                updateBackupProgress(`正在清理 ${storeName} 表...`, 60 + (i / storeNames.length) * 10);
+                await clearObjectStore(window.db, storeName);
+            } else {
+                updateBackupProgress(`正在更新 ${storeName} 表...`, 60 + (i / storeNames.length) * 10);
+            }
             
             const total = records.length;
             // 鍒嗘壒鍐欏叆锛岄伩鍏嶄竴娆℃€ц繃澶т簨鍔?
             const BATCH_SIZE = 500;
             for (let j = 0; j < total; j += BATCH_SIZE) {
-            const batch = records.slice(j, j + BATCH_SIZE);
-            updateBackupProgress(`正在恢复 ${storeName} (${Math.min(j + BATCH_SIZE, total)}/${total})...`, 70 + (i / storeNames.length) * 20 + (j/total)*20);
-            await putBatchToObjectStore(window.db, storeName, batch);
+                const batch = records.slice(j, j + BATCH_SIZE);
+                updateBackupProgress(`正在恢复 ${storeName} (${Math.min(j + BATCH_SIZE, total)}/${total})...`, 70 + (i / storeNames.length) * 20 + (j/total)*20);
+                await putBatchToObjectStore(window.db, storeName, batch);
             }
         }
     }

@@ -1,4 +1,4 @@
-/* 朋友圈样式 */
+/* 朋友圈样�?*/
 .moment-item {
   background: white;
   padding: 15px;
@@ -65,7 +65,7 @@
 
 .moment-action-btn:hover {
   background: var(--light-pink);
-  color: var(--main-pink);
+  color: var(--theme-title-color, var(--main-pink));
 }
 
 .moment-action-btn.delete-moment {
@@ -79,7 +79,7 @@
   background: #f5f5f5;
   border-radius: 8px 8px 0 0;
   font-size: 13px;
-  color: var(--main-pink);
+  color: var(--theme-title-color, var(--main-pink));
   border-bottom: 1px solid #eee;
 }
 
@@ -105,7 +105,7 @@
 }
 
 .comment-author {
-  color: var(--main-pink);
+  color: var(--theme-title-color, var(--main-pink));
   font-weight: 500;
 }
 

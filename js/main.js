@@ -1448,6 +1448,7 @@ function renderChat(forceStartIdx) {
   }
 
   displayRecords.forEach((m, idx) => {
+    if (m.side==='notif' && m.type==='rp_notif') { const nd=document.createElement('div'); nd.innerHTML=m.content; fragment.appendChild(nd.firstElementChild || nd); return; }
     if (m.isHidden) return;
     let ava = chatSettings.chatUserAvatar || userAvatar;
     let sName = null;
@@ -1575,8 +1576,19 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
     idx = rec.length;
   }
 
-    const div = document.createElement('div');
-    const isBlueOfflineCard = isCurrentChatBlueMinimalEnabled(isOfflineMsg, statusData) && side === 'left';
+  const div = document.createElement('div');
+  
+  if (side === 'notif') {
+    div.className = 'msg-item notif';
+    div.style.cssText = 'display: flex; justify-content: center; width: 100%; margin: 10px 0;';
+    const notifP = document.createElement('p');
+    notifP.innerHTML = content;
+    notifP.style.cssText = 'font-size: 12px; color: #999; text-align: center; margin: 0; background-color: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 4px;';
+    div.appendChild(notifP);
+    return div;
+  }
+
+  const isBlueOfflineCard = isCurrentChatBlueMinimalEnabled(isOfflineMsg, statusData) && side === 'left' && type !== 'red_packet' && type !== 'transfer';
   
   if (isBlueOfflineCard) {
     div.className = `msg-item ${side} blue-offline-mode`;
@@ -1697,24 +1709,51 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
     }
 
     div.innerHTML = `
-      <div class="check-icon">?</div>
-      <div class="msg-menu" onclick="event.stopPropagation();"><div class="msg-menu-item" onclick="replyToMsg(decodeURIComponent(this.dataset.replyText), this)" data-reply-text="${replyText}">回复</div></div>
+      <div class="check-icon">✓</div>
     `;
-    const menuEl = div.querySelector('.msg-menu');
-    div.insertBefore(bubbleWrapper, menuEl);
+    div.appendChild(bubbleWrapper);
     
   } else {
-    bubble.className = 'msg-bubble';
-    if (type === 'image') {
-      bubble.style.cssText = 'padding:4px; background:transparent !important; border:none !important; box-shadow:none !important;';
-      if (qhtml) bubble.innerHTML = qhtml;
-      const imgEl = document.createElement('img');
-      imgEl.src = content;
-      imgEl.style.cssText = 'max-width:180px; max-height:180px; border-radius:10px; display:block; cursor:zoom-in; object-fit:cover;';
-      imgEl.onclick = (e) => { e.stopPropagation(); viewFullImage(content); };
-      bubble.appendChild(imgEl);
-    } else {
-      let parsedContent = parseTextBeautify(content);
+      bubble.className = 'msg-bubble';
+      if (type === 'image') {
+        bubble.style.cssText = 'padding:4px; background:transparent !important; border:none !important; box-shadow:none !important;';
+        if (qhtml) bubble.innerHTML = qhtml;
+        const imgEl = document.createElement('img');
+        imgEl.src = content;
+        imgEl.style.cssText = 'max-width:180px; max-height:180px; border-radius:10px; display:block; cursor:zoom-in; object-fit:cover;';
+        imgEl.onclick = (e) => { e.stopPropagation(); viewFullImage(content); };
+        bubble.appendChild(imgEl);
+      } else if (type === 'red_packet' || type === 'transfer') {
+        bubble.style.cssText = 'padding: 0; background: transparent !important; border: none !important; box-shadow: none !important; margin-bottom: 5px; cursor: pointer;';
+        if (qhtml) bubble.innerHTML = qhtml;
+        
+        let data = {};
+        try { data = JSON.parse(content); } catch(e) { data = {msg: content}; }
+        
+        const isRedPacket = type === 'red_packet';
+        const bgColor = isRedPacket ? '#F9A745' : '#F9A745'; // Orange for both
+        const title = isRedPacket ? (data.msg || '恭喜发财，大吉大利') : `¥ ${data.amount || '0.00'}`;
+        const subTitle = isRedPacket ? '查看红包' : (data.msg || '转账给你');
+        const iconSrc = isRedPacket ? 'ICON/红包.png' : 'ICON/转账.png';
+        const label = isRedPacket ? '微信红包' : '微信转账';
+
+        const box = document.createElement('div');
+        if (isRedPacket) {
+          const coverUrl = data.cover || '';
+          const rpMsg = data.msg || '恭喜发财，大吉大利';
+          const rpAmt = data.amount || '';
+          const coverBg = coverUrl ? ('url('+coverUrl+') center/cover no-repeat') : 'linear-gradient(160deg,#e8334a,#c62135)';
+          box.style.cssText = 'width:140px;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 8px rgba(0,0,0,0.18);cursor:pointer;user-select:none;';
+          box.innerHTML = '<div class="rp-bubble-top" style="position:relative;width:100%;height:150px;background:'+coverBg+';display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:12px;"><div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.1);border-radius:12px 12px 0 0;"></div><div style="position:relative;z-index:1;text-align:center;padding:0 10px;width:100%;box-sizing:border-box;"><div style="color:#fff;font-size:13px;font-weight:bold;text-shadow:0 1px 4px rgba(0,0,0,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+rpMsg+'</div></div></div><div style="background:#c62135;padding:12px 0;display:flex;align-items:center;justify-content:center;"><div class="rp-open-coin" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f5deb3,#d4a56a);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;color:#8b4513;box-shadow:0 2px 6px rgba(0,0,0,0.2);">開</div></div>';
+          if (side === 'right') { box.style.cursor = 'default'; } else { box.onclick = (e) => { e.stopPropagation(); openRedPacket(box, rpAmt, rpMsg, coverUrl); }; }
+        } else {
+          box.style.cssText = 'width:220px;background:'+bgColor+';border-radius:8px;overflow:hidden;display:flex;flex-direction:column;';
+          box.innerHTML = '<div style="display:flex;align-items:center;padding:12px 15px;color:white;"><img src="'+iconSrc+'" style="width:36px;height:36px;margin-right:12px;filter:brightness(0) invert(1);"><div style="flex:1;overflow:hidden;"><div style="font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+title+'</div><div style="font-size:12px;margin-top:2px;opacity:0.8;">'+subTitle+'</div></div></div><div style="background:white;padding:4px 15px;font-size:11px;color:#999;border-top:1px solid rgba(0,0,0,0.05);text-align:left;">'+label+'</div>';
+          box.onclick = (e) => { e.stopPropagation(); };
+        }
+        bubble.appendChild(box);
+      } else {
+        let parsedContent = parseTextBeautify(content);
       // AI表情包替换：在parseTextBeautify之后执行，因为[]不会被转义
       if (typeof processAiEmojiInMessage === 'function') {
         parsedContent = processAiEmojiInMessage(parsedContent);
@@ -1783,12 +1822,10 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
     let avatarHtml = `<div class="msg-avatar${ringClass}"><img src="${avatar}"></div>`;
 
     div.innerHTML = `
-      <div class="check-icon">?</div>
+      <div class="check-icon">✓</div>
       ${avatarHtml}
-      <div class="msg-menu" onclick="event.stopPropagation();"><div class="msg-menu-item" onclick="replyToMsg(decodeURIComponent(this.dataset.replyText), this)" data-reply-text="${replyText}">�ظ�</div></div>
     `;
-    const menuEl = div.querySelector('.msg-menu');
-    div.insertBefore(bubbleWrapper, menuEl);
+    div.appendChild(bubbleWrapper);
   }
 
   div.onclick = () => {
@@ -2586,7 +2623,11 @@ ${statusRules}
     if (typeof getAiEmojiPromptAddon === 'function') {
         systemPrompt += await getAiEmojiPromptAddon();
     }
-    const messages = [{ role: 'system', content: systemPrompt }];
+    // ===== RP prompt inject =====
+    systemPrompt += '\n\n【红包功能指令】\n你可以主动给用户发红包。如果想发红包，请务必在你的回复最末尾加上这句严格的指令（必须是英文方括号和冒号）：[SEND_RED_PACKET:金额:祝福语]\n例如：[SEND_RED_PACKET:52.0:拿去花吧！]\n千万注意：指令不能被翻译，格式必须精准，否则红包无法发出。';
+    { var _rpL=(rawRecs||[]).slice().reverse().find(function(m){return m.side==='right' && m.type==='red_packet';});if(_rpL&&!_rpL.rpStatus){var _ra=_rpL.rpAmount||'';var _rm=_rpL.rpMsg||'Best wishes';systemPrompt+='\n\n【收到红包提示】\n用户刚刚给你发了一个红包！金额：'+_ra+'，留言：'+_rm+'。\n你需要根据你们的人设和剧情发展决定如何处理。你必须在回复的最末尾加上以下三个严格指令之一来处理红包：\n接收红包：[ACCEPT_RED_PACKET]\n退回红包：[RETURN_RED_PACKET]\n回赠红包：[SEND_RED_PACKET:金额:祝福语]';}}
+    // ===== end RP inject =====
+       const messages = [{ role: 'system', content: systemPrompt }];
     const recs = rawRecs.slice(-60); // 获取更多气泡用于合并
     const mergedMessages = [];
     let currentMsg = null;
@@ -2614,27 +2655,52 @@ ${statusRules}
         }
       }
 
+      let parsedContent;
+      if (r.type === 'image' || r.type === 'emoji') {
+        if (r.content.startsWith('data:image') || r.content.startsWith('http')) {
+          parsedContent = [ { type: 'text', text: contentPrefix + '[图片]' }, { type: 'image_url', image_url: { url: r.content } } ];
+        } else {
+          let filename = r.content.split('/').pop() || r.content;
+          parsedContent = contentPrefix + `[用户发送了表情包：${filename}]`;
+        }
+      } else if (r.type === 'red_packet') {
+        let data = {};
+        try { data = JSON.parse(r.content); } catch(e) { data = {msg: r.content}; }
+        let textPart = contentPrefix + `[用户给你发了一个红包，金额：${data.amount || '未知'}元，祝福语：${data.msg || '恭喜发财，大吉大利'}]`;
+        if (data.cover && (data.cover.startsWith('data:image') || data.cover.startsWith('http'))) {
+          parsedContent = [
+            { type: 'text', text: textPart },
+            { type: 'image_url', image_url: { url: data.cover } }
+          ];
+        } else {
+          parsedContent = textPart;
+        }
+      } else if (r.type === 'transfer') {
+        let data = {};
+        try { data = JSON.parse(r.content); } catch(e) { data = {msg: r.content}; }
+        parsedContent = contentPrefix + `[转账：金额 ${data.amount || '未知'}元，备注：${data.msg || '转账给你'}]`;
+      } else {
+        parsedContent = contentPrefix + r.content;
+      }
+
       if (!currentMsg) {
-        currentMsg = { role: role, content: r.type === 'image' ? [ { type: 'text', text: contentPrefix + '[图片]' }, { type: 'image_url', image_url: { url: r.content } } ] : 
-          contentPrefix + r.content };
+        currentMsg = { role: role, content: parsedContent };
       } else if (currentMsg.role === role) {
-        if (r.type === 'image') {
+        if (Array.isArray(parsedContent)) {
           if (typeof currentMsg.content === 'string') {
             currentMsg.content = [{ type: 'text', text: currentMsg.content }];
           }
-          currentMsg.content.push({ type: 'text', text: contentPrefix + '[图片]' });
-          currentMsg.content.push({ type: 'image_url', image_url: { url: r.content } });
+          currentMsg.content.push(...parsedContent);
         } else {
           if (typeof currentMsg.content === 'string') {
-            currentMsg.content += '\n' + contentPrefix + r.content;
+            currentMsg.content += '\n' + parsedContent;
           } else {
-            currentMsg.content.push({ type: 'text', text: contentPrefix + r.content });
+            currentMsg.content.push({ type: 'text', text: parsedContent });
           }
         }
       } else {
         mergedMessages.push(currentMsg);
-        currentMsg = { role: role, content: r.type === 'image' ? [ { type: 'text', text: contentPrefix + '[图片]' }, { type: 'image_url', image_url: { url: r.content } } ] : 
-          contentPrefix + r.content };
+        currentMsg = { role: role, content: parsedContent };
       }
     });
 
@@ -2868,6 +2934,22 @@ ${statusRules}
     
     // 从显示文本中移除状态标签
     displayText = txt.replace(/<STATUS>[\s\S]*?<\/STATUS>/, '').trim();
+
+    // ===== AI红包指令解析 =====
+    let aiRedPacketAction = null;
+    if (/\[ACCEPT_RED_PACKET\]/i.test(displayText)) {
+      aiRedPacketAction = 'accept';
+      displayText = displayText.replace(/\[ACCEPT_RED_PACKET\]/gi, '').trim();
+    } else if (/\[RETURN_RED_PACKET\]/i.test(displayText)) {
+      aiRedPacketAction = 'return';
+      displayText = displayText.replace(/\[RETURN_RED_PACKET\]/gi, '').trim();
+    } else {
+      const _srpm = displayText.match(/\[SEND_RED_PACKET:\s*([^:\]]+)\s*:\s*([^\]]+)\s*\]/i);
+      if (_srpm) { aiRedPacketAction = { send: { amount: _srpm[1].trim(), msg: _srpm[2].trim() } };
+        displayText = displayText.replace(/\[SEND_RED_PACKET:[^\]]+\]/gi, '').trim();
+      }
+    }  // ===== 红包指令完毕 =====
+
   
     // 检查是否是重roll模式
     const pendingReRoll = window._pendingReRoll;
@@ -2952,7 +3034,38 @@ ${statusRules}
   renderContactList();
     
     // 检查是否需要触发短期记忆总结 (传入正确的联系人ID)
-    checkAndTriggerStmForContact(requestContactId);
+    checkAndTriggerStmForContact(requestContactId)
+  // ===== AI红包行为处理 =====
+  if (aiRedPacketAction && requestContactId) {
+    const _rpCid = requestContactId;
+    const _rpRecs = chatRecords[_rpCid] || [];
+    // 找到最近一条用户发出的红包
+    const _rpMsg = [..._rpRecs].reverse().find(m => m.side==='right' && m.type==='red_packet');
+      if (aiRedPacketAction==='accept' && _rpMsg) {
+        _rpMsg.rpStatus = 'accepted';
+        const c = contacts.find(x => x.id === _rpCid) || {name:'对方'};
+        const uName = chatSettings.chatNickname || window.storageSync?.getItem('USER_NICKNAME') || '你';
+        const notif = { side:'notif', type:'rp_notif', content: '<div style="text-align:center;font-size:12px;color:#999;margin:10px 0;"><img src="ICON/红包.png" style="width:12px;height:14px;margin-right:2px;vertical-align:-2px;filter:drop-shadow(0 0 1px rgba(0,0,0,0.2));">' + c.name + '领取了' + uName + '的红包</div>', time:Date.now() };
+        chatRecords[_rpCid].push(notif);
+        await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+      if (isCurrentContact) renderChat();
+    } else if (aiRedPacketAction==='return' && _rpMsg) {
+      _rpMsg.rpStatus = 'returned';
+      const notif = { side:'notif', type:'rp_notif', content:'<div style="text-align:center;font-size:12px;color:#999;margin:10px 0;"><img src="ICON/红包.png" style="width:12px;height:14px;margin-right:2px;vertical-align:-2px;filter:drop-shadow(0 0 1px rgba(0,0,0,0.2));">对方已退回红包</div>', time:Date.now() };
+      chatRecords[_rpCid].push(notif);
+      await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+      if (isCurrentContact) renderChat();
+    } else if (aiRedPacketAction && aiRedPacketAction.send) {
+      const _s = aiRedPacketAction.send;
+      const c = contacts.find(x => x.id === _rpCid) || {avatar:''};
+      const _content = JSON.stringify({ amount: _s.amount, msg: _s.msg, cover: c.avatar });
+      const _aiRp = { side:'left', type:'red_packet', content: _content, time:Date.now() };
+      chatRecords[_rpCid].push(_aiRp);
+      await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+      if (isCurrentContact) renderChat();
+    }
+  }
+  // ===== AI红包行为处理完毕 =====;
     
   } catch (e) { 
       activeAIRequests.delete(requestContactId);
@@ -3105,13 +3218,19 @@ function toggleAttachPanel() {
   const a = document.getElementById('attachPanel');
   a.style.display = a.style.display === 'block' ? 'none' : 'block';
 }
-function selectFile(t) { 
-  if (t === 'image') {
-    document.getElementById('chat-img-input').click();
-  } else {
-    alert('已选择：'+t); 
-  }
-  hideAllPanels(); 
+function selectFile(t) {
+    if (t === 'image') {
+        document.getElementById('chat-img-input').click();
+    } else if (t === 'red_packet') {
+        const modal = document.getElementById('redPacketSendModal');
+        if (modal) modal.style.display = 'flex';
+    } else if (t === 'transfer') {
+        const modal = document.getElementById('transferSendModal');
+        if (modal) modal.style.display = 'flex';
+    } else {
+        alert('已选择:' + t);
+    }
+    hideAllPanels();
 }
 
 async function handleChatImage(input) {
@@ -5675,9 +5794,10 @@ function syncBgToAllPages(dataOrUrl) {
 
 // ========== 通讯录/发现页面文字颜色自适应背景深浅 ==========
 function updatePageTextColors(dataOrUrl) {
-  const mainColor = getComputedStyle(document.documentElement).getPropertyValue('--main-pink').trim() || '#f0b8c8';
-  const themeBrightness = getColorBrightness(mainColor);
-  const isThemeDark = themeBrightness < 128;
+    const mainColor = getComputedStyle(document.documentElement).getPropertyValue('--main-pink').trim() || '#f0b8c8';
+    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-cream').trim() || '#ffffff';
+    const themeBrightness = getColorBrightness(bgColor);
+    const isThemeDark = themeBrightness < 128;
 
   if (!dataOrUrl) {
     applyPageTextColors(isThemeDark);
@@ -6246,6 +6366,129 @@ function importBackup(input) {
   reader.readAsText(file);
 }
 
+// --- 红包和转账功能 ---
+
+function closeRedPacketModal() {
+    const modal = document.getElementById('redPacketSendModal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function sendRedPacket() {
+    const amount = document.getElementById('redPacketAmount').value;
+    const msg = document.getElementById('redPacketMsg').value || '恭喜发财，大吉大利';
+    
+    if (!amount || amount <= 0) {
+        showToast('请输入有效金额');
+        return;
+    }
+    
+    const cover = window._rpCoverDataUrl || null;
+    const content = JSON.stringify({ amount: amount, msg: msg, cover: cover });
+    window._rpCoverDataUrl = null;
+    addMsgToUI(content, 'right', chatSettings.chatUserAvatar || userAvatar, null, undefined, 'red_packet');
+    chatRecords[currentContactId].push({ 
+      side: 'right', 
+      content: content, 
+      type: 'red_packet',
+      quote: null, 
+      time: Date.now() 
+    });
+    await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+    
+    closeRedPacketModal();
+    document.getElementById('redPacketAmount').value = '';
+    document.getElementById('redPacketMsg').value = '';
+renderContactList();
+    // trigger AI after sending red packet
+    setTimeout(function(){ if(typeof triggerAIReply==='function') triggerAIReply(); }, 300);
+}
+
+function openRedPacket(elem, amount, msg, cover) {
+    if (elem._rpOpened) return;
+    var ex = document.getElementById('rpChoiceModal');
+    if (ex) ex.remove();
+    var cs = cover ? ('url('+cover+') center/cover no-repeat') : 'linear-gradient(160deg,#e8334a,#c62135)';
+    var sm = msg || '恭喜发财，大吉大利';
+    var sa = amount || '0.00';
+    var modal = document.createElement('div');
+    modal.id = 'rpChoiceModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = '<div style="width:260px;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.35);display:flex;flex-direction:column;"><div style="position:relative;width:100%;height:320px;background:'+cs+';display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:40px;"><div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.1);"></div><div style="position:relative;z-index:1;text-align:center;padding:0 16px;"><div style="color:#fff;font-size:18px;font-weight:bold;text-shadow:0 1px 6px rgba(0,0,0,0.6);">'+sm+'</div><div style="color:rgba(255,255,255,0.9);font-size:14px;margin-top:6px;">&yen;'+sa+'</div></div></div><div style="background:#c62135;padding:16px 20px;display:flex;gap:12px;justify-content:center;"><button id="rpChoiceAccept" style="flex:1;padding:10px 0;border:none;border-radius:24px;background:linear-gradient(135deg,#f5deb3,#d4a56a);color:#6b3a1f;font-size:16px;font-weight:bold;cursor:pointer;">收下</button><button id="rpChoiceReturn" style="flex:1;padding:10px 0;border:none;border-radius:24px;background:rgba(255,255,255,0.2);color:#fff;font-size:16px;cursor:pointer;">退回</button></div></div>';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
+      document.getElementById('rpChoiceAccept').onclick = async function() {
+          modal.remove(); elem._rpOpened = true;
+          var coin = elem.querySelector('.rp-open-coin');
+          if (coin) { coin.textContent='已领'; coin.style.background='#aaa'; coin.style.color='#fff'; coin.style.fontSize='13px'; }
+          var t2 = elem.querySelector('.rp-bubble-top');
+          if (t2) t2.style.filter='grayscale(0.5)';
+          
+          if (currentContactId) {
+            const c = contacts.find(x => x.id === currentContactId) || {name:'对方'};
+            const uName = (typeof chatSettings !== 'undefined' && chatSettings.chatNickname) ? chatSettings.chatNickname : (window.storageSync?.getItem('USER_NICKNAME') || '你');
+            const notif = { side:'notif', type:'rp_notif', content: '<div style="text-align:center;font-size:12px;color:#999;margin:10px 0;"><img src="ICON/红包.png" style="width:12px;height:14px;margin-right:2px;vertical-align:-2px;filter:drop-shadow(0 0 1px rgba(0,0,0,0.2));">' + uName + '领取了' + c.name + '的红包</div>', time:Date.now() };
+            chatRecords[currentContactId] = chatRecords[currentContactId] || [];
+            chatRecords[currentContactId].push(notif);
+            await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+            renderChat();
+          }
+      };
+    document.getElementById('rpChoiceReturn').onclick = function() {
+        modal.remove();
+        if (typeof showToast==='function') showToast('红包已退回');
+    };
+}
+
+function closeRpReceiveModal() {
+    const modal = document.getElementById('redPacketReceiveModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function closeTransferModal() {
+    const modal = document.getElementById('transferSendModal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function sendTransfer() {
+    const amount = document.getElementById('transferAmount').value;
+    const msg = document.getElementById('transferMsg').value || '转账给你';
+    
+    if (!amount || amount <= 0) {
+        showToast('请输入有效金额');
+        return;
+    }
+    
+    const content = JSON.stringify({ amount: amount, msg: msg });
+    addMsgToUI(content, 'right', chatSettings.chatUserAvatar || userAvatar, null, undefined, 'transfer');
+    
+    if (!chatRecords[currentContactId]) chatRecords[currentContactId] = [];
+    chatRecords[currentContactId].push({ 
+      side: 'right', 
+      content: content, 
+      type: 'transfer',
+      quote: null, 
+      time: Date.now() 
+    });
+    await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+    
+    closeTransferModal();
+    document.getElementById('transferAmount').value = '';
+    document.getElementById('transferMsg').value = '';
+    renderContactList();
+}
+
+function receiveTransfer(elem, amount) {
+    const statusElem = elem.querySelector('.tf-status');
+    if (statusElem && statusElem.innerText.includes('已收款')) {
+        showToast('已收款');
+        return;
+    }
+    
+    if (statusElem) statusElem.innerText = '已收款';
+    elem.classList.add('tf-opened');
+    showToast('已收款 ¥' + amount);
+}
+
 // ========== 朋友圈及论坛面具选择功能 ==========
 function togglePostMomentMaskSelect() {
   const select = document.getElementById('postMomentMaskSelect');
@@ -6372,6 +6615,35 @@ function applyThemeColor(main, light, bg) {
   document.documentElement.style.setProperty('--light-pink', light);
   document.documentElement.style.setProperty('--bg-cream', bg);
   
+  // Determine title color based on brightness
+  let isWhiteOrVeryLight = false;
+  try {
+    let r, g, b;
+    if (main.startsWith('#')) {
+      let hex = main.length === 4 ? '#' + main[1]+main[1]+main[2]+main[2]+main[3]+main[3] : main;
+      r = parseInt(hex.slice(1,3),16);
+      g = parseInt(hex.slice(3,5),16);
+      b = parseInt(hex.slice(5,7),16);
+    } else if (main.startsWith('rgb')) {
+      const parts = main.replace(/rgba?\(/, '').replace(/\)/, '').split(',');
+      r = parseInt(parts[0]);
+      g = parseInt(parts[1]);
+      b = parseInt(parts[2]);
+    }
+    if (r !== undefined && g !== undefined && b !== undefined) {
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      if (brightness > 220) {
+        isWhiteOrVeryLight = true;
+      }
+    }
+  } catch(e) {}
+  
+  if (isWhiteOrVeryLight) {
+    document.documentElement.style.setProperty('--theme-title-color', '#333333');
+  } else {
+    document.documentElement.style.setProperty('--theme-title-color', main);
+  }
+
   // 如果没有背景图，则根据新的背景色更新文字颜色
   const userBgEl = document.getElementById('user-bg');
   if (!userBgEl || !userBgEl.style.backgroundImage || userBgEl.style.backgroundImage === 'none') {
@@ -6614,36 +6886,48 @@ async function loadTextBeautifySettings() {
             const el = document.getElementById(id);
             const cssVar = `--text-${type}-${prop}`;
             
-            if (val && val !== 'inherit' && val !== 'normal') {
-              if (el) {
-                if (prop === 'color' || prop === 'bg') {
-                  if (val === 'transparent') {
-                      el.dataset.cleared = 'true';
-                      el.value = '#ffffff';
+              if (val && val !== 'inherit' && val !== 'normal') {
+                if (el) {
+                  if (prop === 'color' || prop === 'bg') {
+                    if (val === 'transparent') {
+                        el.dataset.cleared = 'true';
+                        el.value = '#ffffff';
+                    } else {
+                        el.value = val;
+                        delete el.dataset.cleared;
+                    }
                   } else {
-                      el.value = val;
-                      delete el.dataset.cleared;
-                  }
-                } else {
-                  el.dataset.val = val;
-                  if (val === 'bold' || val === 'italic') {
-                    el.classList.add('active');
+                    el.dataset.val = val;
+                    if (val === 'bold' || val === 'italic') {
+                      el.classList.add('active');
+                    }
                   }
                 }
-              }
-              document.documentElement.style.setProperty(cssVar, val);
-            } else if (val === 'inherit' || val === 'normal') {
-              if (el) {
-                if (prop === 'color' || prop === 'bg') {
-                  el.dataset.cleared = 'true';
-                  el.value = prop === 'bg' ? '#ffffff' : '#000000';
-                } else {
-                  el.dataset.val = 'inherit';
-                  el.classList.remove('active');
+                document.documentElement.style.setProperty(cssVar, val);
+              } else if (!val || val === 'inherit' || val === 'normal') {
+                if (el) {
+                  if (prop === 'color' || prop === 'bg') {
+                    el.dataset.cleared = 'true';
+                    el.value = prop === 'bg' ? '#ffffff' : '#000000';
+                  } else {
+                    el.dataset.val = 'inherit';
+                    el.classList.remove('active');
+                  }
                 }
+                document.documentElement.style.setProperty(cssVar, prop === 'bg' ? 'transparent' : 'inherit');
               }
-              document.documentElement.style.setProperty(cssVar, prop === 'bg' ? 'transparent' : 'inherit');
+          });
+        } else {
+          props.forEach(prop => {
+            const id = `tb-${type}-${prop}`;
+            const el = document.getElementById(id);
+            if (el) {
+              if (prop === 'color' || prop === 'bg') {
+                el.dataset.cleared = 'true';
+                el.value = prop === 'bg' ? '#ffffff' : '#000000';
+              }
             }
+            document.documentElement.style.setProperty(`--text-${type}-${prop}`, prop === 'bg' ? 'transparent' : 'inherit');
           });
         }
       });
@@ -6664,6 +6948,20 @@ async function loadTextBeautifySettings() {
     } catch(e) {
       console.error('加载叙事美化设置失败:', e);
     }
+  } else {
+    const types = ['normal', 'brace', 'quote'];
+    const props = ['color', 'bg'];
+    types.forEach(type => {
+      props.forEach(prop => {
+        const id = `tb-${type}-${prop}`;
+        const el = document.getElementById(id);
+        if (el) {
+          el.dataset.cleared = 'true';
+          el.value = prop === 'bg' ? '#ffffff' : '#000000';
+        }
+        document.documentElement.style.setProperty(`--text-${type}-${prop}`, prop === 'bg' ? 'transparent' : 'inherit');
+      });
+    });
   }
 }
 
@@ -10570,3 +10868,25 @@ function importThemeSettings(input) {
 }
 
 
+
+
+
+
+// HarmonyOS & Mobile Keyboard Fix
+(function() {
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', function() {
+            document.body.style.height = window.visualViewport.height + 'px';
+            window.scrollTo(0, 0);
+        });
+    }
+    
+    // Focus scrollIntoView for inputs
+    document.addEventListener('focusin', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            setTimeout(function() {
+                e.target.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 300);
+        }
+    });
+})();

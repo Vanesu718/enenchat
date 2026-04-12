@@ -338,7 +338,7 @@
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字颜色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-normal-color" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-normal-color-hex').value=this.value; applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-normal-color" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-normal-color-hex').value=this.value; applyTextBeautify()">
                   </div>
                   <input type="text" id="tb-normal-color-hex" value="#000000" onchange="document.getElementById('tb-normal-color').value=this.value; document.getElementById('tb-normal-color').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-normal-color')">清除</button>
@@ -346,7 +346,7 @@
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字底色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-normal-bg" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-normal-bg-hex').value=this.value; applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-normal-bg" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-normal-bg-hex').value=this.value; applyTextBeautify()">
                   </div>
                   <input type="text" id="tb-normal-bg-hex" value="#ffffff" onchange="document.getElementById('tb-normal-bg').value=this.value; document.getElementById('tb-normal-bg').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-normal-bg')">清除</button>
@@ -367,7 +367,7 @@
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字颜色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-brace-color" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-brace-color-hex').value=this.value; applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-brace-color" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-brace-color-hex').value=this.value; applyTextBeautify()">
                   </div>
                   <input type="text" id="tb-brace-color-hex" value="#000000" onchange="document.getElementById('tb-brace-color').value=this.value; document.getElementById('tb-brace-color').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-brace-color')">清除</button>
@@ -375,7 +375,7 @@
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字底色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-brace-bg" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-brace-bg-hex').value=this.value; applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-brace-bg" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-brace-bg-hex').value=this.value; applyTextBeautify()">
                   </div>
                   <input type="text" id="tb-brace-bg-hex" value="#ffffff" onchange="document.getElementById('tb-brace-bg').value=this.value; document.getElementById('tb-brace-bg').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-brace-bg')">清除</button>
@@ -396,7 +396,7 @@
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字颜色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-quote-color" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-quote-color-hex').value=this.value; applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-quote-color" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-quote-color-hex').value=this.value; applyTextBeautify()">
                   </div>
                   <input type="text" id="tb-quote-color-hex" value="#000000" onchange="document.getElementById('tb-quote-color').value=this.value; document.getElementById('tb-quote-color').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-quote-color')">清除</button>
@@ -404,7 +404,7 @@
                 <div class="tb-color-item">
                   <div class="tb-color-label">文字底色</div>
                   <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-quote-bg" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-quote-bg-hex').value=this.value; applyTextBeautify()">
+                    <input type="color" class="tb-color-picker" id="tb-quote-bg" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-quote-bg-hex').value=this.value; applyTextBeautify()">
                   </div>
                   <input type="text" id="tb-quote-bg-hex" value="#ffffff" onchange="document.getElementById('tb-quote-bg').value=this.value; document.getElementById('tb-quote-bg').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
                   <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-quote-bg')">清除</button>
@@ -1999,7 +1999,35 @@
   <script src="js/activation.js"></script>
   <script src="js/main.js"></script>
   <script src="js/chat-features.js"></script>
-</body>
+﻿<!-- Red Packet Send Modal -->
+    <div id="redPacketSendModal" class="rp-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+      <div class="rp-send-card">
+        <div class="rp-card-top">
+          <button class="rp-card-close" onclick="document.getElementById('redPacketSendModal').style.display='none'">&#x2715;</button>
+          <div class="rp-card-title">&#x53D1;&#x7EA2;&#x5305;</div>
+          <div class="rp-cover-wrap" id="rpCoverPreview" onclick="document.getElementById('rpCoverInput').click()">
+            <div class="rp-cover-placeholder">
+              <span class="rp-upload-icon">&#x1F5BC;</span>
+              <span class="rp-upload-text">&#x70B9;&#x51FB;&#x4E0A;&#x4F20;&#x5C01;&#x9762;</span>
+            </div>
+          </div>
+          <input type="file" id="rpCoverInput" accept="image/*" style="display:none;" onchange="handleRpCover(this)">
+        </div>
+        <div class="rp-card-bottom">
+          <div class="rp-field">
+            <label class="rp-label">&#x91D1;&#x989D;&#xFF08;&#x5143;&#xFF09;</label>
+            <input type="number" id="rpAmount" class="rp-input" placeholder="0.00" step="0.01" min="0.01" oninput="document.getElementById('rpAmountDisplay').textContent=this.value||'0.00'">
+          </div>
+          <div class="rp-field">
+            <label class="rp-label">&#x795D;&#x798F;&#x8BED;</label>
+            <textarea id="rpGreeting" class="rp-textarea" placeholder="&#x606D;&#x559C;&#x53D1;&#x8D22;&#xFF0C;&#x5927;&#x5409;&#x5927;&#x5229;">&#x606D;&#x559C;&#x53D1;&#x8D22;&#xFF0C;&#x5927;&#x5409;&#x5927;&#x5229;</textarea>
+          </div>
+          <div class="rp-amount-preview">&#xFFE5;<span id="rpAmountDisplay">0.00</span></div>
+          <button class="rp-send-btn" onclick="sendRedPacket()">&#x585E;&#x9322;&#x8FDB;&#x7EA2;&#x5305;</button>
+        </div>
+      </div>
+    </div>
+    </body>
 </html>
 
 

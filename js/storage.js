@@ -25,7 +25,9 @@ class StorageManager {
             if (success) {
               // 迁移成功后清空 localStorage
               console.log('🧹 清理 localStorage...');
+              const ohoActivated = localStorage.getItem('OHO_ACTIVATED');
               localStorage.clear();
+              if (ohoActivated) localStorage.setItem('OHO_ACTIVATED', ohoActivated);
               console.log('✅ 迁移完成，localStorage 已清空');
             }
           }
@@ -143,7 +145,9 @@ class StorageManager {
     
     try {
       // 清空 IndexedDB（需要重新实现）
+      const ohoActivated = localStorage.getItem('OHO_ACTIVATED');
       localStorage.clear();
+      if (ohoActivated) localStorage.setItem('OHO_ACTIVATED', ohoActivated);
       console.log('✅ 存储已清空');
       return true;
     } catch (e) {

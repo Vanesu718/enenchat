@@ -1,9 +1,9 @@
 /* 默认主题 (Pink) */
 :root.theme-pink {
-  --main-pink: #333333;
+  --main-pink: #000000;
   --bg-cream: #ffffff;
   --light-pink: #e0e0e0;
-  --text-dark: #333333;
+  --text-dark: #000000;
   --text-light: #777777;
 }
 
@@ -27,9 +27,9 @@
 
 /* 深色主题 (Dark) */
 :root.theme-dark {
-  --main-pink: #555;
+  --main-pink: #ffffff;
   --bg-cream: #222;
   --light-pink: #333;
-  --text-dark: #eee;
+  --text-dark: #ffffff;
   --text-light: #aaa;
 }
