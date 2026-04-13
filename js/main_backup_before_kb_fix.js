@@ -3277,10 +3277,6 @@ function selectFile(t) {
     if (t === 'image') {
         document.getElementById('chat-img-input').click();
     } else if (t === 'red_packet') {
-        if (isOfflineMode) {
-            showToast('线下模式不支持发送红包');
-            return;
-        }
         const modal = document.getElementById('redPacketSendModal');
         if (modal) modal.style.display = 'flex';
     } else if (t === 'transfer') {
@@ -10993,47 +10989,13 @@ function importThemeSettings(input) {
 
 // HarmonyOS & Mobile Keyboard Fix
 (function() {
-  // ===== 核心修复：用 visualViewport 动态调整容器高度 =====
-  if (window.visualViewport) {
-    var chatPage = document.getElementById('chat-win');
-    var cc = document.getElementById('chatContent');
-    
-    function scrollToBottom() {
-      if (cc) cc.scrollTop = cc.scrollHeight;
-    }
-
-    function updateLayout() {
-      if (!chatPage || !chatPage.classList.contains('show')) return;
-      
-      var vh = window.visualViewport.height;
-      var offsetTop = window.visualViewport.offsetTop;
-      
-      // 设置容器高度为可视区域高度
-      chatPage.style.height = vh + 'px';
-      chatPage.style.top = offsetTop + 'px';
-      chatPage.style.bottom = 'auto';
-      
-      // 延迟滚动，确保布局完成后再滚
-      setTimeout(scrollToBottom, 50);
-      setTimeout(scrollToBottom, 150);
-      setTimeout(scrollToBottom, 300);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', function() {
+            document.body.style.height = window.visualViewport.height + 'px';
+            window.scrollTo(0, 0);
+        });
     }
     
-    window.visualViewport.addEventListener('resize', function() {
-      requestAnimationFrame(updateLayout);
-    });
-    
-    window.visualViewport.addEventListener('scroll', function() {
-      requestAnimationFrame(function() {
-        if (!chatPage || !chatPage.classList.contains('show')) return;
-        var offsetTop = window.visualViewport.offsetTop;
-        chatPage.style.top = offsetTop + 'px';
-      });
-    });
-    
-    // 初始化
-    updateLayout();
-  }
 })();
 
 function checkBgBrightness(bgImage, targetEl) {
