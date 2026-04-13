@@ -2660,8 +2660,10 @@ ${statusRules}
         systemPrompt += await getAiEmojiPromptAddon();
     }
     // ===== RP prompt inject =====
-    systemPrompt += '\n\n【红包功能指令】\n你可以主动给用户发红包。如果想发红包，请务必在你的回复最末尾加上这句严格的指令（必须是英文方括号和冒号）：[SEND_RED_PACKET:金额:祝福语]\n例如：[SEND_RED_PACKET:52.0:拿去花吧！]\n千万注意：指令不能被翻译，格式必须精准，否则红包无法发出。';
-    { var _rpL=(rawRecs||[]).slice().reverse().find(function(m){return m.side==='right' && m.type==='red_packet';});if(_rpL&&!_rpL.rpStatus){var _ra=_rpL.rpAmount||'';var _rm=_rpL.rpMsg||'Best wishes';systemPrompt+='\n\n【收到红包提示】\n用户刚刚给你发了一个红包！金额：'+_ra+'，留言：'+_rm+'。\n你需要根据你们的人设和剧情发展决定如何处理。你必须在回复的最末尾加上以下三个严格指令之一来处理红包：\n接收红包：[ACCEPT_RED_PACKET]\n退回红包：[RETURN_RED_PACKET]\n回赠红包：[SEND_RED_PACKET:金额:祝福语]';}}
+    if (!isOfflineMode) {
+        systemPrompt += '\n\n【红包功能指令】\n你可以主动给用户发红包。如果想发红包，请务必在你的回复最末尾加上这句严格的指令（必须是英文方括号和冒号）：[SEND_RED_PACKET:金额:祝福语]\n例如：[SEND_RED_PACKET:52.0:拿去花吧！]\n千万注意：指令不能被翻译，格式必须精准，否则红包无法发出。';
+        { var _rpL=(rawRecs||[]).slice().reverse().find(function(m){return m.side==='right' && m.type==='red_packet';});if(_rpL&&!_rpL.rpStatus){var _ra=_rpL.rpAmount||'';var _rm=_rpL.rpMsg||'Best wishes';systemPrompt+='\n\n【收到红包提示】\n用户刚刚给你发了一个红包！金额：'+_ra+'，留言：'+_rm+'。\n你需要根据你们的人设和剧情发展决定如何处理。你必须在回复的最末尾加上以下三个严格指令之一来处理红包：\n接收红包：[ACCEPT_RED_PACKET]\n退回红包：[RETURN_RED_PACKET]\n回赠红包：[SEND_RED_PACKET:金额:祝福语]';}}
+    }
     // ===== end RP inject =====
        const messages = [{ role: 'system', content: systemPrompt }];
     const recs = rawRecs.slice(-60); // 获取更多气泡用于合并
@@ -2981,8 +2983,14 @@ ${statusRules}
       displayText = displayText.replace(/\[RETURN_RED_PACKET\]/gi, '').trim();
     } else {
       const _srpm = displayText.match(/\[SEND_RED_PACKET:\s*([^:\]]+)\s*:\s*([^\]]+)\s*\]/i);
-      if (_srpm) { aiRedPacketAction = { send: { amount: _srpm[1].trim(), msg: _srpm[2].trim() } };
-        displayText = displayText.replace(/\[SEND_RED_PACKET:[^\]]+\]/gi, '').trim();
+      if (_srpm) { 
+        if (isOfflineMode) {
+          // 线下模式不发红包，直接显示文字
+          displayText = displayText.replace(/\[SEND_RED_PACKET:\s*([^:\]]+)\s*:\s*([^\]]+)\s*\]/gi, '[转账：' + _srpm[1].trim() + '元]').trim();
+        } else {
+          aiRedPacketAction = { send: { amount: _srpm[1].trim(), msg: _srpm[2].trim() } };
+          displayText = displayText.replace(/\[SEND_RED_PACKET:[^\]]+\]/gi, '').trim();
+        }
       }
     }  // ===== 红包指令完毕 =====
 
@@ -3091,7 +3099,7 @@ ${statusRules}
     // 检查是否需要触发短期记忆总结 (传入正确的联系人ID)
     checkAndTriggerStmForContact(requestContactId)
   // ===== AI红包行为处理 =====
-  if (aiRedPacketAction && requestContactId) {
+  if (aiRedPacketAction && requestContactId && !isOfflineMode) {
     const _rpCid = requestContactId;
     const _rpRecs = chatRecords[_rpCid] || [];
     // 找到最近一条用户发出的红包
@@ -10993,46 +11001,28 @@ function importThemeSettings(input) {
 
 // HarmonyOS & Mobile Keyboard Fix
 (function() {
-  // ===== 核心修复：用 visualViewport 动态调整容器高度 =====
+  // 移除错误的 visualViewport 强制修改 top 和 height 的逻辑
+  // 恢复原生滚动行为，仅在键盘弹出时确保内容滚动到底部
   if (window.visualViewport) {
-    var chatPage = document.getElementById('chat-win');
     var cc = document.getElementById('chatContent');
+    var chatPage = document.getElementById('chat-win');
     
     function scrollToBottom() {
       if (cc) cc.scrollTop = cc.scrollHeight;
     }
 
-    function updateLayout() {
+    window.visualViewport.addEventListener('resize', function() {
       if (!chatPage || !chatPage.classList.contains('show')) return;
       
-      var vh = window.visualViewport.height;
-      var offsetTop = window.visualViewport.offsetTop;
-      
-      // 设置容器高度为可视区域高度
-      chatPage.style.height = vh + 'px';
-      chatPage.style.top = offsetTop + 'px';
-      chatPage.style.bottom = 'auto';
-      
-      // 延迟滚动，确保布局完成后再滚
+      // 当可视区域高度变化（键盘弹出/收起）时，确保内容滚动到底部
       setTimeout(scrollToBottom, 50);
       setTimeout(scrollToBottom, 150);
-      setTimeout(scrollToBottom, 300);
-    }
-    
-    window.visualViewport.addEventListener('resize', function() {
-      requestAnimationFrame(updateLayout);
+      
+      // 清除可能残留的错误内联样式
+      chatPage.style.top = '';
+      chatPage.style.height = '';
+      chatPage.style.bottom = '';
     });
-    
-    window.visualViewport.addEventListener('scroll', function() {
-      requestAnimationFrame(function() {
-        if (!chatPage || !chatPage.classList.contains('show')) return;
-        var offsetTop = window.visualViewport.offsetTop;
-        chatPage.style.top = offsetTop + 'px';
-      });
-    });
-    
-    // 初始化
-    updateLayout();
   }
 })();
 
