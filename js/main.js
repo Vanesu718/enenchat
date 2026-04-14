@@ -1940,25 +1940,49 @@ function cancelReply() {
   document.getElementById('replyTip').style.display = 'none';
 }
 
+// 锁死并清空当前聊天列表最后一条AI消息的多余重roll版本
+function lockLastAiAlternatives() {
+  if (!currentContactId || !chatRecords[currentContactId]) return;
+  const rec = chatRecords[currentContactId];
+  if (rec.length === 0) return;
+  
+  let lastAiIdx = -1;
+  for (let i = rec.length - 1; i >= 0; i--) {
+    if (rec[i].side === 'left') {
+      lastAiIdx = i;
+      break;
+    }
+  }
+  
+  if (lastAiIdx === -1) return;
+  
+  const senderId = rec[lastAiIdx].senderId;
+  let firstAltIdx = -1;
+  
+  for (let i = lastAiIdx; i >= 0; i--) {
+    if (rec[i].side === 'left' && rec[i].senderId === senderId) {
+      if (rec[i].alternatives) {
+        firstAltIdx = i;
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+  
+  if (firstAltIdx !== -1 && rec[firstAltIdx].alternatives) {
+    delete rec[firstAltIdx].alternatives;
+    delete rec[firstAltIdx].currentIndex;
+    renderChat();
+  }
+}
+
 async function sendMsg() {
   const ipt = document.getElementById('chatInput');
   const t = ipt.value.trim();
   if (!t || !currentContactId) return;
 
-  // 锁死并清空当前聊天列表最后一条AI消息的多余重roll版本
-  if (chatRecords[currentContactId] && chatRecords[currentContactId].length > 0) {
-    let lastMsg = chatRecords[currentContactId][chatRecords[currentContactId].length - 1];
-    if (lastMsg.side === 'left' && lastMsg.alternatives && lastMsg.alternatives.length > 0) {
-      lastMsg.content = lastMsg.alternatives[lastMsg.currentIndex || 0].content;
-      if (lastMsg.alternatives[lastMsg.currentIndex || 0].statusData) {
-        lastMsg.statusData = lastMsg.alternatives[lastMsg.currentIndex || 0].statusData;
-      }
-      delete lastMsg.alternatives;
-      delete lastMsg.currentIndex;
-      // 重新渲染UI以隐藏气泡上的切换按钮
-      renderChat();
-    }
-  }
+  lockLastAiAlternatives();
 
   const q = replyMsg ? replyMsg.shortContent : null;
   addMsgToUI(t, 'right', chatSettings.chatUserAvatar || userAvatar, q);
@@ -3304,6 +3328,8 @@ async function handleChatImage(input) {
   const file = input.files?.[0];
   if (!file) return;
   
+  lockLastAiAlternatives();
+
   const reader = new FileReader();
   reader.onload = async e => {
     const img = new Image();
@@ -6482,6 +6508,8 @@ async function sendRedPacket() {
         return;
     }
     
+    lockLastAiAlternatives();
+
     const cover = window._rpCoverDataUrl || null;
     const content = JSON.stringify({ amount: amount, msg: msg, cover: cover });
     window._rpCoverDataUrl = null;
@@ -6558,6 +6586,8 @@ async function sendTransfer() {
         return;
     }
     
+    lockLastAiAlternatives();
+
     const content = JSON.stringify({ amount: amount, msg: msg });
     addMsgToUI(content, 'right', chatSettings.chatUserAvatar || userAvatar, null, undefined, 'transfer');
     
