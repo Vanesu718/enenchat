@@ -1749,13 +1749,37 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
           const rpMsg = data.msg || '恭喜发财，大吉大利';
           const rpAmt = data.amount || '';
           const coverBg = coverUrl ? ('url('+coverUrl+') center/cover no-repeat') : 'linear-gradient(160deg,#e8334a,#c62135)';
+          
+          let rpStatus = null;
+          if (currentContactId && chatRecords[currentContactId] && chatRecords[currentContactId][idx]) {
+            rpStatus = chatRecords[currentContactId][idx].rpStatus;
+          }
+          
+          let coinHtml = '<div class="rp-open-coin" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f5deb3,#d4a56a);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;color:#8b4513;box-shadow:0 2px 6px rgba(0,0,0,0.2);">開</div>';
+          let filterStyle = '';
+          if (rpStatus === 'accepted') {
+            coinHtml = '<div class="rp-open-coin" style="width:40px;height:40px;border-radius:50%;background:#aaa;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.2);">已领</div>';
+            filterStyle = 'filter:grayscale(0.5);';
+          } else if (rpStatus === 'returned') {
+            coinHtml = '<div class="rp-open-coin" style="width:40px;height:40px;border-radius:50%;background:#aaa;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.2);">退回</div>';
+            filterStyle = 'filter:grayscale(0.5);';
+          }
+
           box.style.cssText = 'width:140px;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 8px rgba(0,0,0,0.18);cursor:pointer;user-select:none;';
-          box.innerHTML = '<div class="rp-bubble-top" style="position:relative;width:100%;height:150px;background:'+coverBg+';display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:12px;"><div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.1);border-radius:12px 12px 0 0;"></div><div style="position:relative;z-index:1;text-align:center;padding:0 10px;width:100%;box-sizing:border-box;"><div style="color:#fff;font-size:13px;font-weight:bold;text-shadow:0 1px 4px rgba(0,0,0,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+rpMsg+'</div></div></div><div style="background:#c62135;padding:12px 0;display:flex;align-items:center;justify-content:center;"><div class="rp-open-coin" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f5deb3,#d4a56a);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;color:#8b4513;box-shadow:0 2px 6px rgba(0,0,0,0.2);">開</div></div>';
-          if (side === 'right') { box.style.cursor = 'default'; } else { box.onclick = (e) => { e.stopPropagation(); openRedPacket(box, rpAmt, rpMsg, coverUrl); }; }
+          box.innerHTML = '<div class="rp-bubble-top" style="position:relative;width:100%;height:150px;background:'+coverBg+';'+filterStyle+'display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:12px;"><div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.1);border-radius:12px 12px 0 0;"></div><div style="position:relative;z-index:1;text-align:center;padding:0 10px;width:100%;box-sizing:border-box;"><div style="color:#fff;font-size:13px;font-weight:bold;text-shadow:0 1px 4px rgba(0,0,0,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+rpMsg+'</div></div></div><div style="background:#c62135;padding:12px 0;display:flex;align-items:center;justify-content:center;">'+coinHtml+'</div>';
+          
+          if (side === 'right' || rpStatus) { 
+            box.style.cursor = 'default'; 
+            if (side !== 'right') {
+              box.onclick = (e) => { if(window.isBatchDeleteMode) return; e.stopPropagation(); };
+            }
+          } else { 
+            box.onclick = (e) => { if(window.isBatchDeleteMode) return; e.stopPropagation(); openRedPacket(box, rpAmt, rpMsg, coverUrl, idx); }; 
+          }
         } else {
           box.style.cssText = 'width:220px;background:'+bgColor+';border-radius:8px;overflow:hidden;display:flex;flex-direction:column;';
           box.innerHTML = '<div style="display:flex;align-items:center;padding:12px 15px;color:white;"><img src="'+iconSrc+'" style="width:36px;height:36px;margin-right:12px;filter:brightness(0) invert(1);"><div style="flex:1;overflow:hidden;"><div style="font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+title+'</div><div style="font-size:12px;margin-top:2px;opacity:0.8;">'+subTitle+'</div></div></div><div style="background:white;padding:4px 15px;font-size:11px;color:#999;border-top:1px solid rgba(0,0,0,0.05);text-align:left;">'+label+'</div>';
-          box.onclick = (e) => { e.stopPropagation(); };
+          box.onclick = (e) => { if(window.isBatchDeleteMode) return; e.stopPropagation(); };
         }
         bubble.appendChild(box);
       } else {
@@ -1880,7 +1904,8 @@ function switchMsgAlternative(idx, direction) {
       content: l,
       time: firstMsg.time || Date.now(),
       senderId: senderId,
-      statusData: (i === lines.length - 1) ? chosen.statusData : null
+      statusData: (i === lines.length - 1) ? chosen.statusData : null,
+      isOfflineMsg: firstMsg.isOfflineMsg
     });
   });
   
@@ -2601,7 +2626,7 @@ ${sanitizeInput(activeWsContent)}
 【角色状态监控系统：SYS_STATUS_MONITOR】
 请在每次回复的最后，必须严格按照以下格式添加角色当前的状态信息（必须包含在<STATUS>标签内）：
 <STATUS>
-心声：[内容必须反映角色内心最真实的潜意识想法，必须包含角色真实的情感波动、隐秘的欲望或对用户的真实评价，15字以内，纯文本，严禁使用{}等括号]
+心声：[极简短句！绝对不能超过15个字！界面显示受限，超过会被截断。必须用最精炼的词表达完整意思，例如：“好想抱抱他”、“他今天真好看”、“真让人火大”]
 地点：[当前所在地点]
 心情：[当前心情，如：开心、紧张、疲惫等]
 好感度：[0-100的数字，反映对用户的好感程度]`;
@@ -2611,7 +2636,7 @@ ${sanitizeInput(activeWsContent)}
 【角色状态监控系统：SYS_STATUS_MONITOR】
 请在每次回复的最后，必须严格按照以下格式添加角色当前的状态信息（必须包含在<STATUS>标签内）：
 <STATUS>
-心声：[内容必须反映角色内心最真实的潜意识想法，必须包含角色真实的情感波动、隐秘的欲望或对用户的真实评价，15字以内，纯文本，严禁使用{}等括号]
+心声：[极简短句！绝对不能超过15个字！界面显示受限，超过会被截断。必须用最精炼的词表达完整意思，例如：“好想抱抱他”、“他今天真好看”、“真让人火大”]
 地点：[当前所在地点]
 心情：[当前心情，如：开心、紧张、疲惫等]
 好感度：[0-100的数字，反映对用户的好感程度]
@@ -2623,10 +2648,10 @@ ${sanitizeInput(activeWsContent)}
 </STATUS>
 
 【心声生成准则】
-1. 真实性：心声必须反映角色内心最真实、最私密的潜意识想法，即使与表面的言语完全相反。
-2. 隐秘性：展现角色不愿公开表达的欲望、吐槽、秘密、生理反应或对用户的真实心理评价。
-3. 动态性：必须根据当前这一轮对话的最新进展进行即时更新。
-4. 深度：挖掘角色性格深处的动机，心声是角色灵魂的独白。`;
+1. 极度精简（最高优先级）：心声绝对不能超过15个字！必须是一个意思完整的极简短句，绝不能长篇大论。
+2. 真实性：心声必须反映角色内心最真实、最私密的潜意识想法，即使与表面的言语完全相反。
+3. 隐秘性：展现角色不愿公开表达的欲望、吐槽、秘密、生理反应或对用户的真实心理评价。
+4. 动态性：必须根据当前这一轮对话的最新进展进行即时更新。`;
 
     if (isOfflineMode) {
       let offlinePrompt = `【场景设定：线下物理空间互动】
@@ -2687,6 +2712,8 @@ ${statusRules}
     if (!isOfflineMode) {
         systemPrompt += '\n\n【红包功能指令】\n你可以主动给用户发红包。如果想发红包，请务必在你的回复最末尾加上这句严格的指令（必须是英文方括号和冒号）：[SEND_RED_PACKET:金额:祝福语]\n例如：[SEND_RED_PACKET:52.0:拿去花吧！]\n千万注意：指令不能被翻译，格式必须精准，否则红包无法发出。';
         { var _rpL=(rawRecs||[]).slice().reverse().find(function(m){return m.side==='right' && m.type==='red_packet';});if(_rpL&&!_rpL.rpStatus){var _ra=_rpL.rpAmount||'';var _rm=_rpL.rpMsg||'Best wishes';systemPrompt+='\n\n【收到红包提示】\n用户刚刚给你发了一个红包！金额：'+_ra+'，留言：'+_rm+'。\n你需要根据你们的人设和剧情发展决定如何处理。你必须在回复的最末尾加上以下三个严格指令之一来处理红包：\n接收红包：[ACCEPT_RED_PACKET]\n退回红包：[RETURN_RED_PACKET]\n回赠红包：[SEND_RED_PACKET:金额:祝福语]';}}
+    } else {
+        systemPrompt += '\n\n【系统提示】当前是线下物理空间互动，无法使用微信发红包功能。如果剧情需要给钱或送礼，请直接在回复中用文字表达，例如输出：转账：XX.00元。';
     }
     // ===== end RP inject =====
        const messages = [{ role: 'system', content: systemPrompt }];
@@ -2728,19 +2755,27 @@ ${statusRules}
       } else if (r.type === 'red_packet') {
         let data = {};
         try { data = JSON.parse(r.content); } catch(e) { data = {msg: r.content}; }
-        let textPart = contentPrefix + `[用户给你发了一个红包，金额：${data.amount || '未知'}元，祝福语：${data.msg || '恭喜发财，大吉大利'}]`;
-        if (data.cover && (data.cover.startsWith('data:image') || data.cover.startsWith('http'))) {
-          parsedContent = [
-            { type: 'text', text: textPart },
-            { type: 'image_url', image_url: { url: data.cover } }
-          ];
+        if (r.side === 'right') {
+          let textPart = contentPrefix + `[用户给你发了一个红包，金额：${data.amount || '未知'}元，祝福语：${data.msg || '恭喜发财，大吉大利'}]`;
+          if (data.cover && (data.cover.startsWith('data:image') || data.cover.startsWith('http'))) {
+            parsedContent = [
+              { type: 'text', text: textPart },
+              { type: 'image_url', image_url: { url: data.cover } }
+            ];
+          } else {
+            parsedContent = textPart;
+          }
         } else {
-          parsedContent = textPart;
+          parsedContent = contentPrefix + `[你发送了一个红包，金额：${data.amount || '未知'}元，祝福语：${data.msg || '恭喜发财，大吉大利'}]`;
         }
       } else if (r.type === 'transfer') {
         let data = {};
         try { data = JSON.parse(r.content); } catch(e) { data = {msg: r.content}; }
         parsedContent = contentPrefix + `[转账：金额 ${data.amount || '未知'}元，备注：${data.msg || '转账给你'}]`;
+      } else if (r.side === 'notif') {
+        let plainText = r.content.replace(/<[^>]*>?/gm, '').trim();
+        parsedContent = `[系统提示：${plainText}]`;
+        role = 'user';
       } else {
         parsedContent = contentPrefix + r.content;
       }
@@ -3120,8 +3155,11 @@ ${statusRules}
   
   renderContactList();
     
-    // 检查是否需要触发短期记忆总结 (传入正确的联系人ID)
-    checkAndTriggerStmForContact(requestContactId)
+  // 检查是否需要触发短期记忆总结 (传入正确的联系人ID)
+  // 如果是重roll，则不增加回合数
+  if (!isThisReRoll) {
+    checkAndTriggerStmForContact(requestContactId);
+  }
   // ===== AI红包行为处理 =====
   if (aiRedPacketAction && requestContactId && !isOfflineMode) {
     const _rpCid = requestContactId;
@@ -3196,13 +3234,13 @@ async function checkAndTriggerStmForContact(contactId) {
     const batchRecs = rec.slice(startIndex); // 提取从上次总结到现在的全部消息（完美囊括这10个回合的所有消息）
     
     if (batchRecs.length > 0) {
-      // 生成新的STM条目
-      await generateStmEntryForBatch(contactId, stm, batchRecs);
-      
-      // 更新已总结的索引和回合数
+      // 提前重置回合数和索引，防止并发聊天导致重复触发
       stm.lastSummarizedIndex = rec.length;
       stm.roundCount = 0;
       await saveStmData(contactId, stm);
+
+      // 生成新的STM条目
+      await generateStmEntryForBatch(contactId, stm, batchRecs);
 
       // 如果已有10条STM，先归档到世界书
       if (stm.entries.length >= 10) {
@@ -3286,15 +3324,14 @@ function showLoading() {
     avatarSrc = c.avatar;
   }
   
-  d.innerHTML = `<div class="msg-avatar"><img src="${avatarSrc}"></div><div class="msg-bubble">思考中...</div>`;
+  let avatarHtml = `<div class="msg-avatar"><img src="${avatarSrc}"></div>`;
+  if (chatSettings && chatSettings.hideAvatar) {
+    avatarHtml = `<div class="msg-avatar" style="display:none;"><img src="${avatarSrc}"></div>`;
+  }
+  
+  d.innerHTML = `${avatarHtml}<div class="msg-bubble">思考中...</div>`;
   el.appendChild(d); 
   el.scrollTop = el.scrollHeight;
-  
-  // 应用隐藏头像设置
-  if (chatSettings.hideAvatar) {
-    const loadingAvatar = d.querySelector('.msg-avatar');
-    if (loadingAvatar) loadingAvatar.style.display = 'none';
-  }
 }
 function hideLoading() { document.querySelectorAll('.loading').forEach(x => x.remove()); }
 
@@ -6531,7 +6568,7 @@ renderContactList();
     setTimeout(function(){ if(typeof triggerAIReply==='function') triggerAIReply(); }, 300);
 }
 
-function openRedPacket(elem, amount, msg, cover) {
+function openRedPacket(elem, amount, msg, cover, idx) {
     if (elem._rpOpened) return;
     var ex = document.getElementById('rpChoiceModal');
     if (ex) ex.remove();
@@ -6552,6 +6589,9 @@ function openRedPacket(elem, amount, msg, cover) {
           if (t2) t2.style.filter='grayscale(0.5)';
           
           if (currentContactId) {
+            if (idx !== undefined && chatRecords[currentContactId] && chatRecords[currentContactId][idx]) {
+              chatRecords[currentContactId][idx].rpStatus = 'accepted';
+            }
             const c = contacts.find(x => x.id === currentContactId) || {name:'对方'};
             const uName = (typeof chatSettings !== 'undefined' && chatSettings.chatNickname) ? chatSettings.chatNickname : (window.storageSync?.getItem('USER_NICKNAME') || '你');
             const notif = { side:'notif', type:'rp_notif', content: '<div style="text-align:center;font-size:12px;color:#999;margin:10px 0;"><img src="ICON/红包.png" style="width:12px;height:14px;margin-right:2px;vertical-align:-2px;filter:drop-shadow(0 0 1px rgba(0,0,0,0.2));">' + uName + '领取了' + c.name + '的红包</div>', time:Date.now() };
@@ -6561,8 +6601,23 @@ function openRedPacket(elem, amount, msg, cover) {
             renderChat();
           }
       };
-    document.getElementById('rpChoiceReturn').onclick = function() {
-        modal.remove();
+    document.getElementById('rpChoiceReturn').onclick = async function() {
+        modal.remove(); elem._rpOpened = true;
+        var coin = elem.querySelector('.rp-open-coin');
+        if (coin) { coin.textContent='退回'; coin.style.background='#aaa'; coin.style.color='#fff'; coin.style.fontSize='13px'; }
+        var t2 = elem.querySelector('.rp-bubble-top');
+        if (t2) t2.style.filter='grayscale(0.5)';
+        
+        if (currentContactId) {
+          if (idx !== undefined && chatRecords[currentContactId] && chatRecords[currentContactId][idx]) {
+            chatRecords[currentContactId][idx].rpStatus = 'returned';
+          }
+          const notif = { side:'notif', type:'rp_notif', content: '<div style="text-align:center;font-size:12px;color:#999;margin:10px 0;"><img src="ICON/红包.png" style="width:12px;height:14px;margin-right:2px;vertical-align:-2px;filter:drop-shadow(0 0 1px rgba(0,0,0,0.2));">已退回红包</div>', time:Date.now() };
+          chatRecords[currentContactId] = chatRecords[currentContactId] || [];
+          chatRecords[currentContactId].push(notif);
+          await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+          renderChat();
+        }
         if (typeof showToast==='function') showToast('红包已退回');
     };
 }
