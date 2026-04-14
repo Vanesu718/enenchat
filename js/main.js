@@ -11146,3 +11146,169 @@ function checkBgBrightness(bgImage, targetEl) {
   }
 }
 
+// ========== 气泡调色盘新UI辅助函数 (Bubble Palette UI Helpers) ==========
+
+/** 顶部 Tab 切换：气泡设置 vs 叙事美化 */
+function switchBpSegment(btn) {
+  document.querySelectorAll('.bp-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const t = btn.dataset.target;
+  document.querySelectorAll('.bp-view').forEach(v => v.classList.remove('active'));
+  const view = document.getElementById('bp-view-' + t);
+  if (view) view.classList.add('active');
+  // 切换预览内容
+  const isBubble = (t === 'bubble');
+  const pb = document.getElementById('bpPreviewBubbles');
+  const pn = document.getElementById('bpPreviewNarrative');
+  if (pb) pb.style.display = isBubble ? 'flex' : 'none';
+  if (pn) pn.style.display = isBubble ? 'none' : 'block';
+  // 展开预览
+  const dock = document.getElementById('bpPreviewDock');
+  if (dock) dock.classList.remove('mini');
+}
+
+/** 颜色选择同步 → 预览气泡 + hex显示 */
+function bpSyncColor(side, type) {
+  if (type === 'bg') {
+    const colorEl = document.getElementById(side === 'L' ? 'leftBubbleColor' : 'rightBubbleColor');
+    const hexEl = document.getElementById(side === 'L' ? 'leftBubbleColorHex' : 'rightBubbleColorHex');
+    const swatchEl = document.getElementById('bpSwatch' + side);
+    const bubbleEl = document.getElementById(side === 'L' ? 'bpPbLeft' : 'bpPbRight');
+    if (colorEl && hexEl) hexEl.value = colorEl.value.toUpperCase();
+    if (colorEl && swatchEl) swatchEl.style.background = colorEl.value;
+    if (colorEl && bubbleEl) bubbleEl.style.background = colorEl.value;
+  } else {
+    const colorEl = document.getElementById(side === 'L' ? 'leftBubbleTextColor' : 'rightBubbleTextColor');
+    const swatchEl = document.getElementById('bpSwatchT' + side);
+    const bubbleEl = document.getElementById(side === 'L' ? 'bpPbLeft' : 'bpPbRight');
+    if (colorEl && swatchEl) swatchEl.style.background = colorEl.value;
+    if (colorEl && bubbleEl) bubbleEl.style.color = colorEl.value;
+  }
+}
+
+/** 圆角 & 透明度 → 预览气泡更新 */
+function bpUpdateBubbleStyle() {
+  const rEl = document.getElementById('bubbleRadius');
+  const opEl = document.getElementById('bubbleOpacity');
+  if (!rEl || !opEl) return;
+  const r = rEl.value;
+  const op = parseFloat(opEl.value).toFixed(2);
+  const rvEl = document.getElementById('bubbleRadiusValue');
+  const ovEl = document.getElementById('bubbleOpacityValue');
+  if (rvEl) rvEl.textContent = r + 'px';
+  if (ovEl) ovEl.textContent = parseFloat(op).toFixed(1);
+  // 更新预览气泡
+  ['bpPbLeft', 'bpPbRight'].forEach((id, idx) => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.style.borderRadius = r + 'px';
+    if (idx === 0) b.style.borderBottomLeftRadius = '5px';
+    else b.style.borderBottomRightRadius = '5px';
+    b.style.opacity = op;
+  });
+  bpUpdateSliderTrack(rEl);
+  bpUpdateSliderTrack(opEl);
+}
+
+/** 内联Tab切换（对方/我的装饰） */
+function bpSwitchInlineTab(tab) {
+  const parent = tab.closest('.bp-inline-tabs');
+  if (parent) parent.querySelectorAll('.bp-itab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  const paneId = tab.dataset.pane;
+  document.querySelectorAll('.bp-itab-pane').forEach(p => p.classList.remove('active'));
+  const pane = document.getElementById(paneId);
+  if (pane) pane.classList.add('active');
+}
+
+/** 九宫格位置选择 → 同步到隐藏的 select */
+function bpSelectPos(cell) {
+  const picker = cell.closest('.bp-pos-picker');
+  if (!picker) return;
+  picker.querySelectorAll('.bp-pos-cell').forEach(c => c.classList.remove('active'));
+  cell.classList.add('active');
+  // 同步到隐藏 select
+  const selectId = picker.dataset.selectId;
+  if (selectId) {
+    const sel = document.getElementById(selectId);
+    if (sel) {
+      sel.value = cell.dataset.pos;
+      sel.dispatchEvent(new Event('change'));
+    }
+  }
+}
+
+/** 滑块数值同步显示 */
+function bpSliderSync(rangeEl, valId) {
+  const valEl = document.getElementById(valId);
+  if (valEl) valEl.textContent = rangeEl.value + 'px';
+  bpUpdateSliderTrack(rangeEl);
+}
+
+/** 滑块轨道填充进度 */
+function bpUpdateSliderTrack(el) {
+  if (!el) return;
+  const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
+  const pct = ((val - min) / (max - min)) * 100;
+  el.style.setProperty('--pct', pct + '%');
+}
+
+/** 叙事美化 - 字号更新 */
+function bpUpdateFontSize() {
+  const el = document.getElementById('customFontSize');
+  const valEl = document.getElementById('bpValFontSize');
+  if (el && valEl) {
+    valEl.textContent = el.value + 'px';
+    bpUpdateSliderTrack(el);
+  }
+  // 同步预览
+  const prevNarr = document.getElementById('bpPreviewNarrative');
+  if (prevNarr && el) prevNarr.style.fontSize = el.value + 'px';
+  // 应用字号
+  if (el) applyCustomFontSize(parseInt(el.value), false);
+}
+
+/** 叙事美化 - 颜色/格式更新 */
+function bpUpdateNarr(type) {
+  const colorEl = document.getElementById('tb-' + type + '-color');
+  const bgEl = document.getElementById('tb-' + type + '-bg');
+  const hexEl = document.getElementById('tb-' + type + '-color-hex');
+  const bgHexEl = document.getElementById('tb-' + type + '-bg-hex');
+  if (colorEl && hexEl) hexEl.value = colorEl.value.toUpperCase();
+  if (bgEl && bgHexEl) bgHexEl.value = bgEl.value.toUpperCase();
+  // 更新色块
+  const swatchMap = { normal: 'bpSwNormC', quote: 'bpSwQuoteC', brace: 'bpSwBraceC' };
+  const bgSwatchMap = { normal: 'bpSwNormBg', quote: 'bpSwQuoteBg', brace: 'bpSwBraceBg' };
+  const sw = document.getElementById(swatchMap[type]);
+  const swBg = document.getElementById(bgSwatchMap[type]);
+  if (sw && colorEl) sw.style.background = colorEl.value;
+  if (swBg && bgEl) swBg.style.background = bgEl.value;
+  // 更新预览
+  const prevMap = { normal: 'bpPrevNorm', quote: 'bpPrevQuote', brace: 'bpPrevBrace' };
+  const prevEl = document.getElementById(prevMap[type]);
+  if (prevEl) {
+    if (colorEl) prevEl.style.color = colorEl.value;
+    if (bgEl) {
+      prevEl.style.backgroundColor = (bgEl.value.toLowerCase() === '#ffffff') ? 'transparent' : bgEl.value;
+    }
+    const boldEl = document.getElementById('tb-' + type + '-weight');
+    const italicEl = document.getElementById('tb-' + type + '-style');
+    if (boldEl) prevEl.style.fontWeight = boldEl.classList.contains('active') ? '700' : '400';
+    if (italicEl) prevEl.style.fontStyle = italicEl.classList.contains('active') ? 'italic' : 'normal';
+  }
+}
+
+/** 保存所有气泡设置（调用已有的 applyBubbleSettings） */
+function bpSaveAll() {
+  applyBubbleSettings();
+  applyBubbleDecSettings();
+  showToast('气泡设置已保存 ✓');
+}
+
+/** 初始化气泡调色盘UI的滑块轨道 */
+(function initBpSliders() {
+  setTimeout(function() {
+    document.querySelectorAll('.bp-range').forEach(bpUpdateSliderTrack);
+  }, 500);
+})();
+

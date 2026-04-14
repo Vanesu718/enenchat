@@ -227,12 +227,6 @@
             <span style="color:var(--text-light);">></span>
           </div>
         </div>
-        <div class="menu-item" onclick="openSub('theme-text-setting')" style="padding:16px; margin-top:12px; margin-bottom:0;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:500;">叙事美化</span>
-            <span style="color:var(--text-light);">></span>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -295,132 +289,6 @@
       </div>
     </div>
 
-    <div class="sub-page" id="theme-text-setting">
-      <div class="page-header">
-        <div class="page-back" onclick="closeSub('theme-text-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="page-title">叙事美化</div>
-      </div>
-      <div class="page-body">
-        <div class="setting-desc" style="margin-bottom:15px;">支持针对普通正文以及被 {}、“” 或 "" 包裹的文字分别设置样式。</div>
-        
-        <div class="form-section">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <div class="form-label" style="font-size:14px; color:var(--main-pink); margin-bottom:0;">自定义全局字体</div>
-            <div style="display:flex; gap:8px;">
-              <button class="tb-clear-btn" style="background:var(--light-pink); color:var(--main-pink);" onclick="applyCustomFont()">应用</button>
-              <button class="tb-clear-btn" onclick="clearCustomFont()">清除</button>
-            </div>
-          </div>
-          <input class="form-input" id="customFontUrl" placeholder="输入字体文件链接 (如 .ttf, .woff)" onchange="applyCustomFont()">
-          <div class="setting-desc" style="margin-top:6px;">输入字体链接后点击应用，全局字体将替换为该字体。</div>
-        </div>
-
-        <div class="form-section">
-          <div class="form-label" style="font-size:14px; color:var(--main-pink); margin-bottom:0;">全局字体大小</div>
-          <input type="range" id="customFontSize" min="12" max="24" step="1" value="14" oninput="applyCustomFontSize(this.value)" style="width:100%; margin-top:10px;">
-          <div class="setting-desc" style="margin-top:6px;">拖动调节全局字体大小 (12px - 24px)。</div>
-        </div>
-
-        <div style="padding: 15px; background: rgba(0,0,0,0.03); border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--light-pink);">
-          <div style="font-size: 14px; line-height: 1.6;">
-            <span class="text-normal">比格林看着用户</span><br>
-            <span class="text-quote">“怎么这么多代码要修！”</span><br>
-            <span class="text-brace">{它叼起扳手verver的跑走。}</span>
-          </div>
-        </div>
-
-        <div id="text-beautify-container">
-          <!-- 普通正文 -->
-          <div class="tb-section">
-            <div class="tb-title">普通正文</div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-              <div class="tb-color-group">
-                <div class="tb-color-item">
-                  <div class="tb-color-label">文字颜色</div>
-                  <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-normal-color" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-normal-color-hex').value=this.value; applyTextBeautify()">
-                  </div>
-                  <input type="text" id="tb-normal-color-hex" value="#000000" onchange="document.getElementById('tb-normal-color').value=this.value; document.getElementById('tb-normal-color').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
-                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-normal-color')">清除</button>
-                </div>
-                <div class="tb-color-item">
-                  <div class="tb-color-label">文字底色</div>
-                  <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-normal-bg" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-normal-bg-hex').value=this.value; applyTextBeautify()">
-                  </div>
-                  <input type="text" id="tb-normal-bg-hex" value="#ffffff" onchange="document.getElementById('tb-normal-bg').value=this.value; document.getElementById('tb-normal-bg').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
-                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-normal-bg')">清除</button>
-                </div>
-              </div>
-              <div class="tb-format-group">
-                <button class="tb-format-btn" id="tb-normal-weight" onclick="toggleTextFormat(this, 'weight')" style="font-weight: bold;" title="加粗">B</button>
-                <button class="tb-format-btn" id="tb-normal-style" onclick="toggleTextFormat(this, 'style')" style="font-style: italic; font-family: serif;" title="斜体">I</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- {} 包裹文字 -->
-          <div class="tb-section">
-            <div class="tb-title">{} 包裹文字 (动作/心理)</div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-              <div class="tb-color-group">
-                <div class="tb-color-item">
-                  <div class="tb-color-label">文字颜色</div>
-                  <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-brace-color" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-brace-color-hex').value=this.value; applyTextBeautify()">
-                  </div>
-                  <input type="text" id="tb-brace-color-hex" value="#000000" onchange="document.getElementById('tb-brace-color').value=this.value; document.getElementById('tb-brace-color').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
-                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-brace-color')">清除</button>
-                </div>
-                <div class="tb-color-item">
-                  <div class="tb-color-label">文字底色</div>
-                  <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-brace-bg" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-brace-bg-hex').value=this.value; applyTextBeautify()">
-                  </div>
-                  <input type="text" id="tb-brace-bg-hex" value="#ffffff" onchange="document.getElementById('tb-brace-bg').value=this.value; document.getElementById('tb-brace-bg').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
-                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-brace-bg')">清除</button>
-                </div>
-              </div>
-              <div class="tb-format-group">
-                <button class="tb-format-btn" id="tb-brace-weight" onclick="toggleTextFormat(this, 'weight')" style="font-weight: bold;" title="加粗">B</button>
-                <button class="tb-format-btn" id="tb-brace-style" onclick="toggleTextFormat(this, 'style')" style="font-style: italic; font-family: serif;" title="斜体">I</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- “” / "" 包裹文字 -->
-          <div class="tb-section">
-            <div class="tb-title">“ ” 或 " " 包裹文字 (对话)</div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-              <div class="tb-color-group">
-                <div class="tb-color-item">
-                  <div class="tb-color-label">文字颜色</div>
-                  <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-quote-color" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-quote-color-hex').value=this.value; applyTextBeautify()">
-                  </div>
-                  <input type="text" id="tb-quote-color-hex" value="#000000" onchange="document.getElementById('tb-quote-color').value=this.value; document.getElementById('tb-quote-color').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
-                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-quote-color')">清除</button>
-                </div>
-                <div class="tb-color-item">
-                  <div class="tb-color-label">文字底色</div>
-                  <div class="tb-color-picker-wrap">
-                    <input type="color" class="tb-color-picker" id="tb-quote-bg" data-cleared="true" onchange="this.removeAttribute('data-cleared'); document.getElementById('tb-quote-bg-hex').value=this.value; applyTextBeautify()">
-                  </div>
-                  <input type="text" id="tb-quote-bg-hex" value="#ffffff" onchange="document.getElementById('tb-quote-bg').value=this.value; document.getElementById('tb-quote-bg').removeAttribute('data-cleared'); applyTextBeautify()" style="width:60px;height:22px;border:1px solid #e0e0e0;border-radius:4px;padding:0 4px;font-size:11px;text-align:center;outline:none;" placeholder="#HEX">
-                  <button class="tb-clear-btn" onclick="clearTextBeautifyColor('tb-quote-bg')">清除</button>
-                </div>
-              </div>
-              <div class="tb-format-group">
-                <button class="tb-format-btn" id="tb-quote-weight" onclick="toggleTextFormat(this, 'weight')" style="font-weight: bold;" title="加粗">B</button>
-                <button class="tb-format-btn" id="tb-quote-style" onclick="toggleTextFormat(this, 'style')" style="font-style: italic; font-family: serif;" title="斜体">I</button>
-              </div>
-            </div>
-          </div>
-          
-          <button class="save-btn" onclick="saveTextBeautifySettings()">保存叙事美化设置</button>
-        </div>
-      </div>
-    </div>
 
 
     <div class="sub-page" id="theme-color-setting">
@@ -466,108 +334,307 @@
         <div class="page-back" onclick="closeSub('theme-bubble-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">气泡调色盘</div>
       </div>
-      <div class="page-body">
-        
-        <div class="form-label">气泡调色盘</div>
-        <div class="setting-desc" style="margin-top:6px;margin-bottom:12px;">调整聊天气泡的颜色、透明度和圆角。</div>
-        
-        <div style="padding: 25px 15px; background: rgba(0,0,0,0.03); border-radius: 12px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 20px; border: 1px dashed var(--light-pink); overflow: hidden;">
-          <div class="msg-item left" style="align-self: flex-start; max-width: 80%;">
-            <div class="msg-avatar" style="border:none;"><img src="haibaologo.png" style="border-radius:50%;"></div>
-            <div class="msg-bubble" style="pointer-events: none;">对方气泡预览</div>
-          </div>
-          <div class="msg-item right" style="align-self: flex-end; max-width: 80%;">
-            <div class="msg-avatar" style="border:none;"><img src="haibaologo.png" style="border-radius:50%;"></div>
-            <div class="msg-bubble" style="pointer-events: none;">我的气泡预览</div>
-          </div>
-        </div>
-        
-        <div style="display:flex; gap:10px;">
-          <div class="form-section" style="flex:1;">
-            <div class="form-label" style="font-size:13px;">对方气泡颜色</div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <input type="color" id="leftBubbleColor" value="#ffffff" onchange="document.getElementById('leftBubbleColorHex').value=this.value; applyBubbleSettings(); updateBubblePreview();" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;padding:0;">
-              <input type="text" id="leftBubbleColorHex" value="#ffffff" onchange="document.getElementById('leftBubbleColor').value=this.value; applyBubbleSettings(); updateBubblePreview();" style="width:80px;height:36px;border:1px solid var(--light-pink);border-radius:8px;padding:0 10px;font-size:14px;outline:none;" placeholder="#HEX">
-            </div>
-          </div>
+      <div class="page-body" style="padding:0; background:var(--bubble-ui-bg, #f2f2f7); overflow-y:auto;">
 
-          <div class="form-section" style="flex:1;">
-            <div class="form-label" style="font-size:13px;">我的气泡颜色</div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <input type="color" id="rightBubbleColor" value="#f0b8c8" onchange="document.getElementById('rightBubbleColorHex').value=this.value; applyBubbleSettings(); updateBubblePreview();" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;padding:0;">
-              <input type="text" id="rightBubbleColorHex" value="#f0b8c8" onchange="document.getElementById('rightBubbleColor').value=this.value; applyBubbleSettings(); updateBubblePreview();" style="width:80px;height:36px;border:1px solid var(--light-pink);border-radius:8px;padding:0 10px;font-size:14px;outline:none;" placeholder="#HEX">
-            </div>
+        <!-- ===== TOP SEGMENT CONTROL ===== -->
+        <div class="bp-seg-bar">
+          <div class="bp-seg-wrap">
+            <div class="bp-seg-btn active" data-target="bubble" onclick="switchBpSegment(this)">🫧 气泡美化</div>
+            <div class="bp-seg-btn" data-target="narrative" onclick="switchBpSegment(this)">📖 叙事美化</div>
           </div>
         </div>
 
-        <div style="margin-top:15px;">
-          <div style="font-size:13px; color:var(--text-main); margin-bottom:8px; font-weight:500;">气泡角度 <span id="bubbleRadiusValue">12</span>px</div>
-          <input type="range" id="bubbleRadius" min="0" max="30" step="1" value="12" oninput="applyBubbleSettings(); updateBubblePreview();" style="width:100%;">
-        </div>
-        <div style="margin-top:15px; margin-bottom:20px;">
-          <div style="font-size:13px; color:var(--text-main); margin-bottom:8px; font-weight:500;">透明度 <span id="bubbleOpacityValue">1.0</span></div>
-          <input type="range" id="bubbleOpacity" min="0.1" max="1" step="0.1" value="1.0" oninput="applyBubbleSettings(); updateBubblePreview();" style="width:100%;">
-        </div>
-        
-        <div class="form-section">
-          <div class="form-label" style="font-size:13px;">对方气泡装饰</div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div id="leftDecPreview" style="width:40px; height:40px; border:1px dashed #ccc; border-radius:8px; background-size:contain; background-repeat:no-repeat; background-position:center;"></div>
-            <label class="upload-btn" style="margin:0;">上传<input type="file" accept="image/png" onchange="uploadBubbleDec(this, 'left')" style="display:none;"></label>
-            <button class="upload-btn" style="margin:0;" onclick="clearBubbleDec('left')">清除</button>
-            <select id="leftDecCorner" onchange="applyBubbleDecSettings()" class="form-input" style="width:auto; padding:4px 8px; margin:0;">
-              <option value="top-left">左上角</option>
-              <option value="top-right">右上角</option>
-              <option value="bottom-left">左下角</option>
-              <option value="bottom-right">右下角</option>
-            </select>
-          </div>
-          <div style="margin-top:10px;">
-            <div style="font-size:12px; color:var(--text-light);">大小 <span id="leftDecSizeValue">30</span>px</div>
-            <input type="range" id="leftDecSize" min="10" max="100" step="1" value="30" oninput="applyBubbleDecSettings()" style="width:100%;">
-          </div>
-          <div style="margin-top:5px; display:flex; gap:10px;">
-            <div style="flex:1;">
-              <div style="font-size:12px; color:var(--text-light);">垂直偏移 <span id="leftDecYValue">-10</span>px</div>
-              <input type="range" id="leftDecY" min="-15" max="15" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
+        <!-- ===== PREVIEW DOCK ===== -->
+        <div class="bp-preview-dock" id="bpPreviewDock" onclick="this.classList.toggle('mini')">
+          <div class="bp-preview-dock-inner">
+            <div id="bpPreviewBubbles" class="bp-preview-bubbles">
+              <div class="bp-pb-row left">
+                <div class="bp-pb-avatar"></div>
+                <div class="bp-pb-bubble" id="bpPbLeft" style="background:#ffffff; color:#333;">对方气泡预览文字</div>
+              </div>
+              <div class="bp-pb-row right">
+                <div class="bp-pb-avatar"></div>
+                <div class="bp-pb-bubble" id="bpPbRight" style="background:#f0b8c8; color:#333;">我的气泡预览文字</div>
+              </div>
             </div>
-            <div style="flex:1;">
-              <div style="font-size:12px; color:var(--text-light);">水平偏移 <span id="leftDecXValue">-5</span>px</div>
-              <input type="range" id="leftDecX" min="-15" max="15" step="1" value="-5" oninput="applyBubbleDecSettings()" style="width:100%;">
+            <div id="bpPreviewNarrative" class="bp-preview-narrative" style="display:none;">
+              <span class="text-normal" id="bpPrevNorm" style="color:#333;">比格林看着用户，</span>
+              <span class="text-quote" id="bpPrevQuote" style="color:#007aff;">"怎么这么多代码！"</span>
+              <span class="text-brace" id="bpPrevBrace" style="color:#ff3b30;">{它叼起扳手跑走了。}</span>
             </div>
+            <div class="bp-preview-hint">点击收起 / 展开预览</div>
           </div>
         </div>
 
-        <div class="form-section">
-          <div class="form-label" style="font-size:13px;">我的气泡装饰</div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div id="rightDecPreview" style="width:40px; height:40px; border:1px dashed #ccc; border-radius:8px; background-size:contain; background-repeat:no-repeat; background-position:center;"></div>
-            <label class="upload-btn" style="margin:0;">上传<input type="file" accept="image/png" onchange="uploadBubbleDec(this, 'right')" style="display:none;"></label>
-            <button class="upload-btn" style="margin:0;" onclick="clearBubbleDec('right')">清除</button>
-            <select id="rightDecCorner" onchange="applyBubbleDecSettings()" class="form-input" style="width:auto; padding:4px 8px; margin:0;">
-              <option value="top-left">左上角</option>
-              <option value="top-right" selected>右上角</option>
-              <option value="bottom-left">左下角</option>
-              <option value="bottom-right">右下角</option>
-            </select>
-          </div>
-          <div style="margin-top:10px;">
-            <div style="font-size:12px; color:var(--text-light);">大小 <span id="rightDecSizeValue">30</span>px</div>
-            <input type="range" id="rightDecSize" min="10" max="100" step="1" value="30" oninput="applyBubbleDecSettings()" style="width:100%;">
-          </div>
-          <div style="margin-top:5px; display:flex; gap:10px;">
-            <div style="flex:1;">
-              <div style="font-size:12px; color:var(--text-light);">垂直偏移 <span id="rightDecYValue">-10</span>px</div>
-              <input type="range" id="rightDecY" min="-15" max="15" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
+        <!-- ===== SCROLL BODY ===== -->
+        <div class="bp-scroll-body">
+
+          <!-- ====== BUBBLE VIEW ====== -->
+          <div class="bp-view active" id="bp-view-bubble">
+
+            <div class="bp-section-label">气泡颜色</div>
+            <div class="bp-card">
+              <div class="bp-color-pair">
+                <div class="bp-color-pair-item">
+                  <div class="bp-color-pair-label">对方气泡</div>
+                  <div class="bp-color-swatch-lg" id="bpSwatchL" style="background:#ffffff;">
+                    <input type="color" id="leftBubbleColor" value="#ffffff" oninput="bpSyncColor('L','bg')">
+                  </div>
+                  <input class="bp-hex-pill-sm" id="leftBubbleColorHex" value="#FFFFFF" readonly>
+                  <div style="font-size:11px; color:var(--bp-text3, #8e8e93); margin-top:2px;">背景色</div>
+                </div>
+                <div class="bp-color-pair-item">
+                  <div class="bp-color-pair-label">我的气泡</div>
+                  <div class="bp-color-swatch-lg" id="bpSwatchR" style="background:#f0b8c8;">
+                    <input type="color" id="rightBubbleColor" value="#f0b8c8" oninput="bpSyncColor('R','bg')">
+                  </div>
+                  <input class="bp-hex-pill-sm" id="rightBubbleColorHex" value="#F0B8C8" readonly>
+                  <div style="font-size:11px; color:var(--bp-text3, #8e8e93); margin-top:2px;">背景色</div>
+                </div>
+              </div>
+
+              <div class="bp-card-divider"></div>
+
+              <div class="bp-row">
+                <div style="flex:1;">
+                  <div class="bp-row-label">字体颜色</div>
+                  <div class="bp-row-sublabel">对方 / 我的</div>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                  <div class="bp-color-swatch" id="bpSwatchTL" style="background:#333333;" title="对方字色">
+                    <input type="color" id="leftBubbleTextColor" value="#333333" oninput="bpSyncColor('L','txt')">
+                  </div>
+                  <div class="bp-color-swatch" id="bpSwatchTR" style="background:#333333;" title="我的字色">
+                    <input type="color" id="rightBubbleTextColor" value="#333333" oninput="bpSyncColor('R','txt')">
+                  </div>
+                </div>
+              </div>
             </div>
-            <div style="flex:1;">
-              <div style="font-size:12px; color:var(--text-light);">水平偏移 <span id="rightDecXValue">-10</span>px</div>
-              <input type="range" id="rightDecX" min="-15" max="15" step="1" value="-10" oninput="applyBubbleDecSettings()" style="width:100%;">
+
+            <div class="bp-section-label">气泡样式</div>
+            <div class="bp-card">
+              <div class="bp-slider-row">
+                <div class="bp-slider-meta">
+                  <span class="bp-slider-name">圆角大小</span>
+                  <span class="bp-slider-val" id="bubbleRadiusValue">12px</span>
+                </div>
+                <input type="range" class="bp-range" min="0" max="30" value="12" id="bubbleRadius" oninput="bpUpdateBubbleStyle()">
+              </div>
+              <div class="bp-slider-row">
+                <div class="bp-slider-meta">
+                  <span class="bp-slider-name">透明度</span>
+                  <span class="bp-slider-val" id="bubbleOpacityValue">1.0</span>
+                </div>
+                <input type="range" class="bp-range" min="0.1" max="1" step="0.05" value="1" id="bubbleOpacity" oninput="bpUpdateBubbleStyle()">
+              </div>
             </div>
-          </div>
-        </div>
-        </div>
-      </div>
+
+            <div class="bp-section-label">气泡装饰贴图</div>
+            <div class="bp-card">
+              <div style="padding: 12px 16px 0;">
+                <div class="bp-inline-tabs" id="bpDecoTabs">
+                  <div class="bp-itab active" data-pane="bp-pane-deco-L" onclick="bpSwitchInlineTab(this)">对方</div>
+                  <div class="bp-itab" data-pane="bp-pane-deco-R" onclick="bpSwitchInlineTab(this)">我的</div>
+                </div>
+              </div>
+
+              <div class="bp-itab-pane active" id="bp-pane-deco-L">
+                <div class="bp-upload-row">
+                  <div class="bp-upload-thumb" id="leftDecPreview">＋</div>
+                  <div class="bp-upload-actions">
+                    <div class="bp-upload-action-label">贴图装饰 · 对方</div>
+                    <div class="bp-upload-btns">
+                      <label class="bp-chip-btn primary">上传图片<input type="file" accept="image/png" onchange="uploadBubbleDec(this, 'left')" style="display:none;"></label>
+                      <button class="bp-chip-btn ghost" onclick="clearBubbleDec('left')">清除</button>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-size:11px; color:var(--bp-text3, #8e8e93); text-align:center; margin-bottom:6px;">位置</div>
+                    <div class="bp-pos-picker" id="bpPosL" data-select-id="leftDecCorner">
+                      <div class="bp-pos-cell active" data-pos="top-left" onclick="bpSelectPos(this)"></div>
+                      <div class="bp-pos-cell" data-pos="top-right" onclick="bpSelectPos(this)"></div>
+                      <div class="bp-pos-cell" data-pos="bottom-left" onclick="bpSelectPos(this)"></div>
+                      <div class="bp-pos-cell" data-pos="bottom-right" onclick="bpSelectPos(this)"></div>
+                    </div>
+                    <select id="leftDecCorner" onchange="applyBubbleDecSettings()" style="display:none;">
+                      <option value="top-left" selected>左上角</option>
+                      <option value="top-right">右上角</option>
+                      <option value="bottom-left">左下角</option>
+                      <option value="bottom-right">右下角</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="bp-card-divider"></div>
+                <div class="bp-slider-row">
+                  <div class="bp-slider-meta"><span class="bp-slider-name">贴图大小</span><span class="bp-slider-val" id="leftDecSizeValue">30px</span></div>
+                  <input type="range" class="bp-range" min="10" max="100" value="30" id="leftDecSize" oninput="applyBubbleDecSettings(); bpSliderSync(this, 'leftDecSizeValue')">
+                </div>
+                <div class="bp-slider-row">
+                  <div class="bp-slider-meta"><span class="bp-slider-name">垂直偏移</span><span class="bp-slider-val" id="leftDecYValue">-10px</span></div>
+                  <input type="range" class="bp-range" min="-60" max="60" value="-10" id="leftDecY" oninput="applyBubbleDecSettings(); bpSliderSync(this, 'leftDecYValue')">
+                </div>
+                <div class="bp-slider-row">
+                  <div class="bp-slider-meta"><span class="bp-slider-name">水平偏移</span><span class="bp-slider-val" id="leftDecXValue">-5px</span></div>
+                  <input type="range" class="bp-range" min="-60" max="60" value="-5" id="leftDecX" oninput="applyBubbleDecSettings(); bpSliderSync(this, 'leftDecXValue')">
+                </div>
+              </div>
+
+              <div class="bp-itab-pane" id="bp-pane-deco-R">
+                <div class="bp-upload-row">
+                  <div class="bp-upload-thumb" id="rightDecPreview">＋</div>
+                  <div class="bp-upload-actions">
+                    <div class="bp-upload-action-label">贴图装饰 · 我的</div>
+                    <div class="bp-upload-btns">
+                      <label class="bp-chip-btn primary">上传图片<input type="file" accept="image/png" onchange="uploadBubbleDec(this, 'right')" style="display:none;"></label>
+                      <button class="bp-chip-btn ghost" onclick="clearBubbleDec('right')">清除</button>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-size:11px; color:var(--bp-text3, #8e8e93); text-align:center; margin-bottom:6px;">位置</div>
+                    <div class="bp-pos-picker" id="bpPosR" data-select-id="rightDecCorner">
+                      <div class="bp-pos-cell" data-pos="top-left" onclick="bpSelectPos(this)"></div>
+                      <div class="bp-pos-cell active" data-pos="top-right" onclick="bpSelectPos(this)"></div>
+                      <div class="bp-pos-cell" data-pos="bottom-left" onclick="bpSelectPos(this)"></div>
+                      <div class="bp-pos-cell" data-pos="bottom-right" onclick="bpSelectPos(this)"></div>
+                    </div>
+                    <select id="rightDecCorner" onchange="applyBubbleDecSettings()" style="display:none;">
+                      <option value="top-left">左上角</option>
+                      <option value="top-right" selected>右上角</option>
+                      <option value="bottom-left">左下角</option>
+                      <option value="bottom-right">右下角</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="bp-card-divider"></div>
+                <div class="bp-slider-row">
+                  <div class="bp-slider-meta"><span class="bp-slider-name">贴图大小</span><span class="bp-slider-val" id="rightDecSizeValue">30px</span></div>
+                  <input type="range" class="bp-range" min="10" max="100" value="30" id="rightDecSize" oninput="applyBubbleDecSettings(); bpSliderSync(this, 'rightDecSizeValue')">
+                </div>
+                <div class="bp-slider-row">
+                  <div class="bp-slider-meta"><span class="bp-slider-name">垂直偏移</span><span class="bp-slider-val" id="rightDecYValue">-10px</span></div>
+                  <input type="range" class="bp-range" min="-60" max="60" value="-10" id="rightDecY" oninput="applyBubbleDecSettings(); bpSliderSync(this, 'rightDecYValue')">
+                </div>
+                <div class="bp-slider-row">
+                  <div class="bp-slider-meta"><span class="bp-slider-name">水平偏移</span><span class="bp-slider-val" id="rightDecXValue">-10px</span></div>
+                  <input type="range" class="bp-range" min="-60" max="60" value="-10" id="rightDecX" oninput="applyBubbleDecSettings(); bpSliderSync(this, 'rightDecXValue')">
+                </div>
+              </div>
+            </div>
+
+            <button class="bp-apply-btn" onclick="bpSaveAll()">💾 保存气泡设置</button>
+
+          </div><!-- /bp-view-bubble -->
+
+          <!-- ====== NARRATIVE VIEW ====== -->
+          <div class="bp-view" id="bp-view-narrative">
+
+            <div class="bp-section-label">全局设置</div>
+            <div class="bp-card">
+              <div class="bp-row">
+                <div style="flex:1;">
+                  <div class="bp-row-label">自定义全局字体</div>
+                  <div class="bp-row-sublabel">输入字体文件链接</div>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <button class="bp-chip-btn primary" onclick="applyCustomFont()">应用</button>
+                  <button class="bp-chip-btn ghost" onclick="clearCustomFont()">清除</button>
+                </div>
+              </div>
+              <div style="padding:0 16px 14px;">
+                <input class="bp-font-input" id="customFontUrl" placeholder="输入字体文件链接 (.ttf, .woff)" onchange="applyCustomFont()">
+              </div>
+              <div class="bp-card-divider"></div>
+              <div class="bp-slider-row">
+                <div class="bp-slider-meta">
+                  <span class="bp-slider-name">全局字体大小</span>
+                  <span class="bp-slider-val" id="bpValFontSize">14px</span>
+                </div>
+                <input type="range" class="bp-range" min="12" max="24" value="14" id="customFontSize" oninput="bpUpdateFontSize()">
+              </div>
+            </div>
+
+            <div class="bp-section-label">普通正文</div>
+            <div class="bp-card">
+              <div class="bp-row">
+                <div class="bp-row-label">文字颜色</div>
+                <div class="bp-color-swatch" id="bpSwNormC" style="background:#333333;">
+                  <input type="color" id="tb-normal-color" value="#333333" data-cleared="true" oninput="this.removeAttribute('data-cleared'); bpUpdateNarr('normal')">
+                </div>
+                <input class="bp-hex-pill" id="tb-normal-color-hex" value="#333333" readonly>
+              </div>
+              <div class="bp-row">
+                <div class="bp-row-label">文字底色</div>
+                <div class="bp-color-swatch" id="bpSwNormBg" style="background:#ffffff;">
+                  <input type="color" id="tb-normal-bg" value="#ffffff" data-cleared="true" oninput="this.removeAttribute('data-cleared'); bpUpdateNarr('normal')">
+                </div>
+                <input class="bp-hex-pill" id="tb-normal-bg-hex" value="#ffffff" readonly>
+              </div>
+              <div class="bp-row">
+                <div class="bp-row-label">样式</div>
+                <div class="bp-fmt-row">
+                  <div class="bp-fmt-btn" id="tb-normal-weight" style="font-weight:700;" onclick="toggleTextFormat(this, 'weight'); bpUpdateNarr('normal')">B</div>
+                  <div class="bp-fmt-btn" id="tb-normal-style" style="font-style:italic; font-family:Georgia,serif;" onclick="toggleTextFormat(this, 'style'); bpUpdateNarr('normal')">I</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bp-section-label">对话 " "</div>
+            <div class="bp-card">
+              <div class="bp-row">
+                <div class="bp-row-label">文字颜色</div>
+                <div class="bp-color-swatch" id="bpSwQuoteC" style="background:#007aff;">
+                  <input type="color" id="tb-quote-color" value="#007aff" data-cleared="true" oninput="this.removeAttribute('data-cleared'); bpUpdateNarr('quote')">
+                </div>
+                <input class="bp-hex-pill" id="tb-quote-color-hex" value="#007AFF" readonly>
+              </div>
+              <div class="bp-row">
+                <div class="bp-row-label">文字底色</div>
+                <div class="bp-color-swatch" id="bpSwQuoteBg" style="background:#ffffff;">
+                  <input type="color" id="tb-quote-bg" value="#ffffff" data-cleared="true" oninput="this.removeAttribute('data-cleared'); bpUpdateNarr('quote')">
+                </div>
+                <input class="bp-hex-pill" id="tb-quote-bg-hex" value="#ffffff" readonly>
+              </div>
+              <div class="bp-row">
+                <div class="bp-row-label">样式</div>
+                <div class="bp-fmt-row">
+                  <div class="bp-fmt-btn" id="tb-quote-weight" style="font-weight:700;" onclick="toggleTextFormat(this, 'weight'); bpUpdateNarr('quote')">B</div>
+                  <div class="bp-fmt-btn" id="tb-quote-style" style="font-style:italic; font-family:Georgia,serif;" onclick="toggleTextFormat(this, 'style'); bpUpdateNarr('quote')">I</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bp-section-label">动作 / 心理 { }</div>
+            <div class="bp-card">
+              <div class="bp-row">
+                <div class="bp-row-label">文字颜色</div>
+                <div class="bp-color-swatch" id="bpSwBraceC" style="background:#ff3b30;">
+                  <input type="color" id="tb-brace-color" value="#ff3b30" data-cleared="true" oninput="this.removeAttribute('data-cleared'); bpUpdateNarr('brace')">
+                </div>
+                <input class="bp-hex-pill" id="tb-brace-color-hex" value="#FF3B30" readonly>
+              </div>
+              <div class="bp-row">
+                <div class="bp-row-label">文字底色</div>
+                <div class="bp-color-swatch" id="bpSwBraceBg" style="background:#ffffff;">
+                  <input type="color" id="tb-brace-bg" value="#ffffff" data-cleared="true" oninput="this.removeAttribute('data-cleared'); bpUpdateNarr('brace')">
+                </div>
+                <input class="bp-hex-pill" id="tb-brace-bg-hex" value="#ffffff" readonly>
+              </div>
+              <div class="bp-row">
+                <div class="bp-row-label">样式</div>
+                <div class="bp-fmt-row">
+                  <div class="bp-fmt-btn" id="tb-brace-weight" style="font-weight:700;" onclick="toggleTextFormat(this, 'weight'); bpUpdateNarr('brace')">B</div>
+                  <div class="bp-fmt-btn" id="tb-brace-style" style="font-style:italic; font-family:Georgia,serif;" onclick="toggleTextFormat(this, 'style'); bpUpdateNarr('brace')">I</div>
+                </div>
+              </div>
+            </div>
+
+            <button class="bp-apply-btn" onclick="saveTextBeautifySettings()">💾 保存叙事美化设置</button>
+
+          </div><!-- /bp-view-narrative -->
+
+        </div><!-- /bp-scroll-body -->
+
+      </div><!-- /page-body -->
     </div>
 
     <div class="sub-page" id="api-win">
