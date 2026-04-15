@@ -7250,39 +7250,6 @@ async function loadBubbleSettings() {
       }
       
       updateBubblePreview();
-      
-      // 同步更新新UI中的色块、预览气泡和hex显示
-      const bpSwL = document.getElementById('bpSwatchL');
-      const bpSwR = document.getElementById('bpSwatchR');
-      if (bpSwL && leftColor) bpSwL.style.background = leftColor;
-      if (bpSwR && rightColor) bpSwR.style.background = rightColor;
-      const hexL = document.getElementById('leftBubbleColorHex');
-      const hexR = document.getElementById('rightBubbleColorHex');
-      if (hexL && leftColor) hexL.value = leftColor.toUpperCase();
-      if (hexR && rightColor) hexR.value = rightColor.toUpperCase();
-      const bpSwTL = document.getElementById('bpSwatchTL');
-      const bpSwTR = document.getElementById('bpSwatchTR');
-      if (bpSwTL && leftTextColor) bpSwTL.style.background = leftTextColor;
-      if (bpSwTR && rightTextColor) bpSwTR.style.background = rightTextColor;
-      const bpPbL = document.getElementById('bpPbLeft');
-      const bpPbR = document.getElementById('bpPbRight');
-      if (bpPbL) {
-        if (leftColor) bpPbL.style.background = leftColor;
-        if (leftTextColor) bpPbL.style.color = leftTextColor;
-        if (radius !== undefined) { bpPbL.style.borderRadius = radius + 'px'; bpPbL.style.borderBottomLeftRadius = '5px'; }
-        if (opacity !== undefined) bpPbL.style.opacity = opacity;
-      }
-      if (bpPbR) {
-        if (rightColor) bpPbR.style.background = rightColor;
-        if (rightTextColor) bpPbR.style.color = rightTextColor;
-        if (radius !== undefined) { bpPbR.style.borderRadius = radius + 'px'; bpPbR.style.borderBottomRightRadius = '5px'; }
-        if (opacity !== undefined) bpPbR.style.opacity = opacity;
-      }
-      // 更新滑块track样式
-      const rEl = document.getElementById('bubbleRadius');
-      const opEl = document.getElementById('bubbleOpacity');
-      if (rEl) bpUpdateSliderTrack(rEl);
-      if (opEl) bpUpdateSliderTrack(opEl);
     } catch(e) {}
   }
 }
@@ -7308,26 +7275,7 @@ function uploadBubbleDec(input, side) {
       const compressed = canvas.toDataURL('image/png');
       
       document.getElementById(`${side}DecPreview`).style.backgroundImage = `url(${compressed})`;
-      document.getElementById(`${side}DecPreview`).textContent = '';
       document.documentElement.style.setProperty(`--${side}-dec-img`, `url(${compressed})`);
-      // 同步更新顶部预览窗口的装饰贴图
-      const previewBubbleId = side === 'left' ? 'bpPbLeft' : 'bpPbRight';
-      const previewBubble = document.getElementById(previewBubbleId);
-      if (previewBubble) {
-        previewBubble.style.position = 'relative';
-        let decEl = previewBubble.querySelector('.bp-dec-preview-img');
-        if (!decEl) {
-          decEl = document.createElement('img');
-          decEl.className = 'bp-dec-preview-img';
-          decEl.style.cssText = 'position:absolute; pointer-events:none; z-index:2;';
-          previewBubble.appendChild(decEl);
-        }
-        decEl.src = compressed;
-        const sizeEl = document.getElementById(`${side}DecSize`);
-        const sz = sizeEl ? sizeEl.value : 30;
-        decEl.style.width = sz + 'px';
-        decEl.style.height = sz + 'px';
-      }
       
       safeSaveAsync(`BUBBLE_DEC_IMG_${side.toUpperCase()}`, compressed);
     };

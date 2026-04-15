@@ -440,11 +440,10 @@
 
               <div class="bp-itab-pane active" id="bp-pane-deco-L">
                 <div class="bp-upload-row">
-                  <div class="bp-upload-thumb" id="leftDecPreview">＋</div>
+                  <div class="bp-upload-thumb" id="leftDecPreview" style="cursor:pointer;" onclick="document.getElementById('leftDecFileInput').click()">＋<input type="file" id="leftDecFileInput" accept="image/png" onchange="uploadBubbleDec(this, 'left')" style="display:none;"></div>
                   <div class="bp-upload-actions">
                     <div class="bp-upload-action-label">贴图装饰 · 对方</div>
                     <div class="bp-upload-btns">
-                      <label class="bp-chip-btn primary">上传图片<input type="file" accept="image/png" onchange="uploadBubbleDec(this, 'left')" style="display:none;"></label>
                       <button class="bp-chip-btn ghost" onclick="clearBubbleDec('left')">清除</button>
                     </div>
                   </div>
@@ -481,11 +480,10 @@
 
               <div class="bp-itab-pane" id="bp-pane-deco-R">
                 <div class="bp-upload-row">
-                  <div class="bp-upload-thumb" id="rightDecPreview">＋</div>
+                  <div class="bp-upload-thumb" id="rightDecPreview" style="cursor:pointer;" onclick="document.getElementById('rightDecFileInput').click()">＋<input type="file" id="rightDecFileInput" accept="image/png" onchange="uploadBubbleDec(this, 'right')" style="display:none;"></div>
                   <div class="bp-upload-actions">
                     <div class="bp-upload-action-label">贴图装饰 · 我的</div>
                     <div class="bp-upload-btns">
-                      <label class="bp-chip-btn primary">上传图片<input type="file" accept="image/png" onchange="uploadBubbleDec(this, 'right')" style="display:none;"></label>
                       <button class="bp-chip-btn ghost" onclick="clearBubbleDec('right')">清除</button>
                     </div>
                   </div>
@@ -556,13 +554,6 @@
             <div class="bp-section-label">普通正文</div>
             <div class="bp-card">
               <div class="bp-row">
-                <div class="bp-row-label">文字颜色</div>
-                <div class="bp-color-swatch" id="bpSwNormC" style="background:#333333;">
-                  <input type="color" id="tb-normal-color" value="#333333" data-cleared="true" oninput="this.removeAttribute('data-cleared'); bpUpdateNarr('normal')">
-                </div>
-                <input class="bp-hex-pill" id="tb-normal-color-hex" value="#333333" readonly>
-              </div>
-              <div class="bp-row">
                 <div class="bp-row-label">文字底色</div>
                 <div class="bp-color-swatch" id="bpSwNormBg" style="background:#ffffff;">
                   <input type="color" id="tb-normal-bg" value="#ffffff" data-cleared="true" oninput="this.removeAttribute('data-cleared'); bpUpdateNarr('normal')">
@@ -599,6 +590,7 @@
                 <div class="bp-fmt-row">
                   <div class="bp-fmt-btn" id="tb-quote-weight" style="font-weight:700;" onclick="toggleTextFormat(this, 'weight'); bpUpdateNarr('quote')">B</div>
                   <div class="bp-fmt-btn" id="tb-quote-style" style="font-style:italic; font-family:Georgia,serif;" onclick="toggleTextFormat(this, 'style'); bpUpdateNarr('quote')">I</div>
+                  <div class="bp-fmt-btn" style="font-size:11px; color:#ff3b30; margin-left:auto;" onclick="bpClearNarr('quote')">清除</div>
                 </div>
               </div>
             </div>
@@ -624,6 +616,7 @@
                 <div class="bp-fmt-row">
                   <div class="bp-fmt-btn" id="tb-brace-weight" style="font-weight:700;" onclick="toggleTextFormat(this, 'weight'); bpUpdateNarr('brace')">B</div>
                   <div class="bp-fmt-btn" id="tb-brace-style" style="font-style:italic; font-family:Georgia,serif;" onclick="toggleTextFormat(this, 'style'); bpUpdateNarr('brace')">I</div>
+                  <div class="bp-fmt-btn" style="font-size:11px; color:#ff3b30; margin-left:auto;" onclick="bpClearNarr('brace')">清除</div>
                 </div>
               </div>
             </div>

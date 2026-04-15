@@ -450,8 +450,8 @@ body {
 .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .msg-bubble { position: relative; padding: 10px 14px; border-radius: var(--bubble-radius, 18px); line-height: 1.4; font-size: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
 .chat-content { touch-action: manipulation; }
-.msg-item.left .msg-bubble { background: rgba(var(--left-bubble-bg, 255, 255, 255), var(--bubble-opacity, 0.85)); color: #333333; border-bottom-left-radius: var(--bubble-bottom-radius, 6px); box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.5); }
-.msg-item.right .msg-bubble { background: rgba(var(--right-bubble-bg, 240, 184, 200), var(--bubble-opacity, 0.85)); color: #fff; border-bottom-right-radius: var(--bubble-bottom-radius, 6px); box-shadow: 0 4px 12px rgba(var(--right-bubble-bg, 240, 184, 200), 0.2); border: 1px solid rgba(255,255,255,0.3); }
+.msg-item.left .msg-bubble { background: rgba(var(--left-bubble-bg, 255, 255, 255), var(--bubble-opacity, 0.85)); color: var(--left-bubble-text-color, var(--bubble-other-text, var(--text-dark))); border-bottom-left-radius: var(--bubble-bottom-radius, 6px); box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.5); }
+.msg-item.right .msg-bubble { background: rgba(var(--right-bubble-bg, 240, 184, 200), var(--bubble-opacity, 0.85)); color: var(--right-bubble-text-color, var(--bubble-my-text, #fff)); border-bottom-right-radius: var(--bubble-bottom-radius, 6px); box-shadow: 0 4px 12px rgba(var(--right-bubble-bg, 240, 184, 200), 0.2); border: 1px solid rgba(255,255,255,0.3); }
 .msg-item.left .msg-bubble::after { content: ''; position: absolute; top: var(--left-dec-top, auto); bottom: var(--left-dec-bottom, auto); left: var(--left-dec-left, auto); right: var(--left-dec-right, auto); width: var(--left-dec-size, 30px); height: var(--left-dec-size, 30px); background-image: var(--left-dec-img, none); background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 10; transform: translate(var(--left-dec-tx, 0), var(--left-dec-ty, 0)); }
 .msg-item.right .msg-bubble::after { content: ''; position: absolute; top: var(--right-dec-top, auto); bottom: var(--right-dec-bottom, auto); left: var(--right-dec-left, auto); right: var(--right-dec-right, auto); width: var(--right-dec-size, 30px); height: var(--right-dec-size, 30px); background-image: var(--right-dec-img, none); background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 10; transform: translate(var(--right-dec-tx, 0), var(--right-dec-ty, 0)); }
 .msg-quote { padding: 6px 10px; border-radius: 8px; font-size: 12px; margin-bottom: 6px; line-height: 1.2; background: #f8f5f0; color: #777777; }
@@ -463,7 +463,7 @@ body {
 .msg-item .check-icon { position: absolute; top: 0; left: 0; width: 20px; height: 20px; background: #ff6b81; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; display: none; }
 .msg-item.selected .check-icon { display: flex; }
 
-.text-normal { color: var(--text-normal-color, inherit); font-weight: var(--text-normal-weight, inherit); font-style: var(--text-normal-style, inherit); background-color: var(--text-normal-bg, transparent); }
+.text-normal { font-weight: var(--text-normal-weight, inherit); font-style: var(--text-normal-style, inherit); background-color: var(--text-normal-bg, transparent); }
 .text-brace { color: var(--text-brace-color, inherit); font-weight: var(--text-brace-weight, inherit); font-style: var(--text-brace-style, inherit); background-color: var(--text-brace-bg, transparent); }
 .text-quote { color: var(--text-quote-color, inherit); font-weight: var(--text-quote-weight, inherit); font-style: var(--text-quote-style, inherit); background-color: var(--text-quote-bg, transparent); }
 

@@ -86,9 +86,9 @@
   -webkit-backdrop-filter: blur(12px); 
 }
 
-.msg-item.left .msg-bubble { 
-  background: rgba(255, 255, 255, 0.6); 
-  color: var(--text-dark); 
+.msg-item.left .msg-bubble {
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--left-bubble-text-color, var(--text-dark));
   border-bottom-left-radius: 6px; 
   box-shadow: 0 4px 12px rgba(0,0,0,0.04); 
   border: 1px solid rgba(255,255,255,0.5); 
@@ -96,7 +96,7 @@
 
 .msg-item.right .msg-bubble { 
   background: rgba(240, 184, 200, 0.85); 
-  color: #fff; 
+  color: var(--right-bubble-text-color, #fff); 
   border-bottom-right-radius: 6px; 
   box-shadow: 0 4px 12px rgba(240, 184, 200, 0.2); 
   border: 1px solid rgba(255,255,255,0.3); 
