@@ -7308,26 +7308,8 @@ function uploadBubbleDec(input, side) {
       const compressed = canvas.toDataURL('image/png');
       
       document.getElementById(`${side}DecPreview`).style.backgroundImage = `url(${compressed})`;
-      document.getElementById(`${side}DecPreview`).textContent = '';
+      document.getElementById(`${side}DecPreview`).style.color = 'transparent';
       document.documentElement.style.setProperty(`--${side}-dec-img`, `url(${compressed})`);
-      // 同步更新顶部预览窗口的装饰贴图
-      const previewBubbleId = side === 'left' ? 'bpPbLeft' : 'bpPbRight';
-      const previewBubble = document.getElementById(previewBubbleId);
-      if (previewBubble) {
-        previewBubble.style.position = 'relative';
-        let decEl = previewBubble.querySelector('.bp-dec-preview-img');
-        if (!decEl) {
-          decEl = document.createElement('img');
-          decEl.className = 'bp-dec-preview-img';
-          decEl.style.cssText = 'position:absolute; pointer-events:none; z-index:2;';
-          previewBubble.appendChild(decEl);
-        }
-        decEl.src = compressed;
-        const sizeEl = document.getElementById(`${side}DecSize`);
-        const sz = sizeEl ? sizeEl.value : 30;
-        decEl.style.width = sz + 'px';
-        decEl.style.height = sz + 'px';
-      }
       
       safeSaveAsync(`BUBBLE_DEC_IMG_${side.toUpperCase()}`, compressed);
     };
@@ -7339,6 +7321,7 @@ function uploadBubbleDec(input, side) {
 
 function clearBubbleDec(side) {
   document.getElementById(`${side}DecPreview`).style.backgroundImage = 'none';
+  document.getElementById(`${side}DecPreview`).style.color = '';
   document.documentElement.style.setProperty(`--${side}-dec-img`, 'none');
   window.storage.removeItem(`BUBBLE_DEC_IMG_${side.toUpperCase()}`);
 }
@@ -7412,6 +7395,7 @@ async function loadBubbleDecSettings() {
     const img = await getFromStorage(`BUBBLE_DEC_IMG_${side.toUpperCase()}`);
     if (img) {
       document.getElementById(`${side}DecPreview`).style.backgroundImage = `url(${img})`;
+      document.getElementById(`${side}DecPreview`).style.color = 'transparent';
       document.documentElement.style.setProperty(`--${side}-dec-img`, `url(${img})`);
     }
   });
