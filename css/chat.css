@@ -443,9 +443,9 @@
 
 /* 背景亮度自适应 */
 .bg-dark {
-    color: #d1d5db !important;
+    color: #d1d5db;
 }
 .bg-light {
-    color: #374151 !important;
+    color: #374151;
 }
 

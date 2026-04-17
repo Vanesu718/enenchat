@@ -1072,6 +1072,9 @@ body {
   }
 
   /* 蓝色清爽主题线下模式卡片样式 */
+  .msg-blue-card {
+    background: rgba(var(--left-bubble-bg, 255, 255, 255), var(--bubble-opacity, 0.85));
+  }
   .msg-item.left.blue-offline-mode {
     max-width: none;
     width: calc(100% + 30px);

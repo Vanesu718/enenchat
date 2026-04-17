@@ -20,6 +20,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <link rel="stylesheet" href="css/index-main.css">
   <link rel="stylesheet" href="css/emoji.css">
+  <link rel="stylesheet" href="css/secret-thought.css">
 <style>
 .icon {
   width: 1em;
@@ -565,6 +566,7 @@
                 <div class="bp-fmt-row">
                   <div class="bp-fmt-btn" id="tb-normal-weight" style="font-weight:700;" onclick="toggleTextFormat(this, 'weight'); bpUpdateNarr('normal')">B</div>
                   <div class="bp-fmt-btn" id="tb-normal-style" style="font-style:italic; font-family:Georgia,serif;" onclick="toggleTextFormat(this, 'style'); bpUpdateNarr('normal')">I</div>
+                  <div class="bp-fmt-btn" style="font-size:11px; color:#ff3b30; margin-left:auto;" onclick="bpClearNarr('normal')">清除</div>
                 </div>
               </div>
             </div>
@@ -2060,7 +2062,8 @@
   <script src="js/activation.js"></script>
   <script src="js/main.js"></script>
   <script src="js/chat-features.js"></script>
-﻿<!-- Red Packet Send Modal -->
+  <script src="js/secret-thought.js"></script>
+<!-- Red Packet Send Modal -->
     <div id="redPacketSendModal" class="rp-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
       <div class="rp-send-card">
         <div class="rp-card-top">
@@ -2087,6 +2090,23 @@
           <button class="rp-send-btn" onclick="sendRedPacket()">&#x585E;&#x9322;&#x8FDB;&#x7EA2;&#x5305;</button>
         </div>
       </div>
+    </div>
+    <div class="secret-trigger-icon" id="triggerIcon" onclick="openPuzzle()"></div>
+
+    <div class="puzzle-modal" id="puzzleModal">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+            <div style="color:white; font-size:14px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 20px; backdrop-filter: blur(5px);">将碎片拖拽到虚线框内拼好</div>
+            <div onclick="closePuzzleModal()" style="width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,0.3); color:white; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(5px); font-size:16px;">×</div>
+        </div>
+        <div class="puzzle-container" id="puzzleContainer"></div>
+        
+        <div class="complete-paper" id="completePaper">
+            <div class="paper-text" id="paperText"></div>
+            <div class="action-btns">
+                <button class="btn-save" onclick="saveThought()">保存到相册</button>
+                <button class="btn-destroy" onclick="destroyThought()">销毁纸条</button>
+            </div>
+        </div>
     </div>
     </body>
 </html>

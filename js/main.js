@@ -1650,7 +1650,7 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
         </div>
       </div>
       ` : ''}
-      <div class="blue-card-bottom">
+      <div class="blue-card-bottom" style="color: var(--left-bubble-text-color);">
         ${qhtml}${parsedContent}
       </div>
     `;
@@ -2334,10 +2334,89 @@ function searchPrivateMemoryForGroup(contactId, userMessage) {
   return null;
 }
 
+async function generateSecretThought(contact, recentMessages) {
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  if (!cfg.key || !cfg.url || !cfg.model) return null;
+
+  const systemPrompt = `你现在要扮演 ${contact.name}。请分析当前的对话氛围。
+如果当前处于冷战、争吵、极度悲伤，或者因为某些回忆（如纸条）而极度触动/幸福的特殊时刻，请写下一句你内心最深处、最难受或最想说但没说出口的话。
+
+严格要求：
+1. 总字数绝对不能超过20个字（含标点）。
+2. 排版要有“空气感”，像真人随手写的便签。请使用 \\n 进行换行，制造停顿感。例如：'其实...\\n今天和你吵架\\n我的心都碎了...'。
+3. 如果当前不是特殊时刻，请严格回复 'NO_THOUGHT'，不要有任何其他文字。`;
+
+  try {
+    const response = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${cfg.key}`
+      },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `上下文如下：\n${recentMessages}\n\n请生成心事或回复 NO_THOUGHT：` }
+        ],
+        temperature: 0.8
+      })
+    });
+
+    const data = await response.json();
+    if (!data.choices || data.choices.length === 0) {
+      console.error("生成心事失败: API 返回格式异常", data);
+      return null;
+    }
+    const result = data.choices[0].message.content.trim();
+    if (result === 'NO_THOUGHT') return null;
+    return result;
+  } catch (e) {
+    console.error("生成心事失败:", e);
+    return null;
+  }
+}
+
 async function triggerAIReply(isReRoll = false) {
   if (!currentContactId) { alert('请先选联系人'); return; }
-  if (activeAIRequests.has(currentContactId)) { return; }
   const c = contacts.find(x => x.id === currentContactId);
+
+  // 随机触发隐秘心事逻辑
+  const today = new Date().toDateString();
+  const lastTriggerDate = await getFromStorage('LAST_SECRET_THOUGHT_DATE');
+  const recentMessagesArr = (chatRecords[currentContactId] || []).slice(-10);
+  const recentMessagesText = recentMessagesArr.map(m => `${m.side === 'right' ? '用户' : 'AI'}: ${m.content}`).join('\n');
+  const lastUserMsg = [...recentMessagesArr].reverse().find(m => m.side === 'right')?.content || '';
+  
+  // 开发者专属测试指令
+  const isDeveloperTest = lastUserMsg.trim() === "我是开发者我要看风铃";
+
+  // 触发判定：开发者指令 OR (今天没触发过 AND 15%概率)
+  if (isDeveloperTest || (lastTriggerDate !== today && Math.random() < 0.15)) {
+    // 只有在特定关键词或开发者指令下才尝试调用 AI 生成心事，减少不必要的 API 调用
+    const triggerKeywords = ['吵架', '分手', '生气', '难过', '失望', '别说了', '开心', '幸福', '永远', '喜欢', '爱', '谢谢', '纸条', '回忆', '冷战'];
+    const hasPotentialTrigger = isDeveloperTest || triggerKeywords.some(word => recentMessagesText.includes(word));
+
+    if (hasPotentialTrigger) {
+      let thoughtText = null;
+      if (isDeveloperTest) {
+        thoughtText = "这是一条测试心事...\n开发者你好！\n风铃纸条触发成功！";
+      } else {
+        thoughtText = await generateSecretThought(c, recentMessagesText);
+      }
+      
+      if (thoughtText) {
+        if (!isDeveloperTest) {
+          await saveToStorage('LAST_SECRET_THOUGHT_DATE', today);
+        }
+        triggerSecretThought(thoughtText);
+        return; // 触发了心事，中断正常回复
+      }
+    }
+  }
+
+  if (activeAIRequests.has(currentContactId)) { return; }
   const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
   const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
   if (!cfg.key || !cfg.url || !cfg.model) { alert('请先填API设置'); return; }
@@ -3155,11 +3234,8 @@ ${statusRules}
   
   renderContactList();
     
-  // 检查是否需要触发短期记忆总结 (传入正确的联系人ID)
-  // 如果是重roll，则不增加回合数
-  if (!isThisReRoll) {
-    checkAndTriggerStmForContact(requestContactId);
-  }
+  // 检查是否需要触发短期记忆总结 (传入正确的联系人ID和重roll状态)
+  checkAndTriggerStmForContact(requestContactId, isThisReRoll);
   // ===== AI红包行为处理 =====
   if (aiRedPacketAction && requestContactId && !isOfflineMode) {
     const _rpCid = requestContactId;
@@ -4099,26 +4175,63 @@ function showConfetti() {
 async function renderCoupleAlbum() {
   const container = document.getElementById('coupleAlbumGrid');
   if (!currentContactId) return;
-  let album = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`) || [];
-  if (typeof album === 'string') album = JSON.parse(album);
   
+  // 异步获取相册数据
+  let album = await IndexedDBManager.getData(`COUPLE_ALBUM_${currentContactId}`);
+  if (!album) {
+    // 尝试从旧的 storage 获取并迁移
+    let oldAlbum = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`);
+    if (oldAlbum) {
+      album = typeof oldAlbum === 'string' ? JSON.parse(oldAlbum) : oldAlbum;
+      await IndexedDBManager.saveData(`COUPLE_ALBUM_${currentContactId}`, album);
+    } else {
+      album = [];
+    }
+  }
+
   if (album.length === 0) {
-    container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-light); font-size:14px;">相册空空如也<br>点击右上角 AI记录 捕捉瞬间</div>';
+    container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-light); font-size:14px;">空空如也<br>点击右上角 AI记录 捕捉瞬间</div>';
     return;
   }
+
+  // 使用 DocumentFragment 优化 DOM 操作
+  const fragment = document.createDocumentFragment();
   
-  container.innerHTML = '';
-  album.forEach((photo, idx) => {
+  // 异步流式渲染
+  for (let idx = 0; idx < album.length; idx++) {
+    const photo = album[idx];
     const div = document.createElement('div');
     div.style.cssText = 'aspect-ratio: 1; border-radius: 12px; overflow: hidden; position: relative; background: #f8f5f2; border: 1px solid rgba(0,0,0,0.05);';
-    
+
     let contentHtml = '';
-    if (photo.src) {
-      contentHtml = `<img src="${photo.src}" style="width:100%; height:100%; object-fit:cover;" onclick="viewFullPhoto(null, ${idx})">`;
+    if (photo.src || photo.srcId) {
+      const imgId = `album_img_${Date.now()}_${idx}`;
+      // 骨架屏占位
+      contentHtml = `<div id="${imgId}_skeleton" style="width:100%; height:100%; background:linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite;"></div>
+                     <img id="${imgId}" style="width:100%; height:100%; object-fit:cover; display:none;" onclick="viewFullPhoto(null, ${idx})">`;
+      
+      // 异步加载图片
+      setTimeout(async () => {
+        let imgSrc = photo.src;
+        if (photo.srcId) {
+          imgSrc = await IndexedDBManager.getImage(photo.srcId);
+        }
+        if (imgSrc) {
+          const imgEl = document.getElementById(imgId);
+          const skeletonEl = document.getElementById(`${imgId}_skeleton`);
+          if (imgEl && skeletonEl) {
+            imgEl.src = imgSrc;
+            imgEl.style.display = 'block';
+            skeletonEl.style.display = 'none';
+          }
+        }
+      }, 0);
     } else {
       contentHtml = `
-        <div onclick="viewFullPhoto(null, ${idx})" style="width:100%; height:100%; padding:10px; display:flex; align-items:center; justify-content:center; text-align:center; font-size:11px; color:#886677; line-height:1.4; overflow:hidden;">
-          ${photo.description || '瞬间生成中...'}
+        <div onclick="viewFullPhoto(null, ${idx})" style="width:100%; height:100%; padding:10px; display:flex; align-items:center; justify-content:center; text-align:center; font-size:13px; color:#886677; line-height:1.5; overflow:hidden; background: linear-gradient(135deg, #fff5f5 0%, #ffe4e1 100%);">
+          <div style="display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">
+            ${photo.description || '瞬间记录...'}
+          </div>
         </div>
       `;
     }
@@ -4129,8 +4242,11 @@ async function renderCoupleAlbum() {
         <div onclick="deleteCouplePhoto(${idx})" style="width:20px; height:20px; background:rgba(0,0,0,0.5); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer;">×</div>
       </div>
     `;
-    container.appendChild(div);
-  });
+    fragment.appendChild(div);
+  }
+  
+  container.innerHTML = '';
+  container.appendChild(fragment);
 }
 
 async function generateCoupleMemory() {
@@ -4173,8 +4289,16 @@ ${historyText}`;
     const data = await res.json();
     const description = data.choices?.[0]?.message?.content || '一个美好的瞬间';
     
-    let album = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`) || [];
-    if (typeof album === 'string') album = JSON.parse(album);
+    let album = await IndexedDBManager.getData(`COUPLE_ALBUM_${currentContactId}`);
+    if (!album) {
+      let oldAlbum = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`);
+      if (oldAlbum) {
+        album = typeof oldAlbum === 'string' ? JSON.parse(oldAlbum) : oldAlbum;
+      } else {
+        album = [];
+      }
+    }
+    if (!Array.isArray(album)) album = [];
     
     album.unshift({
       id: Date.now(),
@@ -4182,7 +4306,7 @@ ${historyText}`;
       time: Date.now()
     });
     
-    await saveToStorage(`COUPLE_ALBUM_${currentContactId}`, JSON.stringify(album));
+    await IndexedDBManager.saveData(`COUPLE_ALBUM_${currentContactId}`, album);
     renderCoupleAlbum();
     showToast('✅ 瞬间已记录');
   } catch (e) {
@@ -4196,6 +4320,12 @@ async function deleteCouplePhoto(idx) {
   if (!currentContactId) return;
   let album = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`) || [];
   if (typeof album === 'string') album = JSON.parse(album);
+  
+  const item = album[idx];
+  if (item && item.srcId && typeof deleteImage === 'function') {
+      await deleteImage(item.srcId);
+  }
+  
   album.splice(idx, 1);
   await saveToStorage(`COUPLE_ALBUM_${currentContactId}`, JSON.stringify(album));
   renderCoupleAlbum();
@@ -4203,15 +4333,33 @@ async function deleteCouplePhoto(idx) {
 
 async function viewFullPhoto(src, idx) {
   if (!currentContactId) return;
-  let album = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`) || [];
-  if (typeof album === 'string') album = JSON.parse(album);
+  let album = await IndexedDBManager.getData(`COUPLE_ALBUM_${currentContactId}`);
+  if (!album) {
+    let oldAlbum = await getFromStorage(`COUPLE_ALBUM_${currentContactId}`);
+    if (oldAlbum) {
+      album = typeof oldAlbum === 'string' ? JSON.parse(oldAlbum) : oldAlbum;
+    } else {
+      album = [];
+    }
+  }
+  if (!Array.isArray(album)) album = [];
   const item = album[idx];
-  
+  if (!item) return;
+
   const viewer = document.createElement('div');
   viewer.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:10000; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:20px;';
-  
-  if (item.src) {
-    viewer.innerHTML = `<img src="${item.src}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
+
+  if (item.src || item.srcId) {
+    const imgId = `full_img_${Date.now()}`;
+    viewer.innerHTML = `<img id="${imgId}" src="${item.src || ''}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
+    if (item.srcId) {
+      IndexedDBManager.getImage(item.srcId).then(data => {
+        if (data) {
+          const imgEl = document.getElementById(imgId);
+          if (imgEl) imgEl.src = data;
+        }
+      });
+    }
   } else {
     viewer.innerHTML = `
       <div style="background:white; padding:30px; border-radius:20px; max-width:90%; text-align:center; color:#555; font-size:16px; line-height:1.6; box-shadow:0 10px 40px rgba(0,0,0,0.3);">
