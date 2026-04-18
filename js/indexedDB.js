@@ -29,6 +29,12 @@ async function initDB() {
 
   dbReadyPromise = (async () => {
     try {
+      // 尝试请求持久化存储权限
+      if (navigator.storage && navigator.storage.persist) {
+        const isPersisted = await navigator.storage.persist();
+        console.log(`💾 存储持久化状态: ${isPersisted ? '已授权' : '未授权 (可能会被浏览器清理)'}`);
+      }
+
       await db.open();
       console.log('✅ Dexie 数据库已打开:', DB_NAME);
 

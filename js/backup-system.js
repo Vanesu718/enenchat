@@ -156,7 +156,8 @@ async function exportChatBackup(filename) {
     
     // Dexie 表名列表
     const tableNames = dexieDb.tables.map(t => t.name);
-    const storesToExport = ['images', 'contacts', 'chats', 'settings'];
+    // 仅聊天备份完全排除 images 表，使备份体积保持小巧
+    const storesToExport = ['contacts', 'chats', 'settings'];
     const actualTables = storesToExport.filter(s => tableNames.includes(s));
     
     for (let i = 0; i < actualTables.length; i++) {
@@ -167,7 +168,7 @@ async function exportChatBackup(filename) {
         const totalCount = await dexieDb[tableName].count();
         
         await dexieDb[tableName].each((item) => {
-            // 聊天备份中过滤图片
+            // 聊天记录中过滤图片消息体，进一步减小体积
             if (tableName === 'chats' && item.type === 'image') {
                 item = { ...item, type: 'text', content: '[图片已在仅聊天备份中省略]' };
             }
@@ -210,7 +211,7 @@ async function exportChatBackup(filename) {
 
 // ================== 全局备份 (流式压缩方案) ==================
 async function exportFullBackup(filename) {
-    updateBackupProgress('正在准备全局备份...', 5);
+    updateBackupProgress('正在准备全局备份，自检全量数据...', 5);
     
     const dexieDb = window.db;
     if (!dexieDb) throw new Error('数据库尚未初始化');
@@ -235,6 +236,7 @@ async function exportFullBackup(filename) {
     writer.endObject();
 
     // IndexedDB - 使用 Dexie API
+    updateBackupProgress('全局备份自检：正在扫描所有 IndexedDB 核心表...', 15);
     writer.startObject('indexedDB');
     const tableNames = dexieDb.tables.map(t => t.name);
     
@@ -364,11 +366,24 @@ async function performRestore(data, isFull) {
                 continue;
             }
             
-            if (isFull || !['settings', 'images'].includes(storeName)) {
-                updateBackupProgress(`正在清理 ${storeName} 表...`, 60 + (i / storeNames.length) * 10);
+            if (isFull) {
+                // 全局备份：先清空，然后完全覆盖，确保彻底恢复
+                updateBackupProgress(`全局恢复：正在清理 ${storeName} 表...`, 60 + (i / storeNames.length) * 10);
                 await dexieDb[storeName].clear();
             } else {
-                updateBackupProgress(`正在更新 ${storeName} 表...`, 60 + (i / storeNames.length) * 10);
+                // 仅聊天备份
+                if (['images'].includes(storeName)) {
+                    // 仅聊天备份永远不触碰现有的 images 表，保留当前的背景、头像
+                    continue;
+                }
+                if (['settings'].includes(storeName)) {
+                    // 对于 settings 采用合并更新
+                    updateBackupProgress(`仅聊天恢复：正在合并 ${storeName} 表...`, 60 + (i / storeNames.length) * 10);
+                } else {
+                    // contacts 和 chats 直接清空并覆盖
+                    updateBackupProgress(`仅聊天恢复：正在清理 ${storeName} 表...`, 60 + (i / storeNames.length) * 10);
+                    await dexieDb[storeName].clear();
+                }
             }
             
             const total = records.length;
@@ -376,8 +391,25 @@ async function performRestore(data, isFull) {
             const BATCH_SIZE = 500;
             for (let j = 0; j < total; j += BATCH_SIZE) {
                 const batch = records.slice(j, j + BATCH_SIZE);
-                updateBackupProgress(`正在恢复 ${storeName} (${Math.min(j + BATCH_SIZE, total)}/${total})...`, 70 + (i / storeNames.length) * 20 + (j/total)*20);
-                await dexieDb[storeName].bulkPut(batch);
+                
+                // 对仅聊天备份的 settings 表进行过滤合并处理
+                if (!isFull && storeName === 'settings') {
+                    const filteredBatch = batch.filter(item => {
+                        // 过滤掉所有与外观和背景相关的键值，避免清空当前页面的外观
+                        const k = item.key;
+                        if (k === 'THEME_CLASS' || k.startsWith('bg_') || k.startsWith('group_bg_')) {
+                            return false; 
+                        }
+                        return true;
+                    });
+                    if (filteredBatch.length > 0) {
+                        updateBackupProgress(`正在合并更新 ${storeName} (${Math.min(j + BATCH_SIZE, total)}/${total})...`, 70 + (i / storeNames.length) * 20 + (j/total)*20);
+                        await dexieDb[storeName].bulkPut(filteredBatch);
+                    }
+                } else {
+                    updateBackupProgress(`正在恢复 ${storeName} (${Math.min(j + BATCH_SIZE, total)}/${total})...`, 70 + (i / storeNames.length) * 20 + (j/total)*20);
+                    await dexieDb[storeName].bulkPut(batch);
+                }
             }
         }
     }
