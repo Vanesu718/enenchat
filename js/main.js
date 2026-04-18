@@ -7847,6 +7847,7 @@ window.onload = async () => {
     await loadGlobalData(); // 确保加载全局数据，如联系人、聊天记录等
     loadApiConfig();
     await restoreDockIconsOnLoad();
+    await loadThemePresets();
     await loadSavedTheme();
     await loadThemeSettings();
     await loadBubbleSettings();
@@ -11283,9 +11284,8 @@ async function archiveStmToWorldBook(contactId, stm) {
   } catch (e) { console.error('归档失败:', e); }
 }
 
-// ========== 美化设置专属导出/导入 ==========
-async function exportThemeSettings() {
-  showToast('⏳ 正在打包美化数据...');
+// ========== 美化预设管理与导出/导入 ==========
+async function getCurrentThemeData() {
   const data = { _type: 'oho_theme_backup', exportTime: new Date().toISOString() };
 
   // 1. 主题颜色与气泡设置
@@ -11327,26 +11327,11 @@ async function exportThemeSettings() {
   const playerSub = document.querySelector('.player-sub');
   if (playerSub) data.playerSub = playerSub.innerText;
 
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `oho_theme_${Date.now()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast('✅ 美化设置已导出！');
+  return data;
 }
 
-function importThemeSettings(input) {
-  const file = input.files?.[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data._type !== 'oho_theme_backup') { showToast('❌ 不是有效的美化备份文件！'); input.value = ''; return; }
+async function applyThemeData(data) {
+      if (data._type !== 'oho_theme_backup') { showToast('❌ 数据格式不正确！'); return false; }
 
       // 1. 主题颜色与气泡设置
       if (data.themeColors) {
@@ -11433,13 +11418,142 @@ function importThemeSettings(input) {
       }
 
       setTimeout(updateMePageTextColor, 300);
-      showToast('✅ 美化设置已恢复！');
+      return true;
+}
+
+async function exportThemeSettings() {
+  showToast('⏳ 正在打包美化数据...');
+  const data = await getCurrentThemeData();
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `oho_theme_${Date.now()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✅ 美化设置已导出！');
+}
+
+function importThemeSettings(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data._type !== 'oho_theme_backup') { showToast('❌ 不是有效的美化备份文件！'); input.value = ''; return; }
+      
+      const success = await applyThemeData(data);
+      if (success) {
+        showToast('✅ 美化设置已恢复！');
+      }
     } catch (err) {
       showToast('❌ 导入失败：' + err.message);
     }
     input.value = '';
   };
   reader.readAsText(file);
+}
+
+// ========== 美化预设管理 ==========
+let currentPresetIndex = 0; // 0 表示默认预设
+let themePresets = []; // 从 IndexedDB 加载的预设列表
+
+async function loadThemePresets() {
+  try {
+    const data = await IndexedDBManager.getData('THEME_PRESETS');
+    if (data && Array.isArray(data)) {
+      themePresets = data;
+    } else {
+      themePresets = [];
+    }
+    updatePresetSelectUI();
+  } catch(e) {
+    console.error('加载预设失败:', e);
+  }
+}
+
+function updatePresetSelectUI() {
+  const select = document.getElementById('theme-preset-select');
+  if (!select) return;
+  
+  // 保留第一个默认选项，清除其他选项
+  while (select.options.length > 1) {
+    select.remove(1);
+  }
+  
+  // 添加自定义预设选项
+  themePresets.forEach((preset, index) => {
+    const option = document.createElement('option');
+    option.value = index + 1; // value 从 1 开始，0 是默认
+    option.text = preset.name;
+    select.add(option);
+  });
+  
+  select.value = currentPresetIndex;
+}
+
+async function onPresetChange(selectEl) {
+  const idx = parseInt(selectEl.value);
+  currentPresetIndex = idx;
+  
+  if (idx === 0) {
+    return;
+  }
+  
+  const presetData = themePresets[idx - 1].data;
+  if (presetData) {
+    showToast('⏳ 正在应用预设...');
+    const success = await applyThemeData(presetData);
+    if (success) {
+      showToast('✅ 预设应用成功');
+    }
+  }
+}
+
+
+async function saveAsNewPreset() {
+  const name = prompt('请输入新预设的名称：', '我的美化预设' + (themePresets.length + 1));
+  if (!name) return; // 用户取消或输入为空
+  
+  showToast('⏳ 正在保存新预设...');
+  const currentData = await getCurrentThemeData();
+  
+  const newPreset = {
+    name: name,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    data: currentData
+  };
+  
+  themePresets.push(newPreset);
+  await IndexedDBManager.saveData('THEME_PRESETS', themePresets);
+  
+  // 切换到新保存的预设
+  currentPresetIndex = themePresets.length;
+  updatePresetSelectUI();
+  
+  showToast(`✅ 已另存为预设：${name}`);
+}
+
+async function deleteCurrentPreset() {
+  if (currentPresetIndex === 0) {
+    showToast('⚠️ 默认预设无法删除');
+    return;
+  }
+  
+  if (confirm('确定要删除当前预设吗？')) {
+    const actualIndex = currentPresetIndex - 1;
+    themePresets.splice(actualIndex, 1);
+    await IndexedDBManager.saveData('THEME_PRESETS', themePresets);
+    
+    currentPresetIndex = 0; // 重置为默认
+    updatePresetSelectUI();
+    showToast('✅ 预设已删除');
+  }
 }
 
 

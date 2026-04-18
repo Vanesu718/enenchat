@@ -232,11 +232,25 @@
     </div>
 
     <div class="sub-page" id="main-page-setting">
-      <div class="page-header">
+      <div class="page-header" style="border-bottom:none;">
         <div class="page-back" onclick="closeSub('main-page-setting')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div class="page-title">主页面设置</div>
       </div>
-      <div class="page-body">
+      
+      <!-- 美化预设模块 -->
+      <div style="background:#fff; margin:15px 15px 0 15px; border-radius:16px; padding:15px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 12px rgba(0,0,0,0.03);">
+        <div style="font-size:15px; font-weight:600; color:var(--text-dark); display:flex; align-items:center; gap:8px;">
+          美化预设
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <select id="theme-preset-select" onchange="onPresetChange(this)" style="padding:6px 12px; border-radius:12px; border:1px solid #eee; background:#f9f9f9; font-size:13px; color:var(--text-dark); outline:none; cursor:pointer;">
+            <option value="0">默认状态</option>
+          </select>
+          <button onclick="deleteCurrentPreset()" style="padding:6px 12px; border-radius:12px; border:1px solid #eee; background:#f9f9f9; font-size:13px; color:var(--text-dark); cursor:pointer;">删除</button>
+        </div>
+      </div>
+
+      <div class="page-body" style="padding-top:0;">
         <div class="form-section">
           <div class="form-label">用户ID (昵称)</div>
           <input class="form-input" id="themeNickname" placeholder="输入你的昵称" oninput="syncNickname(this.value)">
@@ -266,11 +280,11 @@
           </div>
         </div>
         <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
-        <div class="form-label">美化备份与恢复</div>
+        <div class="form-label">美化数据备份</div>
         <div class="setting-desc" style="margin-top:6px;">仅备份/恢复美化相关设置：主题色、昵称、签名、dock图标、背景图、头像、照片及备注。</div>
         <div style="display:flex; gap:8px; margin-top:10px;">
-          <button class="upload-btn" style="flex:1; margin:0;" onclick="exportThemeSettings()">导出美化</button>
-          <label class="upload-btn" style="flex:1; margin:0; text-align:center; cursor:pointer;">
+          <button class="upload-btn" style="flex:1; margin:0; padding:6px 12px; font-size:13px; border-radius:12px;" onclick="exportThemeSettings()">导出美化</button>
+          <label class="upload-btn" style="flex:1; margin:0; padding:6px 12px; font-size:13px; border-radius:12px; text-align:center; cursor:pointer;">
             导入美化
             <input type="file" id="import-theme-file" accept=".json" onchange="importThemeSettings(this)" style="display:none;">
           </label>
@@ -278,15 +292,18 @@
         <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
         <div class="form-label">"我"页面背景图片（仅支持2M以内图片上传）</div>
         <div style="margin-top:10px;">
-          <div style="width:100%; height:120px; border-radius:12px; border:2px solid var(--light-pink); overflow:hidden; margin-bottom:10px;" id="me-bg-preview">
+          <div style="display:flex; gap:8px; margin-bottom:10px;">
+            <label class="upload-btn" style="flex:1; text-align:center; margin:0; padding:6px 12px; font-size:13px; border-radius:12px;">本地上传<input type="file" id="me-bg-file" accept="image/*" onchange="previewMeBgFile(this)" style="display:none;"></label>
+            <button class="upload-btn" style="flex:1; margin:0; padding:6px 12px; font-size:13px; border-radius:12px;" onclick="uploadMeBgByUrl()">链接上传</button>
+          </div>
+          <div style="width:100%; height:120px; border-radius:12px; border:2px solid var(--light-pink); overflow:hidden;" id="me-bg-preview">
             <img id="me-bg-preview-img" style="width:100%; height:100%; object-fit:cover;">
           </div>
-          <div style="display:flex; gap:8px;">
-            <label class="upload-btn" style="flex:1; text-align:center;">本地上传<input type="file" id="me-bg-file" accept="image/*" onchange="previewMeBgFile(this)" style="display:none;"></label>
-            <button class="upload-btn" style="flex:1;" onclick="uploadMeBgByUrl()">链接上传</button>
-          </div>
         </div>
-        <button class="save-btn" onclick="saveAllThemeSettings()">保存全部美化</button>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+          <button class="save-btn" style="flex:1; background:var(--light-pink); color:var(--text-dark); margin:0; padding:8px 12px; font-size:14px; border-radius:12px;" onclick="saveAsNewPreset()">另存为预设</button>
+          <button class="save-btn" style="flex:1; margin:0; padding:8px 12px; font-size:14px; border-radius:12px;" onclick="saveAllThemeSettings()">保存全部美化</button>
+        </div>
       </div>
     </div>
 
