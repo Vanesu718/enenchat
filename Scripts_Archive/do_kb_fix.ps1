@@ -1,0 +1,1 @@
+﻿$enc = [System.Text.Encoding]::GetEncoding(936); $file = "c:\Users\Administrator\Desktop\111\js\main.js"; $content = [System.IO.File]::ReadAllText($file, $enc); $old = "phoneCase.style.setProperty(`"height`", window.visualViewport.height + `"px`", `"important`");`r`n            }"; $found = $content.Contains($old); Write-Output ("Contains: " + $found)

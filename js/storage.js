@@ -1,5 +1,5 @@
-// 统一存储管理器 - 自动使用 IndexedDB，向后兼容 localStorage
-// 这个模块提供与 localStorage 相同的 API，但底层使用 IndexedDB
+// 统一存储管理器 - 基于 Dexie.js 的 IndexedDB，向后兼容 localStorage
+// 这个模块提供与 localStorage 相同的 API，但底层使用 Dexie.js
 
 class StorageManager {
   constructor() {
@@ -16,14 +16,13 @@ class StorageManager {
       try {
         await IndexedDBManager.initDB();
         
-        // 检查是否需要迁移
+        // 检查是否需要从 localStorage 迁移
         try {
           const migrated = await IndexedDBManager.checkMigration();
           if (!migrated) {
             console.log('🔄 检测到 localStorage 数据，开始自动迁移...');
             const success = await IndexedDBManager.migrateFromLocalStorage();
             if (success) {
-              // 迁移成功后清空 localStorage
               console.log('🧹 清理 localStorage...');
               const ohoActivated = localStorage.getItem('OHO_ACTIVATED');
               localStorage.clear();
@@ -39,7 +38,7 @@ class StorageManager {
         return true;
       } catch (e) {
         console.error('❌ StorageManager 初始化失败，将降级使用 localStorage:', e);
-        this.ready = false; // 标记未就绪，强制降级
+        this.ready = false;
         return false;
       }
     })();
@@ -93,10 +92,10 @@ class StorageManager {
       }
       
       try {
-        // 先尝试从 IndexedDB 获取
+        // 先尝试从 Dexie settings 表获取
         let data = await IndexedDBManager.getData(key);
         
-        // 如果没有，尝试从图片存储获取
+        // 如果没有，尝试从 images 表获取
         if (data === null) {
           data = await IndexedDBManager.getImage(key);
         }
@@ -109,7 +108,6 @@ class StorageManager {
         return data;
       } catch (e) {
         console.error(`读取失败 ${key}:`, e);
-        // 降级到 localStorage
         try { return localStorage.getItem(key); } catch(e) { return null; }
       }
     } catch(e) {
@@ -134,7 +132,7 @@ class StorageManager {
       return true;
     } catch (e) {
       console.error(`删除失败 ${key}:`, e);
-      localStorage.removeItem(key); // 降级清理
+      localStorage.removeItem(key);
       return false;
     }
   }
@@ -144,7 +142,13 @@ class StorageManager {
     await this.init();
     
     try {
-      // 清空 IndexedDB（需要重新实现）
+      // 清空 Dexie 所有表
+      if (window.db && window.db.isOpen()) {
+        await window.db.images.clear();
+        await window.db.contacts.clear();
+        await window.db.chats.clear();
+        await window.db.settings.clear();
+      }
       const ohoActivated = localStorage.getItem('OHO_ACTIVATED');
       localStorage.clear();
       if (ohoActivated) localStorage.setItem('OHO_ACTIVATED', ohoActivated);

@@ -1,0 +1,416 @@
+198:      showToast('?? 图片大小超过1M，请选择更小的图片！');
+223:        showToast('?? 图标保存失败');
+504:        showToast('?? 存储空间不足！请清理数据或使用图片链接');
+547:        showToast('?? 已自动清理旧数据');
+566:      console.log('?? IndexedDB 存储空间:', storageInfo);
+996:    alert('?? 文件大小超过1M，请选择更小的文件！');
+1042:            alert('?? 文档内容为空或无法解析！');
+1059:  alert('?? 不支持的文件格式！\n\n支持的格式：\n? .txt（纯文本）\n? .docx（Word 2007及以上版本）\n\n注意：不支持.doc（旧版Word）和.wps格式');
+1070:    showToast('?? 文件大小超过1M，请选择更小的文件！');
+1116:            showToast('?? 文档内容为空或无法解析！');
+1133:  showToast('?? 不支持的文件格式！仅支持 .txt 和 .docx 格式');
+1534:          <div class="bc-status-item thoughts"><div class="bc-label">?? 心声</div><div class="bc-val">${(statusData?.thoughts || '没有想法').substring(0,10)}</div></div>
+1535:          <div class="bc-status-item"><div class="bc-label">?? 地点</div><div class="bc-val">${statusData?.location || '未知'}</div></div>
+1536:          <div class="bc-status-item"><div class="bc-label">?? 心情</div><div class="bc-val">${(statusData?.mood || '平静').substring(0,10)}</div></div>
+1537:          <div class="bc-status-item favor"><div class="bc-label">?? 好感度</div><div class="bc-val">${statusData?.favor || 0}%</div></div>
+1544:            <span>?? 情欲指数：</span>
+3201:  chatRecords[currentContactId].push({ side: 'right', content: '?? 我们还是分开吧...', time: Date.now() });
+3209:    showToast('?? 正在告诉TA这个决定...', 3000);
+3240:  showToast('?? 已解除关系', 3000);
+3293:  showToast('?? 正在精心准备求婚，等待TA的回应...', 3000);
+3331:      chatRecords[currentContactId].push({ side: 'right', content: '?? 我向你求婚了！', time: Date.now() });
+3337:      showToast('?? 求婚成功！你们结婚啦！', 4000);
+3346:      chatRecords[currentContactId].push({ side: 'right', content: '?? 我向你求婚了！', time: Date.now() });
+3435:  showToast('?? AI正在回忆捕捉瞬间...');
+4778:    alert('?? 图片大小超过2M，请选择更小的图片！');
+4809:      showToast('?? 背景图保存失败，存储空间不足！');
+5159:      alert('?? 部分数据可能未完全清空，请手动清除浏览器缓存。');
+5170:  if (!confirm('?? 导入备份将覆盖当前所有数据，确定继续吗？')) {
+5180:      // ?? 兼容性处理：如果没有version字段，说明是旧版本备份
+5427:  if (!confirm(`确定要删除联系人"${contact.name}"吗？\n\n?? 这将同时删除与TA的所有聊天记录、设置和状态信息，且无法恢复！`)) {
+6075:          console.log('?? 存储空间使用情况:', storageInfo);
+6078:        console.warn('?? 存储管理器降级为 localStorage');
+6969:      <div style="font-size:13px; color:${board.postTimeColor}; cursor:pointer;">?? 点赞 (${post.likes || 0})</div>
+6970:      <div style="font-size:13px; color:${board.postTimeColor}; cursor:pointer;">?? 评论 (${post.comments?.length || 0})</div>
+7277:      showToast('?? 请先在设置中配置AI');
+7454:    // rulesEl.innerHTML = `<span style="color:${board.rulesColor}; font-weight:600;">?? 发帖须知：</span><span style="color:${board.rulesTextColor};">${board.rules}</span>`;
+7786:    alert('?? 本地上传一次只能上传1张图片！如果需要多张请使用链接上传。');
+7792:    alert('?? 图片大小超过2M，请选择更小的图片！');
+7828:    alert('?? 最多只能上传4张图片！');
+8109:      showToast('?? 朋友圈保存失败');
+8126:    alert('?? 图片大小超过1M，请选择更小的图片！');
+8159:          alert('?? 封面图保存失败，存储空间不足！建议使用更小的图片或清理数据。');
+8207:  // ?? 改为“串行”生成，避免并发请求触发 403 错误
+8554:        <div class="moment-action-btn" onclick="likeMoment('${moment.id}')">${(moment.likes && moment.likes.indexOf('我') > -1) ? '<span style="color:var(--main-pink);">?? 已赞</span>' : '?? 赞'}</div>
+8555:        <div class="moment-action-btn" onclick="commentMoment('${moment.id}')">?? 评论</div>
+8556:        <div class="moment-action-btn delete-moment" onclick="deleteMoment('${moment.id}')">??? 删除</div>
+8624:    likesDiv.innerHTML = '?? ' + moment.likes.join('、');
+8638:    likeBtn.innerHTML = liked ? '<span style="color:var(--main-pink);">?? 已赞</span>' : '?? 赞';
+8994:  loadingEl.innerText = '?? 正在生成记忆总结...';
+9149:        <div onclick="event.stopPropagation(); openEditStm(${idx})" style="font-size:12px; color:var(--main-pink); padding:4px 12px; background:var(--light-pink); border-radius:8px; display:${isStmBatchDeleteMode?'none':'block'};">?? 编辑</div>
+8556:        <div class="moment-action-btn delete-moment" onclick="deleteMoment('${moment.id}')">??? 删除</div>
+86:  showToast('? 主题已应用');
+95:  checkDefault.style.display = (!themeName || themeName === '') ? 'inline' : 'none';
+96:  if (checkBlue) checkBlue.style.display = (themeName === 'theme-blue') ? 'inline' : 'none';
+97:  if (checkDark) checkDark.style.display = (themeName === 'theme-dark') ? 'inline' : 'none';
+119:        name: nameEl ? nameEl.value : '',
+120:        category: catEl ? catEl.value : '',
+121:        content: contentEl ? contentEl.value : '',
+122:        keywords: kwEl ? kwEl.value : '',
+123:        triggerType: triggerEl ? triggerEl.value : 'always'
+198:      showToast('?? 图片大小超过1M，请选择更小的图片！');
+220:        console.log(`? 图标${index}已保存到 IndexedDB`);
+223:        showToast('?? 图标保存失败');
+288:  const contactSettings = contactSettingsStr ? (typeof contactSettingsStr === 'string' ? JSON.parse(contactSettingsStr) : contactSettingsStr) : { useWorldBook: true, selectedWorldBooks: [] };
+304:  return activeWorldBooks.length > 0 ? `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n【世界书/背景设定】\n${activeWorldBooks.join('\n\n')}\n` : '';
+349:      contacts = rawContacts ? (typeof rawContacts === 'string' ? JSON.parse(rawContacts) : rawContacts) : [];
+355:      chatRecords = rawRecords ? (typeof rawRecords === 'string' ? JSON.parse(rawRecords) : rawRecords) : {};
+364:      worldBookEntries = rawWbEntries ? (typeof rawWbEntries === 'string' ? JSON.parse(rawWbEntries) : rawWbEntries) : [];
+370:      userMasks = rawUserMasks ? (typeof rawUserMasks === 'string' ? JSON.parse(rawUserMasks) : rawUserMasks) : [];
+377:    // ? 页面初始化时重新应用主题类，修复刷新后“勾选还是简约，但实际掉回默认样式”的问题
+387:    // ? 如果当前主题是线下简约，则页面初始化时也强制保持线下模式
+504:        showToast('?? 存储空间不足！请清理数据或使用图片链接');
+509:                showToast('? 清理后保存成功');
+512:                showToast('? 存储空间严重不足，请手动清理');
+547:        showToast('?? 已自动清理旧数据');
+566:      console.log('?? IndexedDB 存储空间:', storageInfo);
+631:            // ? 使用 IndexedDB 保存图片
+634:                console.log(`? 图片已保存到 IndexedDB: SVD_${tid}`);
+635:                showToast('? 图片已保存！');
+653:      contactGroups = typeof saved === 'string' ? JSON.parse(saved) : saved;
+687:  showToast('? 分组已添加');
+704:  showToast('? 分组已删除');
+764:      ${g !== '默认' ? `<button onclick="deleteGroup('${g.replace(/'/g, "\\'")}')" style="padding:6px 12px; background:#ffcdd2; border:none; border-radius:8px; cursor:pointer; color:#c62828; font-size:13px; position:relative; z-index:2;">删除</button>` : '<span style="font-size:12px; color:var(--text-light);">默认</span>'}
+854:      const getTime = (recs, ct) => recs.length > 0 ? (recs[recs.length - 1].time || 0) : (parseInt(ct.id) || 0);
+868:      <span style="font-size:12px; color:var(--text-dark); margin-right:6px; transition:transform 0.2s; display:inline-block; transform:rotate(${isCollapsed ? '0' : '90'}deg);">?</span>
+875:    body.style.display = isCollapsed ? 'none' : 'block';
+886:      const ringClass = c.isMarried && !c.isGroup ? ' ring-avatar-frame' : '';
+887:      const displayName = c.isGroup ? `${c.name} (${c.members ? c.members.length : 0})` : c.name;
+996:    alert('?? 文件大小超过1M，请选择更小的文件！');
+1010:      alert('? 文档内容已成功导入！');
+1013:      alert('? 文件读取失败，请重试！');
+1024:      alert('? Word文档解析库未加载！请刷新页面重试。');
+1040:            alert('? Word文档内容已成功导入！');
+1042:            alert('?? 文档内容为空或无法解析！');
+1047:          alert('? Word文档解析失败！\n\n建议：\n1. 确保文件是有效的.docx格式\n2. 或将文档另存为.txt格式后重新上传');
+1051:      alert('? 文件读取失败，请重试！');
+1059:  alert('?? 不支持的文件格式！\n\n支持的格式：\n? .txt（纯文本）\n? .docx（Word 2007及以上版本）\n\n注意：不支持.doc（旧版Word）和.wps格式');
+1070:    showToast('?? 文件大小超过1M，请选择更小的文件！');
+1084:      showToast('? 文档内容已成功导入！');
+1087:      showToast('? 文件读取失败，请重试！');
+1098:      showToast('? Word文档解析库未加载！请刷新页面重试。');
+1114:            showToast('? Word文档内容已成功导入！');
+1116:            showToast('?? 文档内容为空或无法解析！');
+1121:          showToast('? Word文档解析失败！建议将文档另存为.txt格式后重新上传');
+1125:      showToast('? 文件读取失败，请重试！');
+1133:  showToast('?? 不支持的文件格式！仅支持 .txt 和 .docx 格式');
+1228:    showToast('? 群聊已创建！');
+1231:    showToast('? 保存失败：' + e.message);
+1248:    showToast('? 联系人已永久保存！');
+1251:    showToast('? 保存失败：' + e.message);
+1259:  document.getElementById('chatHeaderTitle').innerText = contact.name + (contact.isGroup ? ` (${contact.members.length})` : '');
+1260:  const ringClass = contact.isMarried && !contact.isGroup ? 'class="ring-avatar-frame"' : '';
+1336:  // ? 保存为当前联系人独立的模式设置
+1348:  showToast(isOfflineMode ? '已切换为线下模式 ??' : '已切换为线上模式 ??');
+1357:  const startIdx = forceStartIdx !== undefined ? forceStartIdx : Math.max(0, rec.length - showCount);
+1423:          ava = m.side === 'left' ? c.avatar : (chatSettings.chatUserAvatar || userAvatar);
+1511:  const qhtml = quote ? `<div class="msg-quote">${quote}</div>` : '';
+1513:  const replyText = encodeURIComponent(type === 'image' ? '[图片]' : content);
+1528:    const parsedContent = type === 'image' ? `<img src="${content}" style="max-width:180px; max-height:180px; border-radius:10px; display:block; cursor:zoom-in; object-fit:cover;" onclick="event.stopPropagation(); viewFullImage('${content}')">` : parseTextBeautify(content);
+1534:          <div class="bc-status-item thoughts"><div class="bc-label">?? 心声</div><div class="bc-val">${(statusData?.thoughts || '没有想法').substring(0,10)}</div></div>
+1535:          <div class="bc-status-item"><div class="bc-label">?? 地点</div><div class="bc-val">${statusData?.location || '未知'}</div></div>
+1536:          <div class="bc-status-item"><div class="bc-label">?? 心情</div><div class="bc-val">${(statusData?.mood || '平静').substring(0,10)}</div></div>
+1537:          <div class="bc-status-item favor"><div class="bc-label">?? 好感度</div><div class="bc-val">${statusData?.favor || 0}%</div></div>
+1540:      ${statusData && statusData.physiological ? `
+1542:        <div class="bc-toggle" onclick="const c = this.nextElementSibling; c.style.display = c.style.display === 'none' ? 'block' : 'none';">
+1544:            <span>?? 情欲指数：</span>
+1659:  let short = content.length > 15 ? content.slice(0,15)+'...' : content;
+1675:  const q = replyMsg ? replyMsg.shortContent : null;
+1713:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+1717:  const contentText = plainContent ? `"${plainContent}"` : "[图片]";
+1792:      let triGram = i < cleanedMsg.length - 2 ? cleanedMsg.substring(i, i + 3) : '';
+1849:              let senderName = r.side === 'right' ? '用户(我)' : '某个群员';
+1897:      let triGram = i < cleanedMsg.length - 2 ? cleanedMsg.substring(i, i + 3) : '';
+1943:          let senderName = r.side === 'right' ? '用户(我)' : '你(AI)';
+1964:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+1989:  return mem ? `- ${mem.name}：${mem.persona}` : '';
+2065:        stmContent += (stmContent ? '\n\n' : '') + '【与你的私聊近期记忆】\n' + privateStmData.entries.map((e, i) => `${i+1}. ${e.content}`).join('\n');
+2068:      const privateSettings = privateSettingsStr ? (typeof privateSettingsStr === 'string' ? JSON.parse(privateSettingsStr) : privateSettingsStr) : {};
+2082:  const latestRecallMsg = rawRecs.length > 0 ? [...rawRecs].reverse().find(r => r.side === 'right') : null;
+2149:      const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
+2195:    return mem ? `- ${mem.name}` : '';
+2232:【?? 核心指令 - 必须严格遵守】
+2269:      let role = r.side === 'right' ? 'user' : 'assistant';
+2278:          const senderName = sender ? sender.name : '未知成员';
+2292:        currentMsg = { role: role, content: r.type === 'image' ? 
+2311:        currentMsg = { role: role, content: r.type === 'image' ? 
+2385:          const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
+2390:      let newFavor = favorMatch ? parseInt(favorMatch[1]) : 0;
+2401:        location: locationMatch ? locationMatch[1].trim() : '未知',
+2402:        mood: moodMatch ? moodMatch[1].trim() : '平静',
+2403:        thoughts: thoughtsMatch ? thoughtsMatch[1].trim() : '暂无数据',
+2464:          addMsgToUI(line, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData);
+2472:        addMsgToUI(displayText, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData);
+2514:        addMsgToUI('请求失败：' + e.message, 'left', c.isGroup ? currentSpeaker.avatar : c.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null);
+2517:      chatRecords[requestContactId].push({ side: 'left', content: '请求失败：' + e.message, time: Date.now(), senderId: c.isGroup ? currentSpeaker.id : null });
+2527:  const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
+2589:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+2598:  const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
+2605:    chatSettingsForContact = typeof savedSettings === 'string' ? JSON.parse(savedSettings) : savedSettings;
+2616:    const speaker = r.side === 'right' ? userName : c.name;
+2617:    const time = r.time ? new Date(r.time).toLocaleString('zh-CN') : '';
+2670:  a.style.display = a.style.display === 'block' ? 'none' : 'block';
+2701:      const q = replyMsg ? replyMsg.shortContent : null;
+2726:  m.style.display = m.style.display === 'block' ? 'none' : 'block';
+2783:  const userName = window.storageSync ? (window.storageSync.getItem('USER_NICKNAME') || '我') : '我';
+2803:    let senderName = r.side === 'right' ? userName : (c ? c.name : 'TA');
+2809:    let avatarSrc = r.side === 'right' ? (chatSettings.chatUserAvatar || userAvatar) : (c ? c.avatar : '');
+2815:    const timeStr = r.time ? new Date(r.time).toLocaleString('zh-CN', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
+3185:  showToast('? 甜蜜设置已保存');
+3197:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+3201:  chatRecords[currentContactId].push({ side: 'right', content: '?? 我们还是分开吧...', time: Date.now() });
+3209:    showToast('?? 正在告诉TA这个决定...', 3000);
+3240:  showToast('?? 已解除关系', 3000);
+3248:    const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
+3277:    const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
+3290:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+3293:  showToast('?? 正在精心准备求婚，等待TA的回应...', 3000);
+3331:      chatRecords[currentContactId].push({ side: 'right', content: '?? 我向你求婚了！', time: Date.now() });
+3337:      showToast('?? 求婚成功！你们结婚啦！', 4000);
+3346:      chatRecords[currentContactId].push({ side: 'right', content: '?? 我向你求婚了！', time: Date.now() });
+3353:    showToast('? 求婚失败：' + e.message);
+3367:    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+3432:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+3435:  showToast('?? AI正在回忆捕捉瞬间...');
+3438:  let historyText = rec.slice(-15).map(r => `${r.side === 'right' ? userName : c.name}: ${r.content}`).join('\n');
+3476:    showToast('? 瞬间已记录');
+3479:    showToast('? 回忆失败');
+3565:  document.getElementById('contactMaskTextarea').value = chatSettings.contactMask || (currentContact ? currentContact.persona : '') || '';
+3655:        <input type="checkbox" id="wb-${entry.id}" ${isChecked ? 'checked' : ''} onchange="toggleWorldBookSelection('${entry.id}')" style="width:18px; height:18px; margin-right:10px; cursor:pointer;">
+3766:  showToast('? 已应用用户面具，请点击底部保存');
+3806:    chatSettings = typeof savedSettings === 'string' ? JSON.parse(savedSettings) : savedSettings;
+3845:      const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
+3896:  alert('? 所有聊天设置已保存！');
+3983:  showToast('? 聊天记录及记忆已清空');
+3992:      apiPresets = typeof presetsStr === 'string' ? JSON.parse(presetsStr) : presetsStr;
+4035:    showToast('? 预设已保存');
+4038:    showToast('? 保存预设失败');
+4057:    showToast('? 预设已删除');
+4060:    showToast('? 删除预设失败');
+4108:  const c = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+4116:  const savedModels = modelsStr ? (typeof modelsStr === 'string' ? JSON.parse(modelsStr) : modelsStr) : [];
+4134:// ? 修复后的拉取模型函数，适配手机端
+4245:  const avatar = avatarImg ? avatarImg.src : '';
+4270:  showToast('? 用户面具已保存');
+4295:  showToast('? 已删除');
+4432:  alert('? 世界书条目已永久保存！刷新不会消失！');
+4467:  alert('? 已删除！');
+4554:  const textColor = isDark ? '#d0d0d0' : '#555';
+4555:  const subTextColor = isDark ? '#aaa' : '#777';
+4556:  const cardBg = isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.25)';
+4557:  const cardBorder = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.3)';
+4558:  const iconColor = isDark ? '#d0d0d0' : '#555';
+4582:    playerIconBox.style.background = isDark ? 'rgba(255,255,255,0.15)' : '#fff';
+4589:    playBtn.style.background = isDark ? 'rgba(255,255,255,0.15)' : '#fff';
+4662:    const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
+4751:    const status = typeof savedStatus === 'string' ? JSON.parse(savedStatus) : savedStatus;
+4758:  showToast('? 好感度已清零');
+4778:    alert('?? 图片大小超过2M，请选择更小的图片！');
+4798:  // ? 同步背景到其他三个页面
+4801:  // ? 使用 IndexedDB 保存背景图
+4804:    console.log('? 背景图已保存到 IndexedDB');
+4805:    showToast('? 背景图已保存！');
+4809:      showToast('?? 背景图保存失败，存储空间不足！');
+4818:  const bgCss = dataOrUrl ? `url(${dataOrUrl})` : 'none';
+4885:  const textDark = isDark ? '#e0e0e0' : '#333333';
+4886:  const textLight = isDark ? '#b0b0b0' : '#666666';
+4887:  const backBtnBg = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)';
+4889:  const headerBg = isDark ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.75)';
+4890:  const itemBg = isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.35)';
+4891:  const itemBorder = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.4)';
+4892:  const headerBorder = isDark ? 'rgba(255,255,255,0.1)' : '#f0e8df';
+4929:  showToast(isChatOnly ? '? 正在打包聊天数据...' : '? 正在打包全局数据...');
+4978:      let s = typeof settings === 'string' ? JSON.parse(settings) : settings;
+4993:      backupData.contactStatus[c.id] = typeof status === 'string' ? JSON.parse(status) : status;
+5002:      backupData.stmData[c.id] = typeof stm === 'string' ? JSON.parse(stm) : stm;
+5013:          backupData.coupleAlbums[c.id] = typeof album === 'string' ? JSON.parse(album) : album;
+5019:      backupData.apiConfig = apiConfigStr ? (typeof apiConfigStr === 'string' ? JSON.parse(apiConfigStr) : apiConfigStr) : {};
+5023:      backupData.apiPresets = apiPresetsStr ? (typeof apiPresetsStr === 'string' ? JSON.parse(apiPresetsStr) : apiPresetsStr) : [];
+5027:    backupData.aiModelList = modelListStr ? (typeof modelListStr === 'string' ? JSON.parse(modelListStr) : modelListStr) : [];
+5031:    backupData.memorySettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
+5035:    backupData.contactGroups = groupsStr ? (typeof groupsStr === 'string' ? JSON.parse(groupsStr) : groupsStr) : ['默认'];
+5073:      if (rawUserMasks) backupData.userMasks = typeof rawUserMasks === 'string' ? JSON.parse(rawUserMasks) : rawUserMasks;
+5085:      if (themeColors) backupData.themeColors = typeof themeColors === 'string' ? JSON.parse(themeColors) : themeColors;
+5089:      if (bubbleSettings) backupData.bubbleSettings = typeof bubbleSettings === 'string' ? JSON.parse(bubbleSettings) : bubbleSettings;
+5093:      if (bubbleDecSettings) backupData.bubbleDecSettings = typeof bubbleDecSettings === 'string' ? JSON.parse(bubbleDecSettings) : bubbleDecSettings;
+5104:      if (textSettings) backupData.textSettings = typeof textSettings === 'string' ? JSON.parse(textSettings) : textSettings;
+5118:    ? `oho_chat_${new Date().getTime()}.json`
+5125:  showToast(isChatOnly ? '? 聊天备份已导出！' : '? 全局备份已导出！');
+5153:      alert('? 所有数据已清空，即将重新加载页面。');
+5159:      alert('?? 部分数据可能未完全清空，请手动清除浏览器缓存。');
+5170:  if (!confirm('?? 导入备份将覆盖当前所有数据，确定继续吗？')) {
+5180:      // ?? 兼容性处理：如果没有version字段，说明是旧版本备份
+5188:        alert('? 备份文件格式不正确！缺少联系人数据。');
+5221:            const apiConfig = typeof backupData.apiConfig === 'string' ? JSON.parse(backupData.apiConfig) : backupData.apiConfig;
+5229:            const apiPresets = typeof backupData.apiPresets === 'string' ? JSON.parse(backupData.apiPresets) : backupData.apiPresets;
+5237:            const aiModelList = typeof backupData.aiModelList === 'string' ? JSON.parse(backupData.aiModelList) : backupData.aiModelList;
+5245:            const memorySettings = typeof backupData.memorySettings === 'string' ? JSON.parse(backupData.memorySettings) : backupData.memorySettings;
+5253:          const contactGroups = typeof backupData.contactGroups === 'string' ? JSON.parse(backupData.contactGroups) : backupData.contactGroups;
+5261:          const momentsData = typeof backupData.moments === 'string' ? JSON.parse(backupData.moments) : backupData.moments;
+5308:          const theme = typeof backupData.themeColors === 'string' ? JSON.parse(backupData.themeColors) : backupData.themeColors;
+5316:          const textSettings = typeof backupData.textSettings === 'string' ? JSON.parse(backupData.textSettings) : backupData.textSettings;
+5342:          const settings = typeof backupData.chatSettings[contactId] === 'string' ? JSON.parse(backupData.chatSettings[contactId]) : backupData.chatSettings[contactId];
+5352:          const status = typeof backupData.contactStatus[contactId] === 'string' ? JSON.parse(backupData.contactStatus[contactId]) : backupData.contactStatus[contactId];
+5362:          const album = typeof backupData.coupleAlbums[contactId] === 'string' ? JSON.parse(backupData.coupleAlbums[contactId]) : backupData.coupleAlbums[contactId];
+5372:            const stm = typeof backupData.stmData[contactId] === 'string' ? JSON.parse(backupData.stmData[contactId]) : backupData.stmData[contactId];
+5381:          const settings = typeof backupData.bubbleSettings === 'string' ? JSON.parse(backupData.bubbleSettings) : backupData.bubbleSettings;
+5389:          const settings = typeof backupData.bubbleDecSettings === 'string' ? JSON.parse(backupData.bubbleDecSettings) : backupData.bubbleDecSettings;
+5403:        alert('? 备份已成功导入！页面将刷新以应用更改。');
+5407:      alert('? 导入失败：' + err.message);
+5427:  if (!confirm(`确定要删除联系人"${contact.name}"吗？\n\n?? 这将同时删除与TA的所有聊天记录、设置和状态信息，且无法恢复！`)) {
+5445:  alert('? 联系人已删除！');
+5473:      ? '3px solid #333' : '3px solid transparent';
+5499:      const { main, light, bg } = typeof saved === 'string' ? JSON.parse(saved) : saved;
+5513:          ? '3px solid #333' : '3px solid transparent';
+5533:  btn.dataset.val = btn.classList.contains('active') ? (prop === 'weight' ? 'bold' : 'italic') : 'inherit';
+5539:  const fontUrl = url !== undefined ? url : (fontInput ? fontInput.value.trim() : '');
+5630:          val = el.dataset.cleared === 'true' ? (prop === 'bg' ? 'transparent' : 'inherit') : el.value;
+5654:            settings[type][prop] = prop === 'bg' ? 'transparent' : 'inherit';
+5676:    showToast('? 叙事美化设置已保存！');
+5684:      const settings = typeof saved === 'string' ? JSON.parse(saved) : saved;
+5723:                  el.value = prop === 'bg' ? '#ffffff' : '#000000';
+5729:              document.documentElement.style.setProperty(cssVar, prop === 'bg' ? 'transparent' : 'inherit');
+5760:  const bottomRadius = radius == 0 ? '0px' : '6px';
+5780:    const bottomRadius = radius == 0 ? '0px' : '6px';
+5801:      const { leftColor, rightColor, opacity, radius } = typeof saved === 'string' ? JSON.parse(saved) : saved;
+5815:        document.documentElement.style.setProperty('--bubble-bottom-radius', radius == 0 ? '0px' : '6px');
+5861:    const corner = document.getElementById(`${side}DecCorner`) ? document.getElementById(`${side}DecCorner`).value : (side === 'left' ? 'top-left' : 'top-right');
+5894:      const data = typeof saved === 'string' ? JSON.parse(saved) : saved;
+5907:            const currentCorner = corner || (side === 'left' ? 'top-left' : 'top-right');
+5938:    saveToStorage(key, value).then(() => console.log(`? [${key}] 已同步保存到IndexedDB`));
+6023:  showToast('? 保存成功');
+6071:        console.log('? 存储管理器初始化成功');
+6075:          console.log('?? 存储空间使用情况:', storageInfo);
+6078:        console.warn('?? 存储管理器降级为 localStorage');
+6081:      console.error('? 存储管理器初始化异常:', e);
+6102:    // ? 从 IndexedDB 加载图片
+6145:    // ? 页面加载时同步背景到所有页面
+6179:    console.error('? 初始化过程中发生错误:', e);
+6252:      return target && target.closest ? target.closest('.msg-bubble, .msg-blue-card') : null;
+6258:      touchStartX = touch ? touch.clientX : 0;
+6259:      touchStartY = touch ? touch.clientY : 0;
+6380:      customForumBoards = typeof saved === 'string' ? JSON.parse(saved) : saved;
+6388:      deletedPresetBoards = typeof deletedSaved === 'string' ? JSON.parse(deletedSaved) : deletedSaved;
+6428:    div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:#fff; border-radius:10px; margin-bottom:8px; border:1px solid var(--light-pink);' + (isDeleted ? ' opacity:0.5;' : '');
+6435:        ? `<button onclick="restorePresetBoard('${pb.key}')" style="padding:6px 12px; background:#c8e6c9; border:none; border-radius:8px; cursor:pointer; color:#2e7d32; font-size:13px;">恢复</button>`
+6471:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+6474:  showToast('? AI 正在构思版块介绍...');
+6478:${wbContext ? `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n【背景设定/世界书】\n${wbContext}\n` : ''}
+6508:    showToast('? AI 生成完成');
+6511:    showToast('? 生成失败，请检查网络或 API 配置');
+6563:  showToast('? 版块已创建！');
+6575:  showToast('? 版块已删除');
+6587:  showToast('? 预设版块已隐藏');
+6595:  showToast('? 预设版块已恢复');
+6623:    const keywords = board.keywords ? board.keywords.split(/[,，]/).map(k => k.trim()).filter(k => k) : [];
+6865:    const titlePreview = (post.title || "无题").substring(0, 10) + (post.title?.length > 10 ? '...' : '');
+6866:    const contentPreview = (post.content || "").substring(0, 100) + (post.content?.length > 100 ? '...' : '');
+6969:      <div style="font-size:13px; color:${board.postTimeColor}; cursor:pointer;">?? 点赞 (${post.likes || 0})</div>
+6970:      <div style="font-size:13px; color:${board.postTimeColor}; cursor:pointer;">?? 评论 (${post.comments?.length || 0})</div>
+7025:        <div style="font-size:13px; font-weight:600; color:${board.accentColor}; cursor:pointer;" onclick="replyToForumComment('${comment.authorName}')">${comment.authorName}${comment.isInteraction ? `<span class="interaction-badge" style="background:${board.accentColor};">互动</span>` : ''}</div>
+7051:  const selectedMaskId = maskSelect ? maskSelect.value : '';
+7088:  showToast('? 评论已发布！');
+7120:${wbContext ? `\n【背景设定/世界书（作为背景参考，在保持角色人设和论坛风格的前提下，自然融入世界书设定）】\n${wbContext}\n` : ''}
+7125:${board.styleDesc ? `【板块风格】${board.styleDesc}\n` : ''}
+7189:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+7211:${wbContext ? `\n【背景设定/世界书（作为背景参考，在保持角色人设和论坛风格的前提下，自然融入世界书设定）】\n${wbContext}\n` : ''}
+7215:${board.styleDesc ? `【板块风格】${board.styleDesc}\n` : ''}
+7266:  loadingDiv.innerHTML = '? AI正在生成新帖子...';
+7271:    const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+7277:      showToast('?? 请先在设置中配置AI');
+7321:${wbContext ? `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n【背景设定/世界书】\n${wbContext}\n` : ''}
+7323:${board.styleDesc ? `板块风格：${board.styleDesc}\n` : ''}
+7410:    showToast('? 刷新成功，正在生成现场讨论...');
+7423:    showToast('? ??: ' + e.message);
+7454:    // rulesEl.innerHTML = `<span style="color:${board.rulesColor}; font-weight:600;">?? 发帖须知：</span><span style="color:${board.rulesTextColor};">${board.rules}</span>`;
+7484:  showToast('? 正在通过模块A优化内容...');
+7488:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+7504:${wbContext ? `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n【背景设定/世界书】\n${wbContext}\n` : ''}
+7507:${board.styleDesc ? `【板块风格】${board.styleDesc}\n` : ''}
+7536:  const authorName = currentPostIdentity === 'user' ? `联系人[${userName}]` : '匿名用户';
+7541:    avatar: currentPostIdentity === 'user' ? userAvatar : 'clover.png',
+7562:  showToast('? 发帖成功！正在生成现场讨论...');
+7574:  showToast('? 已删除');
+7583:        forumPostsByBoard[boardKey] = typeof saved === 'string' ? JSON.parse(saved) : saved;
+7665:      contacts: currentVisibilityType === type ? [...currentVisibilityData.contacts] : [], 
+7666:      groups: currentVisibilityType === type ? [...currentVisibilityData.groups] : [] 
+7686:  document.getElementById('contact-select-title').innerText = type === 'visible_to' ? '部分可见' : '不给谁看';
+7720:      <input type="checkbox" id="sel-g-${g}" ${isChecked ? 'checked' : ''} onchange="toggleSelectGroup('${g}')" style="width:18px; height:18px; margin-right:12px;">
+7732:      <input type="checkbox" id="sel-c-${c.id}" ${isChecked ? 'checked' : ''} onchange="toggleSelectContact('${c.id}')" style="width:18px; height:18px; margin-right:12px;">
+7786:    alert('?? 本地上传一次只能上传1张图片！如果需要多张请使用链接上传。');
+7792:    alert('?? 图片大小超过2M，请选择更小的图片！');
+7828:    alert('?? 最多只能上传4张图片！');
+7873:      const size = postMomentImages.length === 1 ? '150px' : '80px';
+7882:  const selectedMaskId = maskSelect ? maskSelect.value : '';
+7886:      ...(selectedMaskId ? {
+7934:  showToast('? 发布成功！');
+7938:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+7970:    const maskInfo = userMasks ? userMasks.find(m => m.id === moment.mask_id) : null;
+7978:            const settings = typeof settingsStr === 'string' ? JSON.parse(settingsStr) : settingsStr;
+8019:  const contentText = plainContent ? `"${plainContent}"` : "[图片]";
+8109:      showToast('?? 朋友圈保存失败');
+8126:    alert('?? 图片大小超过1M，请选择更小的图片！');
+8159:          alert('?? 封面图保存失败，存储空间不足！建议使用更小的图片或清理数据。');
+8189:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+8204:  loadingDiv.innerHTML = `? 正在生成${count}条新动态...`;
+8207:  // ?? 改为“串行”生成，避免并发请求触发 403 错误
+8213:      const contactSettings = contactSettingsStr ? (typeof contactSettingsStr === 'string' ? JSON.parse(contactSettingsStr) : contactSettingsStr) : { useWorldBook: true, selectedWorldBooks: [] };
+8230:      const wbPrompt = activeWorldBooks.length > 0 ? `\n${WORLD_BOOK_PRIORITY_INSTRUCTION}\n【世界书/背景设定】\n${activeWorldBooks.join('\n\n')}\n` : '';
+8237:          const entries = typeof ltmData === 'string' ? JSON.parse(ltmData) : ltmData;
+8243:      const ltmPrompt = ltmContent ? `\n【长期记忆 (LTM)】\n${ltmContent}\n` : '';
+8252:            const side = r.side === 'right' ? '用户' : contact.name;
+8253:            const text = typeof r.content === 'string' ? r.content : '[图片]';
+8258:      const chatPrompt = recentChat ? `\n【最近对话内容】\n${recentChat}\n` : '';
+8268:      const stmPrompt = stmContent ? `\n【短期记忆 (STM)】\n以下是最近发生的事情总结：\n${stmContent}\n` : '';
+8295:        showToast(`? API报错: ${data.error.message || '403 Forbidden'}`);
+8329:    showToast(`? 已更新${newMoments.length}条动态，评论生成中...`);
+8358:        ? moment.comments.map(c => c.content).join(' | ') 
+8394:        const splitChar = raw.includes(':') ? ':' : '：';
+8531:        const replyInfo = comment.replyTo ? ` <span class="comment-reply-to">回复</span> <span class="comment-author" onclick="replyToComment(event, '${moment.id}', '${comment.replyTo}')">${comment.replyTo}</span>` : '';
+8554:        <div class="moment-action-btn" onclick="likeMoment('${moment.id}')">${(moment.likes && moment.likes.indexOf('我') > -1) ? '<span style="color:var(--main-pink);">?? 已赞</span>' : '?? 赞'}</div>
+8555:        <div class="moment-action-btn" onclick="commentMoment('${moment.id}')">?? 评论</div>
+8556:        <div class="moment-action-btn delete-moment" onclick="deleteMoment('${moment.id}')">??? 删除</div>
+8624:    likesDiv.innerHTML = '?? ' + moment.likes.join('、');
+8638:    likeBtn.innerHTML = liked ? '<span style="color:var(--main-pink);">?? 已赞</span>' : '?? 赞';
+8700:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+8720:            const entries = typeof ltm === 'string' ? JSON.parse(ltm) : ltm;
+8727:${replyTo === aiToReply.name ? '用户回复了你的评论' : '用户回复了路人 '+replyTo+' 的评论'}，对你说：“${content}”。
+8806:      const replyInfo = comment.replyTo ? ` <span class="comment-reply-to">回复</span> <span class="comment-author" onclick="replyToComment(event, '${momentId}', '${comment.replyTo}')">${comment.replyTo}</span>` : '';
+8834:  showToast('? 已删除');
+8847:  showToast('? 评论已删除');
+8906:  alert('? 记忆设置已保存！');
+8917:    const settings = typeof saved === 'string' ? JSON.parse(saved) : saved;
+8949:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+8960:  const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
+8969:    chatSettingsForContact = typeof savedSettings === 'string' ? JSON.parse(savedSettings) : savedSettings;
+8975:    const speaker = r.side === 'right' ? userName : c.name;
+8976:    const time = r.time ? new Date(r.time).toLocaleString('zh-CN') : '未知时间';
+8994:  loadingEl.innerText = '?? 正在生成记忆总结...';
+9049:    alert(`? 记忆总结已生成并保存到世界书！\n\n条目名称：${entryName}\n\n你可以在"世界书管理"中查看和编辑。`);
+9053:    alert('? 记忆总结生成失败：' + e.message);
+9100:  let stm = data ? (typeof data === 'string' ? JSON.parse(data) : data) : {entries: [], roundCount: 0};
+9143:    const time = entry.time ? new Date(entry.time).toLocaleString('zh-CN') : '';
+9149:        <div onclick="event.stopPropagation(); openEditStm(${idx})" style="font-size:12px; color:var(--main-pink); padding:4px 12px; background:var(--light-pink); border-radius:8px; display:${isStmBatchDeleteMode?'none':'block'};">?? 编辑</div>
+9188:  const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
+9296:  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+9303:    chatSettingsForContact = typeof savedSettings === 'string' ? JSON.parse(savedSettings) : savedSettings;
+9311:  const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
+9364:  showToast('? 正在打包美化数据...');
+9369:  if (themeColors) data.themeColors = typeof themeColors === 'string' ? JSON.parse(themeColors) : themeColors;
+9371:  if (bubbleSettings) data.bubbleSettings = typeof bubbleSettings === 'string' ? JSON.parse(bubbleSettings) : bubbleSettings;
+9373:  if (bubbleDecSettings) data.bubbleDecSettings = typeof bubbleDecSettings === 'string' ? JSON.parse(bubbleDecSettings) : bubbleDecSettings;
+9415:  showToast('? 美化设置已导出！');
+9425:      if (data._type !== 'oho_theme_backup') { showToast('? 不是有效的美化备份文件！'); input.value = ''; return; }
+9481:          const el = document.getElementById(id === 'user-avatar' ? 'user-avatar' : id);
+9512:      showToast('? 美化设置已恢复！');
+9514:      showToast('? 导入失败：' + err.message);

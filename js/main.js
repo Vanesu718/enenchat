@@ -2158,6 +2158,49 @@ async function getChatSettings(id) {
   return s ? (typeof s === 'string' ? JSON.parse(s) : s) : {};
 }
 
+// ========== 时间感知工具函数 ==========
+function getTimeSinceLastUserMsg(chatId) {
+  const records = chatRecords[chatId];
+  if (!records || records.length === 0) return null;
+  let lastMsg = null;
+  for (let i = records.length - 1; i >= 0; i--) {
+    if (records[i].side === 'right') {
+      lastMsg = records[i];
+      break;
+    }
+  }
+  if (!lastMsg || !lastMsg.time) return null;
+  const diffMs = Date.now() - lastMsg.time;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHour = Math.floor(diffMs / 3600000);
+  const diffDay = Math.floor(diffMs / 86400000);
+  if (diffMin < 1) return '刚刚';
+  if (diffHour < 1) return `${diffMin}分钟前`;
+  if (diffDay < 1) return `${diffHour}小时前`;
+  return `${diffDay}天前`;
+}
+
+function formatTimeNow() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+  const weekDay = '周' + weekDays[now.getDay()];
+  const hour = now.getHours();
+  const minute = now.getMinutes().toString().padStart(2, '0');
+  let period = '';
+  if (hour < 5) period = '凌晨';
+  else if (hour < 8) period = '早上';
+  else if (hour < 11) period = '上午';
+  else if (hour < 13) period = '中午';
+  else if (hour < 17) period = '下午';
+  else if (hour < 21) period = '晚上';
+  else period = '深夜';
+  const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+  return `${year}年${month}月${day}日 ${weekDay} ${period}${displayHour}:${minute}`;
+}
+
 // 检查关键词是否在本地上下文中已存在 (最近20条/STM/LTM)
 async function isKeywordFoundInLocalContext(contactId, keywords, providedStmText = null, providedLtmText = null) {
   if (!keywords || keywords.length === 0) return false;
@@ -2648,6 +2691,18 @@ ${c.members.map(id => {
   if (crossChatMemoryPrompt) {
     console.log('[记忆互通] 准备注入的跨频道记忆:', crossChatMemoryPrompt);
     systemPrompt += crossChatMemoryPrompt;
+  }
+
+  // 时间感知注入
+  if (chatSettings.timeAwareness) {
+    const timeNow = formatTimeNow();
+    const timeSinceLastMsg = getTimeSinceLastUserMsg(currentContactId);
+    let timePrompt = `【时间感知】当前现实时间：${timeNow}\n`;
+    if (timeSinceLastMsg !== null) {
+      timePrompt += `距离用户（玩家）上一次主动发送消息已过去：${timeSinceLastMsg}（注意：这里只统计用户自己发的消息，你或其他AI角色发送的消息不算在内）\n`;
+    }
+    timePrompt += `请根据当前时间和对话间隔自然地调整你的语气和内容（例如深夜可以提到困意、长时间未聊可以表达想念等），但不要生硬地报时间或刻意强调时间数字。\n`;
+    systemPrompt += timePrompt;
   }
 
   if (stmContent) {
@@ -3701,6 +3756,42 @@ function initGroupChatSettingsPage(contact) {
     }
   }
 
+  // 时间感知开关（动态插入）
+  if (!document.getElementById('group-time-awareness-item')) {
+    const memorySyncRow = memorySyncToggle ? memorySyncToggle.closest('.switch-row') : null;
+    if (memorySyncRow && memorySyncRow.parentNode) {
+      const taItem = document.createElement('div');
+      taItem.className = 'switch-row';
+      taItem.id = 'group-time-awareness-item';
+      taItem.innerHTML = `
+        <div class="switch-label">开启时间感知</div>
+        <div class="switch-toggle" id="group-time-awareness-toggle" onclick="toggleGroupTimeAwareness()"></div>
+      `;
+      const taDesc = document.createElement('div');
+      taDesc.className = 'setting-desc';
+      taDesc.textContent = '开启后AI可感知当前时间和对话间隔';
+      taDesc.id = 'group-time-awareness-desc';
+      // 插入到记忆互通开关之后
+      const nextSibling = memorySyncRow.nextElementSibling;
+      if (nextSibling) {
+        memorySyncRow.parentNode.insertBefore(taItem, nextSibling);
+        taItem.after(taDesc);
+      } else {
+        memorySyncRow.parentNode.appendChild(taItem);
+        memorySyncRow.parentNode.appendChild(taDesc);
+      }
+    }
+  }
+  // 回显时间感知状态
+  const groupTaToggle = document.getElementById('group-time-awareness-toggle');
+  if (groupTaToggle) {
+    if (chatSettings.timeAwareness) {
+      groupTaToggle.classList.add('active');
+    } else {
+      groupTaToggle.classList.remove('active');
+    }
+  }
+
   // 聊天背景
   const bgPreview = document.getElementById('groupChatBgPreview');
   if (bgPreview) {
@@ -3750,6 +3841,28 @@ function toggleGroupMemorySync() {
   if (toggle) {
     toggle.classList.toggle('active');
     chatSettings.memoryInterconnect = toggle.classList.contains('active');
+    if (currentContactId) {
+      saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+    }
+  }
+}
+
+function toggleGroupTimeAwareness() {
+  const toggle = document.getElementById('group-time-awareness-toggle');
+  if (toggle) {
+    toggle.classList.toggle('active');
+    chatSettings.timeAwareness = toggle.classList.contains('active');
+    if (currentContactId) {
+      saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
+    }
+  }
+}
+
+function toggleTimeAwareness() {
+  const toggle = document.getElementById('chat-time-awareness-toggle');
+  if (toggle) {
+    toggle.classList.toggle('active');
+    chatSettings.timeAwareness = toggle.classList.contains('active');
     if (currentContactId) {
       saveToStorage(`CHAT_SETTINGS_${currentContactId}`, JSON.stringify(chatSettings));
     }
@@ -4436,6 +4549,36 @@ function initChatSettingsPage() {
   
   // 渲染世界书多选框列表
   renderWorldBookCheckboxList();
+
+  // 时间感知开关（私聊 - 动态插入）
+  if (!document.getElementById('chat-time-awareness-item')) {
+    const hideAvatarToggle = document.getElementById('hide-avatar-toggle');
+    const hideAvatarRow = hideAvatarToggle ? hideAvatarToggle.closest('.switch-row') : null;
+    const hideAvatarSection = hideAvatarRow ? hideAvatarRow.closest('.setting-section') : null;
+    if (hideAvatarSection && hideAvatarSection.parentNode) {
+      const taSection = document.createElement('div');
+      taSection.className = 'setting-section';
+      taSection.id = 'chat-time-awareness-item';
+      taSection.innerHTML = `
+        <div class="setting-section-title">时间感知</div>
+        <div class="switch-row">
+          <div class="switch-label">开启时间感知</div>
+          <div class="switch-toggle" id="chat-time-awareness-toggle" onclick="toggleTimeAwareness()"></div>
+        </div>
+        <div class="setting-desc">开启后AI可感知当前时间和对话间隔</div>
+      `;
+      hideAvatarSection.parentNode.insertBefore(taSection, hideAvatarSection.nextElementSibling);
+    }
+  }
+  // 回显时间感知状态（私聊）
+  const chatTaToggle = document.getElementById('chat-time-awareness-toggle');
+  if (chatTaToggle) {
+    if (chatSettings.timeAwareness) {
+      chatTaToggle.classList.add('active');
+    } else {
+      chatTaToggle.classList.remove('active');
+    }
+  }
 }
 
 // 加载联系人头像和名字

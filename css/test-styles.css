@@ -1,0 +1,264 @@
+@font-face {
+    font-family: 'Handwritten';
+    src: url('../字体/GuoFengMaChaoGangBiShouXieTi-2.ttf') format('truetype');
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.test-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+#trigger-thought-btn {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#trigger-thought-btn:hover {
+    background-color: #005bb5;
+}
+
+/* 纸团 */
+.crumpled-paper {
+    position: fixed;
+    bottom: -100px; /* 初始位置在屏幕外 */
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    background-image: url('../ICON/crumpled_ball.png'); /* 使用新的纸团图片 */
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: transform 0.3s ease, bottom 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: 9998;
+    display: none; /* 默认隐藏 */
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+.crumpled-paper.show {
+    display: block;
+    bottom: 20px; /* 动画结束位置 */
+}
+
+.crumpled-paper:hover {
+    transform: scale(1.1);
+}
+
+/* 模态框 */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none; /* 默认隐藏 */
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.thought-paper {
+    background-image: url('../ICON/crumpled_background.png'); /* 使用新的纸张背景 */
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    padding: 40px;
+    width: 85vw;
+    max-width: 450px;
+    min-height: 300px;
+    border-radius: 5px;
+    position: relative;
+    transition: transform 0.2s;
+    overflow: hidden;
+    /* 展开动画 */
+    animation: unfold-paper 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transform-origin: bottom right; /* 从右下角纸团的位置展开 */
+}
+
+@keyframes unfold-paper {
+    0% {
+        transform: scale(0.1) rotate(45deg) translate(50%, 50%);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1) rotate(0deg) translate(0, 0);
+        opacity: 1;
+    }
+}
+
+.thought-content {
+    font-family: 'Handwritten', cursive;
+    font-size: 24px;
+    color: #333;
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transform: rotate(-5deg); /* 整体内容倾斜 */
+    transition: opacity 0.5s;
+}
+
+.thought-content span {
+    display: block;
+}
+
+.thought-actions {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    transition: opacity 0.5s;
+}
+
+.thought-actions button {
+    font-family: sans-serif;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+#save-btn {
+    background-color: #28a745;
+    color: white;
+}
+#save-btn:hover {
+    background-color: #218838;
+}
+
+#destroy-btn {
+    background-color: #dc3545;
+    color: white;
+}
+#destroy-btn:hover {
+    background-color: #c82333;
+}
+
+/* 划掉特效 SVG 样式 */
+.scribble-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    /* 稍微旋转一点，增加随意感 */
+    transform: rotate(-2deg) scale(1.05);
+}
+
+.scribble-path {
+    fill: none;
+    stroke: #1a1a1a; /* 深黑色墨水 */
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* 初始状态隐藏路径 */
+    stroke-dasharray: 3000;
+    stroke-dashoffset: 3000;
+    /* 模拟墨水边缘的轻微晕染 */
+    filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.4));
+}
+
+/* 不同笔触的样式 */
+.scribble-path.thick {
+    stroke-width: 18;
+    opacity: 0.85;
+}
+
+.scribble-path.thin {
+    stroke-width: 6;
+    opacity: 0.7;
+    stroke: #2c2c2c; /* 细线稍微浅一点 */
+}
+
+.scribble-path.heavy {
+    stroke-width: 28;
+    opacity: 0.95;
+    stroke: #0a0a0a; /* 重涂更黑 */
+}
+
+/* 触发划掉动画 */
+.thought-paper.scribble .scribble-path {
+    /* 使用 ease-out 让起笔极快，收笔稍缓，体现爆发力 */
+    animation: draw-scribble 0.6s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+/* 为不同的线条设置稍微不同的延迟和持续时间，看起来更真实、更疯狂 */
+.thought-paper.scribble .scribble-path:nth-child(1) { animation-duration: 0.5s; animation-delay: 0s; }
+.thought-paper.scribble .scribble-path:nth-child(2) { animation-duration: 0.55s; animation-delay: 0.05s; }
+.thought-paper.scribble .scribble-path:nth-child(3) { animation-duration: 0.4s; animation-delay: 0.1s; }
+.thought-paper.scribble .scribble-path:nth-child(4) { animation-duration: 0.45s; animation-delay: 0.15s; }
+.thought-paper.scribble .scribble-path:nth-child(5) { animation-duration: 0.3s; animation-delay: 0.2s; }
+.thought-paper.scribble .scribble-path:nth-child(6) { animation-duration: 0.35s; animation-delay: 0.25s; }
+.thought-paper.scribble .scribble-path:nth-child(7) { animation-duration: 0.2s; animation-delay: 0.3s; }
+.thought-paper.scribble .scribble-path:nth-child(8) { animation-duration: 0.25s; animation-delay: 0.35s; }
+
+@keyframes draw-scribble {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* 纸张消失动画 */
+.thought-paper.fade-out {
+    animation: paper-fade-out 0.5s ease-in forwards;
+}
+
+@keyframes paper-fade-out {
+    to {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+/* 模拟情侣相册 */
+.couple-album {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    width: 90%;
+    max-width: 500px;
+    margin-top: 20px;
+    min-height: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.couple-album img {
+    width: 150px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}

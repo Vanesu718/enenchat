@@ -1,0 +1,85 @@
+          newFavor = Math.min(newFavor, oldFavor + 5);
+        } else if (newFavor < oldFavor) {
+          newFavor = Math.max(newFavor, oldFavor - 15);
+        }
+        
+        // 解析状态数据
+        parsedStatusData = {
+          location: locationMatch ? locationMatch[1].trim() : '未知',
+          mood: moodMatch ? moodMatch[1].trim() : '平静',
+          thoughts: thoughtsMatch ? thoughtsMatch[1].trim().replace(/[{}[\]【】()（）]/g, '') : '暂无数据',
+          favor: newFavor
+        };
+  
+        if (physiologicalMatch) parsedStatusData.physiological = physiologicalMatch[1].trim();
+        if (lustMatch) parsedStatusData.lust = parseInt(lustMatch[1]);
+  
+        // 检查角色人设是否包含"无法爱人"相关关键词(用于保存状态)
+        let favorValue = parsedStatusData.favor;
+        const contact = contacts.find(c => c.id === requestContactId);
+        if (contact && contact.persona) {
+          const lowerPersona = contact.persona.toLowerCase();
+          const lockKeywords = ['无法爱人', '不会爱上任何人', '不会爱上user', '不会爱上用户', '无法产生爱情', '不懂爱',
+ '没有爱的能力'];
+          if (lockKeywords.some(keyword => lowerPersona.includes(keyword))) {
+            favorValue = 0;
+            parsedStatusData.favor = 0;
+          }
+        }
+  
+        // 只有在当前窗口才更新状态卡片UI
+        if (isCurrentContact) {
+          document.getElementById('status-location').textContent = parsedStatusData.location;
+          document.getElementById('status-mood').textContent = parsedStatusData.mood;
+          document.getElementById('status-thoughts').textContent = parsedStatusData.thoughts;
+          document.getElementById('status-favor').style.width = favorValue + '%';
+          document.getElementById('status-favor-text').textContent = favorValue + '%';
+          
+          // 如果面板开着，闪烁一下提示更新
+          const statusCard = document.getElementById('statusCard');
+          if (statusCard.style.display === 'block') {
+            statusCard.style.transition = 'none';
+            statusCard.style.opacity = '0.7';
+            setTimeout(() => {
+              statusCard.style.transition = 'opacity 0.3s';
+              statusCard.style.opacity = '1';
+            }, 50);
+          }
+        }
+        
+        // 保存状态到storage
+        const statusToSave = {
+          location: parsedStatusData.location,
+          mood: parsedStatusData.mood,
+          thoughts: parsedStatusData.thoughts,
+          favor: favorValue
+        };
+        await saveToStorage(`STATUS_${requestContactId}`, JSON.stringify(statusToSave));
+        
+      }
+      
+      // 从显示文本中移除状态标签
+      displayText = txt.replace(/<STATUS>[\s\S]*?<\/STATUS>/, '').trim();
+  
+      // ===== AI红包指令解析 =====
+      let aiRedPacketAction = null;
+      if (/\[ACCEPT_RED_PACKET\]/i.test(displayText)) {
+        aiRedPacketAction = 'accept';
+        displayText = displayText.replace(/\[ACCEPT_RED_PACKET\]/gi, '').trim();
+      } else if (/\[RETURN_RED_PACKET\]/i.test(displayText)) {
+        aiRedPacketAction = 'return';
+        displayText = displayText.replace(/\[RETURN_RED_PACKET\]/gi, '').trim();
+      } else {
+        const _srpm = displayText.match(/\[SEND_RED_PACKET:\s*([^:\]]+)\s*:\s*([^\]]+)\s*\]/i);
+        if (_srpm) { aiRedPacketAction = { send: { amount: _srpm[1].trim(), msg: _srpm[2].trim() } };
+          displayText = displayText.replace(/\[SEND_RED_PACKET:[^\]]+\]/gi, '').trim();
+        }
+      }  // ===== 红包指令完毕 =====
+  
+    
+      // 检查是否是重roll模式
+      const pendingReRoll = window._pendingReRoll;
+      const isThisReRoll = isReRoll && pendingReRoll && pendingReRoll.contactId === requestContactId;
+  
+
+
