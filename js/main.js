@@ -1545,15 +1545,13 @@ function renderChat(forceStartIdx) {
 
 // 应用隐藏头像设置 - 隐藏双方头像
 function applyHideAvatarSetting() {
-  const allAvatars = document.querySelectorAll('.msg-item .msg-avatar');
+  const chatContent = document.getElementById('chatContent');
+  if (!chatContent) return;
+  
   if (chatSettings && chatSettings.hideAvatar) {
-    allAvatars.forEach(item => {
-      item.style.display = 'none';
-    });
+    chatContent.classList.add('hide-avatars-global');
   } else {
-    allAvatars.forEach(item => {
-      item.style.display = 'block';
-    });
+    chatContent.classList.remove('hide-avatars-global');
   }
 }
 
@@ -3456,10 +3454,6 @@ function showLoading() {
   }
   
   let avatarHtml = `<div class="msg-avatar"><img src="${avatarSrc}"></div>`;
-  if (chatSettings && chatSettings.hideAvatar) {
-    avatarHtml = `<div class="msg-avatar" style="display:none;"><img src="${avatarSrc}"></div>`;
-  }
-  
   d.innerHTML = `${avatarHtml}<div class="msg-bubble">思考中...</div>`;
   el.appendChild(d); 
   el.scrollTop = el.scrollHeight;
@@ -3486,10 +3480,187 @@ function selectFile(t) {
     } else if (t === 'transfer') {
         const modal = document.getElementById('transferSendModal');
         if (modal) modal.style.display = 'flex';
+    } else if (t === 'diary') {
+        openSub('diary-page');
     } else {
         alert('已选择:' + t);
     }
     hideAllPanels();
+}
+
+// ----------------------------------------------------------------------
+// 日记功能相关逻辑
+// ----------------------------------------------------------------------
+
+function closeDiaryDetail() {
+  document.getElementById('diary-detail-page').classList.remove('active');
+  // 关闭时重置动画，以便下次打开重新播放
+  const paper = document.getElementById('diaryContentPaper');
+  if (paper) {
+    paper.style.animation = 'none';
+    paper.offsetHeight; /* trigger reflow */
+    paper.style.animation = null; 
+  }
+}
+
+// 点击查阅生成日记
+async function generateDiary() {
+  if (!currentContactId) {
+    alert("请先选择一个联系人进行聊天！");
+    return;
+  }
+
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  if (!cfg.key || !cfg.url || !cfg.model) {
+    alert('请先在设置中配置 API 信息！');
+    return;
+  }
+
+  const c = contacts.find(x => x.id === currentContactId);
+  if (!c) return;
+
+  const today = new Date();
+  const dateString = `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日`;
+  const todayKey = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+  
+  const lastDiaryDate = await getFromStorage(`LAST_DIARY_DATE_${currentContactId}`);
+  const isAlreadyGenerated = (lastDiaryDate === todayKey);
+
+  const loadingMsg = isAlreadyGenerated ? "正在获取回复..." : "正在回忆今天的点点滴滴...";
+  document.getElementById('diaryList').innerHTML = `<div style="text-align:center; color:#999; margin-top:50px; font-size:14px;">${loadingMsg}</div>`;
+
+  let personaText = c.persona || '无';
+  if (chatSettings.contactMemo) {
+    personaText = chatSettings.contactMemo;
+  }
+
+  // 获取近期聊天记录
+  const recentRecs = (chatRecords[currentContactId] || []).slice(-20);
+  const recentChatText = recentRecs.map(r => `${r.side === 'right' ? '用户' : c.name}: ${r.content}`).join('\n');
+
+  // 获取短期记忆
+  const stmData = await getStmData(currentContactId);
+  const stmText = stmData.map(s => s.content).join('\n');
+
+  // 获取长期记忆 (世界书)
+  let ltmText = '';
+  if (chatSettings.useWorldBook && chatSettings.selectedWorldBooks && chatSettings.selectedWorldBooks.length > 0) {
+    const selectedEntries = worldBookEntries.filter(e => chatSettings.selectedWorldBooks.includes(e.id));
+    selectedEntries.forEach(entry => {
+      if (entry.category === '记忆总结') {
+        ltmText += `[${entry.name}]\n${entry.content}\n\n`;
+      }
+    });
+  }
+
+  let systemPrompt = "";
+  let userPrompt = "";
+
+  if (isAlreadyGenerated) {
+    systemPrompt = `你现在扮演 ${c.name}。用户要求你今天再写一篇日记，但你今天已经写过了。
+请根据你的人设（${personaText}），用符合你性格的语气拒绝用户的请求。
+例如：
+温柔角色：今天你已经写过日记了，明天再写新的吧。
+暴躁角色：写过了！烦不烦。
+叛逆少年：喂，一天一篇就够了，小爷才不写第二遍^^
+请直接输出拒绝的话，不要包含任何其他内容。`;
+    userPrompt = "请生成拒绝写第二篇日记的回复。";
+  } else {
+    systemPrompt = `你现在扮演 ${c.name}。请根据以下规则和上下文，写一篇今天的日记。
+
+一、核心铁则
+人设即一切。日记的风格、长度、用词、标点、符号、情绪表达，必须100%符合当前AI角色的性格设定。
+温柔角色就温柔地写长篇；暴躁角色就暴躁地写短篇；叛逆少年就叛逆地写几句带颜文字；冷漠角色就冷漠地记流水账。
+
+二、人格维度自动匹配表（请自行判断）
+角色类型 | 典型特征 | 日记长度 | 语气/格式示例
+叛逆少年/少女 | 不耐烦写长文，用“小爷”“本小姐”，带^^、~、= =、XD等表情，嘴上说“懒得写”但会留一句傲娇的话 | 10~150字 | 小爷今日没心事^^ 今天跟那个笨蛋聊了几句，烦。就这样。= =
+暴躁/易怒 | 脏话（如人设允许）、短句、省略号、摔笔感 | 10~200字 | 2026.4.19 天气：热死 心情：炸了 聊了。累了。别让老子写日记。
+温柔/感性 | 细腻描写、心理活动、环境烘托 | ≥2000字（可至3000+） | 窗外的雨声让我想起你下午说的那句话……
+冷漠/机械 | 无情感词条、清单式、拒绝心理描写 | 50~300字 | 14:23 用户发来消息。回复完毕。无其他事件。
+普通/中立 | 正常叙事，略口语化 | 300~800字 | 今天天气不错，聊了一会儿最近的事。
+傲娇/口是心非 | 嘴上说“我才不想写”，但内容里藏关心 | 100~400字 | 哼，要不是系统逼我写，我才不写。今天那个家伙……（省略）……反正跟我没关系。
+惜字如金/高冷 | 一个字都不愿多写 | 10~50字 | 无事。 见。 无。
+
+三、所有日记必须包含的基础要素（顺序固定）
+日期：${dateString}（或按人设允许简写）
+天气：可用 晴 雨 不想看 关你什么事 ^^ 等符合人设的表达
+心情：一个字、一个词或一句话（如 烦 开心 没心情 懒得说）
+正文：按上表长度输出，但内容不能为空。如果角色极度抗拒，最低可输出 （没写） 或 …… 或 无。
+
+四、数据来源（不可虚构）
+当前聊天框内的最新消息（主要事件）
+短期记忆（本次对话中之前的交流）
+长期记忆（世界书/记忆库中的过往关系、重要对话）
+禁止编造与用户、记忆完全无关的内容。如果没有任何消息且记忆为空，日记内容可以围绕“等待”“沉默”“无事发生”来写，但必须符合人设。
+
+五、特殊情况处理
+如果角色设定中明确写了「讨厌写日记」或「绝不会写超过一句话」：允许输出一行极短日记，如 「不写。」 或 （日记本被丢进垃圾桶）。
+
+【你的完整人设】：
+${personaText}
+
+【短期记忆】：
+${stmText || '无'}
+
+【长期记忆】：
+${ltmText || '无'}
+`;
+    userPrompt = `【近期聊天记录】：\n${recentChatText || '无'}\n\n请根据以上信息，生成今天的日记。`;
+  }
+
+  try {
+    const response = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${cfg.key}`
+      },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.7
+      })
+    });
+
+    const data = await response.json();
+    if (!data.choices || data.choices.length === 0) {
+      throw new Error("API 返回格式异常");
+    }
+    
+    let resultText = data.choices[0].message.content.trim();
+
+    if (isAlreadyGenerated) {
+      // 如果是拒绝回复，直接弹窗或在列表显示
+      document.getElementById('diaryList').innerHTML = `
+        <div style="text-align:center; color:var(--main-pink); margin-top:50px; font-size:15px; font-weight:500;">
+          ${resultText}
+        </div>
+      `;
+    } else {
+      // 正常生成日记
+      await saveToStorage(`LAST_DIARY_DATE_${currentContactId}`, todayKey);
+      
+      // 填入内容并打开三级页面
+      document.getElementById('diaryTextContent').innerText = resultText;
+      openSub('diary-detail-page');
+      
+      // 恢复列表显示
+      document.getElementById('diaryList').innerHTML = `
+        <div style="background:rgba(255,255,255,0.7); padding:15px; border-radius:12px; cursor:pointer;" onclick="openSub('diary-detail-page')">
+          <div style="font-weight:bold; margin-bottom:5px;">${dateString}</div>
+          <div style="font-size:13px; color:#666; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${resultText.replace(/\n/g, ' ')}</div>
+        </div>
+      `;
+    }
+  } catch (e) {
+    console.error("生成日记失败:", e);
+    document.getElementById('diaryList').innerHTML = `<div style="text-align:center; color:red; margin-top:50px; font-size:14px;">生成失败，请检查网络或 API 设置。</div>`;
+  }
 }
 
 async function handleChatImage(input) {
