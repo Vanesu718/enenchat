@@ -1,1 +1,0 @@
-﻿$p=[char]39; $bp='c:\Users\Administrator\Desktop\111'; $h=[System.IO.File]::ReadAllText($bp+'\index.html',[System.Text.Encoding]::UTF8); $css=[System.IO.File]::ReadAllText($bp+'\css\index-main.css',[System.Text.Encoding]::UTF8); $oldId='id=' + $p + 'redPacketSendModal' + $p; $idx=$h.IndexOf($oldId); Write-Host ('found_at='+$idx)

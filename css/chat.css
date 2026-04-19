@@ -449,4 +449,4 @@
     color: #374151;
 }
 
-".hide-avatars-global .msg-avatar { display: none !important; }" 
+.hide-avatars-global .msg-avatar { display: none !important; }

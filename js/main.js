@@ -3478,6 +3478,7 @@ function selectFile(t) {
         if (modal) modal.style.display = 'flex';
     } else if (t === 'diary') {
         openSub('diary-page');
+        loadDiaryList();
     } else {
         alert('已选择:' + t);
     }
@@ -3540,10 +3541,10 @@ async function loadDiaryList() {
       <div class="diary-action-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <div class="diary-generate-btn" style="margin: 0; flex: 1; text-align: center;" onclick="generateDiary()">📝 生成今日日记</div>
         <div style="display: flex; gap: 10px; margin-left: 10px;">
-          <div class="diary-manage-btn" style="padding: 12px 15px; background: rgba(0,0,0,0.05); border-radius: 8px; font-size: 14px; cursor: pointer; color: var(--text-dark);" onclick="toggleDiaryManageMode()">
+          <div class="diary-manage-btn" style="padding: 12px 15px; background: rgba(0,0,0,0.05); border-radius: 8px; font-size: 14px; cursor: pointer; color: #999 !important;" onclick="toggleDiaryManageMode()">
             ${isDiaryManageMode ? '取消' : '管理'}
           </div>
-          <div class="diary-delete-btn" style="display: ${isDiaryManageMode ? 'block' : 'none'}; padding: 12px 15px; background: rgba(255, 68, 68, 0.1); color: #ff4444; border-radius: 8px; font-size: 14px; cursor: pointer;" onclick="deleteSelectedDiaries()">
+          <div class="diary-delete-btn" style="display: ${isDiaryManageMode ? 'block' : 'none'}; padding: 12px 15px; background: rgba(255, 68, 68, 0.1); color: #999 !important; border-radius: 8px; font-size: 14px; cursor: pointer;" onclick="deleteSelectedDiaries()">
             删除(${selectedDiaries.size})
           </div>
         </div>

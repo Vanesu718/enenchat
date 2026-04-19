@@ -1,5 +1,0 @@
-f = open(path, "r", encoding="utf-8", errors="replace"
-content = f.read(
-f.close(
-idx = content.find("      if (!currentMsg) {"
-print("idx=", idx

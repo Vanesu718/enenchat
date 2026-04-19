@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="css/index-main.css">
   <link rel="stylesheet" href="css/emoji.css">
   <link rel="stylesheet" href="css/secret-thought.css">
+  <link rel="stylesheet" href="css/diary.css">
 <style>
 .icon {
   width: 1em;
@@ -2068,6 +2069,37 @@
     <input type="file" id="pi1" class="hidden-file" onchange="hdlImg(this, 'p1', 'bg')">
     <input type="file" id="pi2" class="hidden-file" onchange="hdlImg(this, 'p2', 'bg')">
     <input type="file" id="chat-img-input" class="hidden-file" accept="image/*" onchange="handleChatImage(this)">
+
+    <!-- 日记二级页面 (日记列表) -->
+    <div class="sub-page" id="diary-page">
+      <div class="page-header">
+        <div class="page-back" onclick="closeSub('diary-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">日记</div>
+        <div class="page-action" onclick="loadDiaryList()" style="margin-left:auto; font-size: 15px; font-weight: 500; cursor: pointer;">查阅</div>
+      </div>
+      <div class="page-body">
+        <div id="diaryList" style="display:flex; flex-direction:column; gap:10px;">
+          <div class="diary-empty-tip">点击右上角「查阅」查看日记列表</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 日记三级页面 (日记详情) -->
+    <div class="sub-page diary-detail-page" id="diary-detail-page">
+      <div class="page-header diary-detail-header">
+        <div class="page-back" onclick="closeDiaryDetail()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="page-title">日记内容</div>
+      </div>
+      <div class="diary-detail-body">
+        <div class="diary-paper" id="diaryContentPaper">
+          <div class="diary-detail-date" id="diaryDetailDate"></div>
+          <div class="diary-text-content" id="diaryTextContent">
+            <!-- 日记文字将填充在这里 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2127,6 +2159,7 @@
             </div>
         </div>
     </div>
+
     </body>
 </html>
 
