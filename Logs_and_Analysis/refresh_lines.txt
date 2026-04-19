@@ -1,0 +1,7 @@
+﻿
+index.html:1699:        <div class="empty-tip" style="color:#5a5a8a;">暗巷还很安静，点击刷新或率先爆料</div>
+index.html:1723:        <div class="empty-tip" style="color:#3a5a7a;">瞭望台还没有观察报告，点击刷新或开始分析</div>
+index.html:1747:        <div class="empty-tip" style="color:#3a6a4a;">档案馆暂无记录，点击刷新或提交你的异常档案</div>
+index.html:1822:        <div class="empty-tip">点击右上角刷新按钮查看朋友圈</div>
+
+

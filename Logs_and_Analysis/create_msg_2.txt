@@ -1,0 +1,238 @@
+﻿
+> function createMsgElement(content, side, avatar, quote, idx, type, senderName, statusData, isOfflineMsg) {
+    if (idx === undefined) {
+      const rec = chatRecords[currentContactId] || [];
+      idx = rec.length;
+    }
+  
+      const div = document.createElement('div');
+      const isBlueOfflineCard = isCurrentChatBlueMinimalEnabled(isOfflineMsg, statusData) && side === 'left';
+    
+    if (isBlueOfflineCard) {
+      div.className = `msg-item ${side} blue-offline-mode`;
+    } else {
+      div.className = `msg-item ${side}`;
+    }
+    
+    if (selectedMsgIndices.includes(idx)) div.classList.add('selected');
+    const qhtml = quote ? `<div class="msg-quote">${quote}</div>` : '';
+  
+    const replyText = encodeURIComponent(type === 'image' ? '[图片]' : content);
+  
+    let ringClass = '';
+    if (side === 'left' && currentContactId) {
+      const c = contacts.find(x => x.id === currentContactId);
+      if (c && c.isMarried && !c.isGroup) {
+        ringClass = ' ring-avatar-frame';
+      }
+    }
+  
+    const bubble = document.createElement('div');
+    bubble.dataset.msgIdx = idx;
+  
+    if (isBlueOfflineCard) {
+      bubble.className = 'msg-blue-card';
+      let parsedContent = type === 'image' ? `<img src="${content}" style="max-width:180px; max-height:180px; border-ra
+dius:10px; display:block; cursor:zoom-in; object-fit:cover;" onclick="event.stopPropagation(); viewFullImage('${content
+}')">` : parseTextBeautify(content);
+      // AI表情包替换：蓝色卡片模式也需要处理
+      if (type !== 'image' && typeof processAiEmojiInMessage === 'function') {
+        parsedContent = processAiEmojiInMessage(parsedContent);
+      }
+      
+      bubble.innerHTML = `
+        <div class="blue-card-top">
+          <div class="blue-card-avatar${ringClass}"><img src="${avatar}"></div>
+            <div class="blue-card-status">
+              <div class="bc-status-item thoughts"><div class="bc-label"><img src="ICON/心声.png" style="width:14px; heig
+ht:14px; margin-right:2px; vertical-align:-0.15em; filter: opacity(0.7);"> 心声</div><div class="bc-val">${(statusData?.t
+houghts || '没有想法').substring(0,15)}</div></div>
+              <div class="bc-status-item"><div class="bc-label"><img src="ICON/地点.png" style="width:14px; height:14px; 
+margin-right:2px; vertical-align:-0.15em; filter: opacity(0.7);"> 地点</div><div class="bc-val">${statusData?.location ||
+ '未知'}</div></div>
+              <div class="bc-status-item"><div class="bc-label"><img src="ICON/心情.png" style="width:14px; height:14px; 
+margin-right:2px; vertical-align:-0.15em; filter: opacity(0.7);"> 心情</div><div class="bc-val">${(statusData?.mood || '平
+静').substring(0,15)}</div></div>
+              <div class="bc-status-item favor"><div class="bc-label"><img src="ICON/好感阶段.png" style="width:14px; heigh
+t:14px; margin-right:2px; vertical-align:-0.15em; filter: opacity(0.7);"> 好感度</div><div class="bc-val">${statusData?.fa
+vor || 0}%</div></div>
+            </div>
+        </div>
+        ${statusData && statusData.physiological ? `
+        <div class="blue-card-middle">
+          <div class="bc-toggle" onclick="const c = this.nextElementSibling; c.style.display = c.style.display === 'non
+e' ? 'block' : 'none';">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <span>🔥 情欲指数：</span>
+              <div class="bc-lust-bar-bg" style="width: 80px; flex: none;"><div class="bc-lust-bar-fill" style="width:$
+{statusData.lust || 0}%"></div></div>
+              <span>${statusData.lust || 0}%</span>
+            </div>
+          </div>
+          <div class="bc-hidden-content" style="display:none; text-align: center; padding-top: 4px;">
+            <div class="bc-phys-row"><span>生理状态：</span><span>${statusData.physiological}</span></div>
+          </div>
+        </div>
+        ` : ''}
+        <div class="blue-card-bottom">
+          ${qhtml}${parsedContent}
+        </div>
+      `;
+      
+      const bubbleWrapper = document.createElement('div');
+      bubbleWrapper.style.cssText = 'display:flex; flex-direction:column; max-width:100%; width:100%;';
+      if (senderName) {
+        const nameEl = document.createElement('div');
+        nameEl.style.cssText = 'font-size:11px; color:var(--text-light); margin-bottom:4px; margin-left:4px;';
+        nameEl.innerText = senderName;
+        bubbleWrapper.appendChild(nameEl);
+      }
+      bubbleWrapper.appendChild(bubble);
+  
+      // 如果有多个roll版本，在气泡正下方追加切换控件（线下蓝卡模式）
+      // 只在该回合最后一条气泡下显示计数器
+      {
+        const recNow2 = chatRecords[currentContactId] || [];
+        // 找到该回合第一条消息（持有 alternatives）
+        let firstAltIdx2 = idx;
+        let msgDataNow2 = recNow2[idx];
+        // 如果当前消息没有 alternatives，向前查找持有 alternatives 的首条消息
+        if ((!msgDataNow2 || !msgDataNow2.alternatives) && side === 'left') {
+          for (let si = idx - 1; si >= 0; si--) {
+            if (recNow2[si] && recNow2[si].side === 'left' && recNow2[si].senderId === (recNow2[idx] && recNow2[idx].se
+nderId)) {
+              if (recNow2[si].alternatives) { firstAltIdx2 = si; msgDataNow2 = recNow2[si]; break; }
+            } else { break; }
+          }
+        }
+        if (msgDataNow2 && msgDataNow2.alternatives && msgDataNow2.alternatives.length > 1 && side === 'left') {
+          // 找该回合最后一条气泡的 idx
+          const firstSenderId2 = recNow2[firstAltIdx2] && recNow2[firstAltIdx2].senderId;
+          let lastAltIdx2 = firstAltIdx2;
+          for (let li = firstAltIdx2 + 1; li < recNow2.length; li++) {
+            if (recNow2[li] && recNow2[li].side === 'left' && recNow2[li].senderId === firstSenderId2 && !recNow2[li].a
+lternatives) {
+              lastAltIdx2 = li;
+            } else { break; }
+          }
+          // 只在最后一条气泡上渲染计数器
+          if (idx === lastAltIdx2) {
+            const altCount2 = msgDataNow2.alternatives.length;
+            const altCur2 = (msgDataNow2.currentIndex !== undefined ? msgDataNow2.currentIndex : altCount2 - 1) + 1;
+            const switcherDiv2 = document.createElement('div');
+            switcherDiv2.style.cssText = 'display:flex; align-items:center; justify-content:flex-start; gap:0; margin-t
+op:2px; margin-left:4px; padding:0; user-select:none;';
+            const prevBtn2 = document.createElement('span');
+            prevBtn2.textContent = '<';
+            prevBtn2.style.cssText = 'font-size:12px; color:var(--text-light); cursor:pointer; padding:0 4px;';
+            prevBtn2.onclick = (e) => { e.stopPropagation(); switchMsgAlternative(firstAltIdx2, 'prev'); };
+            const indexSpan2 = document.createElement('span');
+            indexSpan2.textContent = altCur2 + '/' + altCount2;
+            indexSpan2.style.cssText = 'font-size:12px; color:var(--text-light);';
+            const nextBtn2 = document.createElement('span');
+            nextBtn2.textContent = '>';
+            nextBtn2.style.cssText = 'font-size:12px; color:var(--text-light); cursor:pointer; padding:0 4px;';
+            nextBtn2.onclick = (e) => { e.stopPropagation(); switchMsgAlternative(firstAltIdx2, 'next'); };
+            switcherDiv2.appendChild(prevBtn2);
+            switcherDiv2.appendChild(indexSpan2);
+            switcherDiv2.appendChild(nextBtn2);
+            bubbleWrapper.appendChild(switcherDiv2);
+          }
+        }
+      }
+  
+      div.innerHTML = `
+        <div class="check-icon">?</div>
+        <div class="msg-menu" onclick="event.stopPropagation();"><div class="msg-menu-item" onclick="replyToMsg(decodeU
+RIComponent(this.dataset.replyText), this)" data-reply-text="${replyText}">回复</div></div>
+      `;
+      const menuEl = div.querySelector('.msg-menu');
+      div.insertBefore(bubbleWrapper, menuEl);
+      
+    } else {
+        bubble.className = 'msg-bubble';
+        if (type === 'image') {
+          bubble.style.cssText = 'padding:4px; background:transparent !important; border:none !important; box-shadow:no
+ne !important;';
+          if (qhtml) bubble.innerHTML = qhtml;
+          const imgEl = document.createElement('img');
+          imgEl.src = content;
+          imgEl.style.cssText = 'max-width:180px; max-height:180px; border-radius:10px; display:block; cursor:zoom-in; 
+object-fit:cover;';
+          imgEl.onclick = (e) => { e.stopPropagation(); viewFullImage(content); };
+          bubble.appendChild(imgEl);
+        } else if (type === 'red_packet' || type === 'transfer') {
+          bubble.style.cssText = 'padding: 0; background: transparent !important; border: none !important; box-shadow: 
+none !important; margin-bottom: 5px; cursor: pointer;';
+          if (qhtml) bubble.innerHTML = qhtml;
+          
+          let data = {};
+          try { data = JSON.parse(content); } catch(e) { data = {msg: content}; }
+          
+          const isRedPacket = type === 'red_packet';
+          const bgColor = isRedPacket ? '#F9A745' : '#F9A745'; // Orange for both
+          const title = isRedPacket ? (data.msg || '恭喜发财，大吉大利') : `¥ ${data.amount || '0.00'}`;
+          const subTitle = isRedPacket ? '查看红包' : (data.msg || '转账给你');
+          const iconSrc = isRedPacket ? 'ICON/红包.png' : 'ICON/转账.png';
+          const label = isRedPacket ? '微信红包' : '微信转账';
+  
+          const box = document.createElement('div');
+          if (isRedPacket) {
+            const coverUrl = data.cover || '';
+            const rpMsg = data.msg || '恭喜发财，大吉大利';
+            const rpAmt = data.amount || '';
+            const coverBg = coverUrl ? ('url('+coverUrl+') center/cover no-repeat') : 'linear-gradient(160deg,#e8334a,#
+c62135)';
+            box.style.cssText = 'width:140px;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-
+shadow:0 2px 8px rgba(0,0,0,0.18);cursor:pointer;user-select:none;';
+            box.innerHTML = '<div class="rp-bubble-top" style="position:relative;width:100%;height:150px;background:'+c
+overBg+';display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:20px;"><div styl
+e="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.1);border-radius:12px 12px 0 0;"></div
+><div style="position:relative;z-index:1;text-align:center;padding:0 10px;"><div style="color:#fff;font-size:15px;font-
+weight:bold;text-shadow:0 1px 4px rgba(0,0,0,0.5);">'+rpMsg+'</div></div></div><div style="background:#c62135;padding:1
+2px 0;display:flex;align-items:center;justify-content:center;"><div class="rp-open-coin" style="width:40px;height:40px;
+border-radius:50%;background:linear-gradient(135deg,#f5deb3,#d4a56a);display:flex;align-items:center;justify-content:ce
+nter;font-size:18px;font-weight:bold;color:#8b4513;box-shadow:0 2px 6px rgba(0,0,0,0.2);">開</div></div>';
+            if (side === 'right') { box.style.cursor = 'default'; } else { box.onclick = (e) => { e.stopPropagation(); 
+openRedPacket(box, rpAmt, rpMsg, coverUrl); }; }
+          } else {
+            box.style.cssText = 'width:220px;background:'+bgColor+';border-radius:8px;overflow:hidden;display:flex;flex
+-direction:column;';
+            box.innerHTML = '<div style="display:flex;align-items:center;padding:12px 15px;color:white;"><img src="'+ic
+onSrc+'" style="width:36px;height:36px;margin-right:12px;filter:brightness(0) invert(1);"><div style="flex:1;overflow:h
+idden;"><div style="font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+title+'</div><div styl
+e="font-size:12px;margin-top:2px;opacity:0.8;">'+subTitle+'</div></div></div><div style="background:white;padding:4px 1
+5px;font-size:11px;color:#999;border-top:1px solid rgba(0,0,0,0.05);text-align:left;">'+label+'</div>';
+            box.onclick = (e) => { e.stopPropagation(); };
+          }
+          bubble.appendChild(box);
+        } else {
+          let parsedContent = parseTextBeautify(content);
+        // AI表情包替换：在parseTextBeautify之后执行，因为[]不会被转义
+        if (typeof processAiEmojiInMessage === 'function') {
+          parsedContent = processAiEmojiInMessage(parsedContent);
+        }
+        bubble.innerHTML = `${qhtml}${parsedContent}`;
+      }
+  
+      const bubbleWrapper = document.createElement('div');
+      bubbleWrapper.style.cssText = 'display:flex; flex-direction:column; max-width:100%;';
+      if (senderName && side === 'left') {
+        const nameEl = document.createElement('div');
+        nameEl.style.cssText = 'font-size:11px; color:var(--text-light); margin-bottom:4px; margin-left:4px;';
+        nameEl.innerText = senderName;
+        bubbleWrapper.appendChild(nameEl);
+      }
+      bubbleWrapper.appendChild(bubble);
+      // 判断是否有多个roll版本，在气泡正下方追加切换控件（普通模式）
+      // 只在该回合最后一条气泡下显示计数器
+      {
+        const recNow3 = chatRecords[currentContactId] || [];
+        // 找到该回合第一条消息（持有 alternatives）
+        let firstAltIdx3 = idx;
+        let msgDataNow3 = recNow3[idx];
+        // 如果当前消息没有 alternatives，向前查找持有 alternatives 的首条消息
+        if ((!msgDataNow3 || !msgDataNow3.alternatives) && side === 'left') {
+          for (let si = idx - 1; si >= 0; si--) {
+
+

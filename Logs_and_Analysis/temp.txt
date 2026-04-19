@@ -1,0 +1,17 @@
+
+js\main.js:682:async function saveContactGroups() {
+js\main.js:692:  await saveContactGroups();
+js\main.js:709:  await saveContactGroups();
+js\main.js:804:        await saveContactGroups();
+js\main.js:960:        await saveContactGroups();
+js\main.js:1245:  async function saveContact() {
+js\main.js:9112:async function generatePersonaMemo(memoId, personaId) {
+index.html:996:            <button class="tb-clear-btn" style="background:var(--light-pink); color:var(--main-pink); pa
+dding:4px 8px; border-radius:12px; font-size:12px; border:none;" onclick="generatePersonaMemo('contactMemo', 'contactPe
+rsona')">?? AI 一键提取</button>
+index.html:1001:        <button class="save-btn" onclick="saveContact()">创建角色</button>
+index.html:1265:            <button class="tb-clear-btn" style="background:rgba(255,255,255,0.8); color:var(--main-pink
+); border:1px solid var(--light-pink); border-radius:12px; padding:4px 8px; font-size:12px;" onclick="generatePersonaMe
+mo('chatContactMemo', 'contactMaskTextarea')">?? AI 提取</button>
+
+
