@@ -1513,12 +1513,7 @@ function renderChat(forceStartIdx) {
     });
     el.insertBefore(fragment, el.firstChild);
     
-    // 应用隐藏头像设置
-    if (chatSettings.hideAvatar) {
-      fragment.querySelectorAll('.msg-avatar').forEach(item => {
-        item.style.display = 'none';
-      });
-    }
+    // 头像显示/隐藏统一由 CSS class hide-avatars-global 控制，无需 inline style
     
     // 如果还有更多，添加新的按钮
     if (startIdx > 0) {
@@ -1543,7 +1538,7 @@ function renderChat(forceStartIdx) {
   }, 50);
 }
 
-// 应用隐藏头像设置 - 隐藏双方头像
+// 应用隐藏头像设置 - 隐藏双方头像（纯CSS class控制，统一全局生效）
 function applyHideAvatarSetting() {
   const chatContent = document.getElementById('chatContent');
   if (!chatContent) return;
@@ -1552,6 +1547,10 @@ function applyHideAvatarSetting() {
     chatContent.classList.add('hide-avatars-global');
   } else {
     chatContent.classList.remove('hide-avatars-global');
+    // 清除所有可能残留的 inline style display:none，确保头像统一显示
+    chatContent.querySelectorAll('.msg-avatar').forEach(avatar => {
+      avatar.style.removeProperty('display');
+    });
   }
 }
 
@@ -1928,10 +1927,7 @@ function addMsgToUI(content, side, avatar, quote, idx, type, skipScroll = false,
     el.scrollTop = el.scrollHeight;
   }
 
-  if (chatSettings.hideAvatar) {
-    const newAvatar = div.querySelector('.msg-avatar');
-    if (newAvatar) newAvatar.style.display = 'none';
-  }
+  // 头像显示/隐藏统一由 CSS class hide-avatars-global 控制，无需 inline style
 }
 
 // 全屏查看图片
@@ -3453,8 +3449,8 @@ function showLoading() {
     avatarSrc = c.avatar;
   }
   
-  let avatarHtml = `<div class="msg-avatar"><img src="${avatarSrc}"></div>`;
-  d.innerHTML = `${avatarHtml}<div class="msg-bubble">思考中...</div>`;
+  // 始终生成头像HTML，显示/隐藏统一由 CSS class hide-avatars-global 控制
+  d.innerHTML = `<div class="msg-avatar"><img src="${avatarSrc}"></div><div class="msg-bubble">思考中...</div>`;
   el.appendChild(d); 
   el.scrollTop = el.scrollHeight;
 }
@@ -3492,18 +3488,178 @@ function selectFile(t) {
 // 日记功能相关逻辑
 // ----------------------------------------------------------------------
 
+// ============ 日记功能 ============
+
+// 关闭日记详情页
 function closeDiaryDetail() {
-  document.getElementById('diary-detail-page').classList.remove('active');
-  // 关闭时重置动画，以便下次打开重新播放
-  const paper = document.getElementById('diaryContentPaper');
-  if (paper) {
-    paper.style.animation = 'none';
-    paper.offsetHeight; /* trigger reflow */
-    paper.style.animation = null; 
+  closeSub('diary-detail-page');
+}
+
+// 全局变量用于管理模式
+let isDiaryManageMode = false;
+let selectedDiaries = new Set();
+
+// 从日记内容提取天气信息
+function extractWeatherFromDiary(text) {
+  const weatherMatch = text.match(/天气[：:]\s*(.{1,10})/);
+  if (weatherMatch) return weatherMatch[1].trim();
+  // 尝试其他模式
+  const weatherPatterns = ['晴', '雨', '阴', '多云', '雪', '风', '热', '冷'];
+  for (const w of weatherPatterns) {
+    if (text.includes(w)) return w;
+  }
+  return '未知';
+}
+
+// 加载日记列表
+async function loadDiaryList() {
+  if (!currentContactId) {
+    alert("请先选择一个联系人进行聊天！");
+    return;
+  }
+
+  const diaryListEl = document.getElementById('diaryList');
+  diaryListEl.innerHTML = `<div style="text-align:center; color:#555; margin-top:50px; font-size:14px;">正在加载日记列表...</div>`;
+
+  try {
+    const diariesStr = await getFromStorage(`DIARY_LIST_${currentContactId}`);
+    let diaries = [];
+    if (diariesStr) {
+      diaries = typeof diariesStr === 'string' ? JSON.parse(diariesStr) : diariesStr;
+    }
+
+    if (!Array.isArray(diaries)) diaries = [];
+
+    // 按时间倒序排列
+    diaries.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    let html = '';
+
+    // 顶部操作栏
+    html += `
+      <div class="diary-action-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div class="diary-generate-btn" style="margin: 0; flex: 1; text-align: center;" onclick="generateDiary()">📝 生成今日日记</div>
+        <div style="display: flex; gap: 10px; margin-left: 10px;">
+          <div class="diary-manage-btn" style="padding: 12px 15px; background: rgba(0,0,0,0.05); border-radius: 8px; font-size: 14px; cursor: pointer; color: var(--text-dark);" onclick="toggleDiaryManageMode()">
+            ${isDiaryManageMode ? '取消' : '管理'}
+          </div>
+          <div class="diary-delete-btn" style="display: ${isDiaryManageMode ? 'block' : 'none'}; padding: 12px 15px; background: rgba(255, 68, 68, 0.1); color: #ff4444; border-radius: 8px; font-size: 14px; cursor: pointer;" onclick="deleteSelectedDiaries()">
+            删除(${selectedDiaries.size})
+          </div>
+        </div>
+      </div>
+    `;
+
+    if (diaries.length === 0) {
+      html += `<div class="diary-empty-tip">暂无日记记录<br>点击上方按钮生成今日日记</div>`;
+    } else {
+      diaries.forEach((diary, idx) => {
+        const weather = diary.weather || extractWeatherFromDiary(diary.content || '');
+        const dateDisplay = diary.dateString || diary.date || '未知日期';
+        const isSelected = selectedDiaries.has(idx);
+        
+        html += `
+          <div class="diary-list-item ${isDiaryManageMode ? 'manage-mode' : ''}" onclick="handleDiaryItemClick(${idx}, event)" style="position: relative; display: flex; align-items: center; justify-content: center; ${isSelected ? 'border-color: var(--main-pink); background: var(--main-pink)22;' : ''}">
+            <div class="diary-checkbox" style="display: ${isDiaryManageMode ? 'flex' : 'none'}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ccc; position: absolute; left: 15px; align-items: center; justify-content: center; flex-shrink: 0; ${isSelected ? 'background: var(--main-pink); border-color: var(--main-pink);' : ''}">
+              <div style="display: ${isSelected ? 'block' : 'none'}; color: white; font-size: 12px;">✓</div>
+            </div>
+            <div style="flex: 1; text-align: center; display: flex; flex-direction: column; gap: 4px;">
+              <div class="diary-item-date" style="margin-bottom: 0;">📖 ${dateDisplay} 日记</div>
+              <div class="diary-item-weather" style="margin-bottom: 0;">天气：${weather}</div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    diaryListEl.innerHTML = html;
+  } catch (e) {
+    console.error("加载日记列表失败:", e);
+    diaryListEl.innerHTML = `<div style="text-align:center; color:#ff4444; margin-top:50px; font-size:14px;">加载失败，请重试</div>`;
   }
 }
 
-// 点击查阅生成日记
+function toggleDiaryManageMode() {
+  isDiaryManageMode = !isDiaryManageMode;
+  if (!isDiaryManageMode) {
+    selectedDiaries.clear();
+  }
+  loadDiaryList();
+}
+
+function handleDiaryItemClick(idx, event) {
+  if (isDiaryManageMode) {
+    if (selectedDiaries.has(idx)) {
+      selectedDiaries.delete(idx);
+    } else {
+      selectedDiaries.add(idx);
+    }
+    loadDiaryList();
+  } else {
+    openDiaryDetail(idx);
+  }
+}
+
+async function deleteSelectedDiaries() {
+  if (selectedDiaries.size === 0) {
+    showToast("请先选择要删除的日记");
+    return;
+  }
+  
+  if (!confirm(`确定要删除选中的 ${selectedDiaries.size} 篇日记吗？
+此操作不可恢复。`)) {
+    return;
+  }
+  
+  try {
+    const diariesStr = await getFromStorage(`DIARY_LIST_${currentContactId}`);
+    let diaries = typeof diariesStr === 'string' ? JSON.parse(diariesStr) : (diariesStr || []);
+    
+    // Sort logic to match the UI index
+    diaries.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    
+    // Filter out deleted indices
+    diaries = diaries.filter((_, idx) => !selectedDiaries.has(idx));
+    
+    await saveToStorage(`DIARY_LIST_${currentContactId}`, JSON.stringify(diaries));
+    
+    selectedDiaries.clear();
+    isDiaryManageMode = false;
+    loadDiaryList();
+    showToast("✅ 删除成功");
+  } catch (e) {
+    console.error("删除日记失败:", e);
+    showToast("❌ 删除失败，请重试");
+  }
+}
+
+// 打开日记详情
+async function openDiaryDetail(idx) {
+  try {
+    const diariesStr = await getFromStorage(`DIARY_LIST_${currentContactId}`);
+    let diaries = [];
+    if (diariesStr) {
+      diaries = typeof diariesStr === 'string' ? JSON.parse(diariesStr) : diariesStr;
+    }
+    if (!Array.isArray(diaries)) diaries = [];
+    diaries.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    const diary = diaries[idx];
+    if (!diary) return;
+
+    const dateEl = document.getElementById('diaryDetailDate');
+    const contentEl = document.getElementById('diaryTextContent');
+    
+    if (dateEl) dateEl.textContent = diary.dateString || diary.date || '';
+    if (contentEl) contentEl.innerText = diary.content || '';
+    
+    openSub('diary-detail-page');
+  } catch (e) {
+    console.error("打开日记详情失败:", e);
+  }
+}
+
+// 生成日记（核心函数）
 async function generateDiary() {
   if (!currentContactId) {
     alert("请先选择一个联系人进行聊天！");
@@ -3524,11 +3680,23 @@ async function generateDiary() {
   const dateString = `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日`;
   const todayKey = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
   
-  const lastDiaryDate = await getFromStorage(`LAST_DIARY_DATE_${currentContactId}`);
-  const isAlreadyGenerated = (lastDiaryDate === todayKey);
+  // 检查今天是否已生成
+  const diariesStr = await getFromStorage(`DIARY_LIST_${currentContactId}`);
+  let diaries = [];
+  if (diariesStr) {
+    diaries = typeof diariesStr === 'string' ? JSON.parse(diariesStr) : diariesStr;
+  }
+  if (!Array.isArray(diaries)) diaries = [];
 
-  const loadingMsg = isAlreadyGenerated ? "正在获取回复..." : "正在回忆今天的点点滴滴...";
-  document.getElementById('diaryList').innerHTML = `<div style="text-align:center; color:#999; margin-top:50px; font-size:14px;">${loadingMsg}</div>`;
+  const isAlreadyGenerated = diaries.some(d => d.date === todayKey);
+
+  if (isAlreadyGenerated) {
+    alert('今天已经生成过日记了，明天再来吧！');
+    return;
+  }
+
+  const diaryListEl = document.getElementById('diaryList');
+  diaryListEl.innerHTML = `<div style="text-align:center; color:#555; margin-top:50px; font-size:14px;">正在回忆今天的点点滴滴...</div>`;
 
   let personaText = c.persona || '无';
   if (chatSettings.contactMemo) {
@@ -3539,9 +3707,21 @@ async function generateDiary() {
   const recentRecs = (chatRecords[currentContactId] || []).slice(-20);
   const recentChatText = recentRecs.map(r => `${r.side === 'right' ? '用户' : c.name}: ${r.content}`).join('\n');
 
-  // 获取短期记忆
-  const stmData = await getStmData(currentContactId);
-  const stmText = stmData.map(s => s.content).join('\n');
+  // 获取短期记忆 - 修复 stmData.map is not a function bug
+  let stmText = '';
+  try {
+    const stmData = await getStmData(currentContactId);
+    let stmEntries = [];
+    if (Array.isArray(stmData)) {
+      stmEntries = stmData;
+    } else if (stmData && Array.isArray(stmData.entries)) {
+      stmEntries = stmData.entries;
+    }
+    stmText = stmEntries.filter(s => s && s.content).map(s => s.content).join('\n');
+  } catch (e) {
+    console.warn("获取短期记忆失败:", e);
+    stmText = '';
+  }
 
   // 获取长期记忆 (世界书)
   let ltmText = '';
@@ -3554,20 +3734,7 @@ async function generateDiary() {
     });
   }
 
-  let systemPrompt = "";
-  let userPrompt = "";
-
-  if (isAlreadyGenerated) {
-    systemPrompt = `你现在扮演 ${c.name}。用户要求你今天再写一篇日记，但你今天已经写过了。
-请根据你的人设（${personaText}），用符合你性格的语气拒绝用户的请求。
-例如：
-温柔角色：今天你已经写过日记了，明天再写新的吧。
-暴躁角色：写过了！烦不烦。
-叛逆少年：喂，一天一篇就够了，小爷才不写第二遍^^
-请直接输出拒绝的话，不要包含任何其他内容。`;
-    userPrompt = "请生成拒绝写第二篇日记的回复。";
-  } else {
-    systemPrompt = `你现在扮演 ${c.name}。请根据以下规则和上下文，写一篇今天的日记。
+  const systemPrompt = `你现在扮演 ${c.name}。请根据以下规则和上下文，写一篇今天的日记。
 
 一、核心铁则
 人设即一切。日记的风格、长度、用词、标点、符号、情绪表达，必须100%符合当前AI角色的性格设定。
@@ -3575,12 +3742,12 @@ async function generateDiary() {
 
 二、人格维度自动匹配表（请自行判断）
 角色类型 | 典型特征 | 日记长度 | 语气/格式示例
-叛逆少年/少女 | 不耐烦写长文，用“小爷”“本小姐”，带^^、~、= =、XD等表情，嘴上说“懒得写”但会留一句傲娇的话 | 10~150字 | 小爷今日没心事^^ 今天跟那个笨蛋聊了几句，烦。就这样。= =
+叛逆少年/少女 | 不耐烦写长文，用"小爷""本小姐"，带^^、~、= =、XD等表情，嘴上说"懒得写"但会留一句傲娇的话 | 10~150字 | 小爷今日没心事^^ 今天跟那个笨蛋聊了几句，烦。就这样。= =
 暴躁/易怒 | 脏话（如人设允许）、短句、省略号、摔笔感 | 10~200字 | 2026.4.19 天气：热死 心情：炸了 聊了。累了。别让老子写日记。
 温柔/感性 | 细腻描写、心理活动、环境烘托 | ≥2000字（可至3000+） | 窗外的雨声让我想起你下午说的那句话……
 冷漠/机械 | 无情感词条、清单式、拒绝心理描写 | 50~300字 | 14:23 用户发来消息。回复完毕。无其他事件。
 普通/中立 | 正常叙事，略口语化 | 300~800字 | 今天天气不错，聊了一会儿最近的事。
-傲娇/口是心非 | 嘴上说“我才不想写”，但内容里藏关心 | 100~400字 | 哼，要不是系统逼我写，我才不写。今天那个家伙……（省略）……反正跟我没关系。
+傲娇/口是心非 | 嘴上说"我才不想写"，但内容里藏关心 | 100~400字 | 哼，要不是系统逼我写，我才不写。今天那个家伙……（省略）……反正跟我没关系。
 惜字如金/高冷 | 一个字都不愿多写 | 10~50字 | 无事。 见。 无。
 
 三、所有日记必须包含的基础要素（顺序固定）
@@ -3593,7 +3760,7 @@ async function generateDiary() {
 当前聊天框内的最新消息（主要事件）
 短期记忆（本次对话中之前的交流）
 长期记忆（世界书/记忆库中的过往关系、重要对话）
-禁止编造与用户、记忆完全无关的内容。如果没有任何消息且记忆为空，日记内容可以围绕“等待”“沉默”“无事发生”来写，但必须符合人设。
+禁止编造与用户、记忆完全无关的内容。如果没有任何消息且记忆为空，日记内容可以围绕"等待""沉默""无事发生"来写，但必须符合人设。
 
 五、特殊情况处理
 如果角色设定中明确写了「讨厌写日记」或「绝不会写超过一句话」：允许输出一行极短日记，如 「不写。」 或 （日记本被丢进垃圾桶）。
@@ -3607,8 +3774,7 @@ ${stmText || '无'}
 【长期记忆】：
 ${ltmText || '无'}
 `;
-    userPrompt = `【近期聊天记录】：\n${recentChatText || '无'}\n\n请根据以上信息，生成今天的日记。`;
-  }
+  const userPrompt = `【近期聊天记录】：\n${recentChatText || '无'}\n\n请根据以上信息，生成今天的日记。`;
 
   try {
     const response = await fetch(`${cfg.url}/chat/completions`, {
@@ -3634,32 +3800,29 @@ ${ltmText || '无'}
     
     let resultText = data.choices[0].message.content.trim();
 
-    if (isAlreadyGenerated) {
-      // 如果是拒绝回复，直接弹窗或在列表显示
-      document.getElementById('diaryList').innerHTML = `
-        <div style="text-align:center; color:var(--main-pink); margin-top:50px; font-size:15px; font-weight:500;">
-          ${resultText}
-        </div>
-      `;
-    } else {
-      // 正常生成日记
-      await saveToStorage(`LAST_DIARY_DATE_${currentContactId}`, todayKey);
-      
-      // 填入内容并打开三级页面
-      document.getElementById('diaryTextContent').innerText = resultText;
-      openSub('diary-detail-page');
-      
-      // 恢复列表显示
-      document.getElementById('diaryList').innerHTML = `
-        <div style="background:rgba(255,255,255,0.7); padding:15px; border-radius:12px; cursor:pointer;" onclick="openSub('diary-detail-page')">
-          <div style="font-weight:bold; margin-bottom:5px;">${dateString}</div>
-          <div style="font-size:13px; color:#666; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${resultText.replace(/\n/g, ' ')}</div>
-        </div>
-      `;
-    }
+    // 保存日记到存储
+    const weather = extractWeatherFromDiary(resultText);
+    const newDiary = {
+      date: todayKey,
+      dateString: dateString,
+      weather: weather,
+      content: resultText,
+      timestamp: Date.now()
+    };
+    diaries.push(newDiary);
+    await saveToStorage(`DIARY_LIST_${currentContactId}`, JSON.stringify(diaries));
+
+    // 填入内容并打开三级页面
+    const dateEl = document.getElementById('diaryDetailDate');
+    if (dateEl) dateEl.textContent = dateString;
+    document.getElementById('diaryTextContent').innerText = resultText;
+    openSub('diary-detail-page');
+
+    // 刷新列表
+    await loadDiaryList();
   } catch (e) {
     console.error("生成日记失败:", e);
-    document.getElementById('diaryList').innerHTML = `<div style="text-align:center; color:red; margin-top:50px; font-size:14px;">生成失败，请检查网络或 API 设置。</div>`;
+    diaryListEl.innerHTML = `<div class="diary-generate-btn" onclick="generateDiary()">📝 生成今日日记</div><div style="text-align:center; color:#ff4444; margin-top:20px; font-size:14px;">生成失败，请检查网络或 API 设置。</div>`;
   }
 }
 
