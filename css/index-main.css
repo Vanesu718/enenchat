@@ -1696,3 +1696,6 @@ body.bg-light .blue-card-status { color: #374151; }
   margin-top: 20px;
 }
 .bp-apply-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+/* HIDE AVATARS GLOBAL */
+.hide-avatars-global .msg-avatar { display: none !important; }
