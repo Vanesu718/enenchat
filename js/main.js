@@ -298,9 +298,7 @@ async function getContactWorldBookPrompt(contactId) {
     if (contactSettings.selectedWorldBooks && contactSettings.selectedWorldBooks.length > 0) {
       const selectedEntries = worldBookEntries.filter(e => contactSettings.selectedWorldBooks.includes(e.id));
       selectedEntries.forEach(entry => {
-        if (entry.category === '记忆总结') {
-          activeWorldBooks.push(`[${entry.name}]\n${entry.content}`);
-        } else if (entry.triggerType !== 'keyword') {
+        if (entry.triggerType !== 'keyword') {
           activeWorldBooks.push(`### 世界书设定开始 ###\n[${entry.name} - 设定]\n${sanitizeInput(entry.content)}\n### 世界书设定结束 ###`);
         }
       });
@@ -314,9 +312,10 @@ let contacts = [];
 let chatRecords = {};
 let contactGroups = ['默认'];
 let currentContactId = '';
-let worldBook = '';
-let worldBookEntries = [];
-let writingStyles = [];
+  let worldBook = '';
+  let worldBookEntries = [];
+  let longTermMemories = []; // 专门存储长期记忆
+  let writingStyles = [];
 let activeWritingStyleId = null;
 let userMasks = []; // 存储用户面具数据
 let _editingUserMaskId = null; // 当前正在编辑的面具ID
@@ -372,11 +371,39 @@ async function loadGlobalData() {
     const rawWb = await getFromStorage('WORLD_BOOK');
     worldBook = rawWb || '';
     
-    const rawWbEntries = await getFromStorage('WORLDBOOK_ENTRIES');
-    try {
-      worldBookEntries = rawWbEntries ? (typeof rawWbEntries === 'string' ? JSON.parse(rawWbEntries) : rawWbEntries) : [];
-      if (!Array.isArray(worldBookEntries)) worldBookEntries = [];
-    } catch(e) { console.error('解析世界书失败:', e); worldBookEntries = []; }
+      const rawWbEntries = await getFromStorage('WORLDBOOK_ENTRIES');
+      try {
+        worldBookEntries = rawWbEntries ? (typeof rawWbEntries === 'string' ? JSON.parse(rawWbEntries) : rawWbEntries) : [];
+        if (!Array.isArray(worldBookEntries)) worldBookEntries = [];
+      } catch(e) { console.error('解析世界书失败:', e); worldBookEntries = []; }
+
+      // 自动迁移：将世界书中的“记忆总结”迁移到 longTermMemories
+      let needsMigration = false;
+      const migratedLtm = [];
+      const remainingWb = [];
+      
+      worldBookEntries.forEach(entry => {
+        if (entry.category === '记忆总结') {
+          migratedLtm.push(entry);
+          needsMigration = true;
+        } else {
+          remainingWb.push(entry);
+        }
+      });
+
+      if (needsMigration) {
+        console.log(`迁移了 ${migratedLtm.length} 条长期记忆`);
+        worldBookEntries = remainingWb;
+        longTermMemories = migratedLtm;
+        await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+        await saveToStorage('LONG_TERM_MEMORIES', JSON.stringify(longTermMemories));
+      } else {
+        const rawLtm = await getFromStorage('LONG_TERM_MEMORIES');
+        try {
+          longTermMemories = rawLtm ? (typeof rawLtm === 'string' ? JSON.parse(rawLtm) : rawLtm) : [];
+          if (!Array.isArray(longTermMemories)) longTermMemories = [];
+        } catch(e) { console.error('解析长期记忆失败:', e); longTermMemories = []; }
+      }
 
       const rawUserMasks = await getFromStorage('USER_MASKS');
       try {
@@ -1341,6 +1368,12 @@ async function openChatPage(contact) {
   const ringClass = contact.isMarried && !contact.isGroup ? 'class="ring-avatar-frame"' : '';
   document.getElementById('chatHeaderAvatar').innerHTML = `<div ${ringClass}><img src="${contact.avatar}"></div>`;
   
+  // 更新钻戒图标显示状态
+  const ringIcon = document.getElementById('chatHeaderRing');
+  if (ringIcon) {
+    ringIcon.style.display = (contact.isMarried && !contact.isGroup) ? 'inline-block' : 'none';
+  }
+  
   // 初始化群聊发言人索引
   if (contact.isGroup) {
     if (typeof window.groupSpeakerIndices === 'undefined') {
@@ -1711,10 +1744,20 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
       }
     }
 
+    const moreBtn = document.createElement('div');
+    moreBtn.className = 'msg-more-btn';
+    moreBtn.innerHTML = '<img src="ICON/更多.png" alt="更多">';
+    moreBtn.onclick = (e) => {
+      if (window.isBatchDeleteMode) return;
+      e.stopPropagation();
+      showHoverMenu(bubble, moreBtn);
+    };
+
     div.innerHTML = `
       <div class="check-icon">✓</div>
     `;
     div.appendChild(bubbleWrapper);
+    div.appendChild(moreBtn);
     
   } else {
       bubble.className = 'msg-bubble';
@@ -1779,6 +1822,15 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
           box.onclick = (e) => { if(window.isBatchDeleteMode) return; e.stopPropagation(); };
         }
         bubble.appendChild(box);
+      } else if (type === 'image_text') {
+        bubble.style.cssText = `padding: 20px 15px; background: #fdfbf7 !important; border: 1px solid #e8e4d9 !important; border-radius: 12px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05) !important; display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 240px; min-height: 80px; box-sizing: border-box;`;
+        if (qhtml) bubble.innerHTML = qhtml;
+        
+        const topText = document.createElement('div');
+        topText.style.cssText = `font-size: 16px !important; color: #555555 !important; font-family: "YouYuan", "SimHei", "黑体", sans-serif !important; text-align: center; word-break: break-all; white-space: pre-wrap; width: 100%; line-height: 1.6;`;
+        topText.innerText = content;
+        
+        bubble.appendChild(topText);
       } else {
         let parsedContent = parseTextBeautify(content);
       // AI表情包替换：在parseTextBeautify之后执行，因为[]不会被转义
@@ -1848,11 +1900,21 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
 
     let avatarHtml = `<div class="msg-avatar${ringClass}"><img src="${avatar}"></div>`;
 
+    const moreBtn = document.createElement('div');
+    moreBtn.className = 'msg-more-btn';
+    moreBtn.innerHTML = '<img src="ICON/更多.png" alt="更多">';
+    moreBtn.onclick = (e) => {
+      if (window.isBatchDeleteMode) return;
+      e.stopPropagation();
+      showHoverMenu(bubble, moreBtn);
+    };
+
     div.innerHTML = `
       <div class="check-icon">✓</div>
       ${avatarHtml}
     `;
     div.appendChild(bubbleWrapper);
+    div.appendChild(moreBtn);
   }
 
   div.onclick = () => {
@@ -1952,7 +2014,10 @@ function replyToMsg(content, btn) {
   replyMsg = { content, shortContent: short };
   document.getElementById('replyTip').style.display = 'flex';
   document.getElementById('replyContent').innerHTML = short;
-  btn.closest('.msg-menu').style.display = 'none';
+  if (btn) {
+    const menu = btn.closest('.msg-menu');
+    if (menu) menu.style.display = 'none';
+  }
 }
 function cancelReply() {
   replyMsg = null;
@@ -2234,10 +2299,10 @@ async function isKeywordFoundInLocalContext(contactId, keywords, providedStmText
   // 3. 长期记忆 (LTM)
   let ltmText = providedLtmText;
   if (ltmText === null) {
-    const settings = await getChatSettings(contactId);
-    if (settings.selectedWorldBooks && settings.selectedWorldBooks.length > 0) {
-      const selectedEntries = worldBookEntries.filter(e => settings.selectedWorldBooks.includes(e.id) && e.category === '记忆总结');
-      ltmText = selectedEntries.map(e => e.content).join('\n');
+    const contact = contacts.find(c => c.id === contactId);
+    if (contact) {
+      const contactLtmEntries = longTermMemories.filter(e => e.category === '长期记忆' && e.name.includes(contact.name));
+      ltmText = contactLtmEntries.map(e => e.content).join('\n');
     }
   }
   if (ltmText && isKeywordsMatch(ltmText, keywords)) return true;
@@ -2588,26 +2653,27 @@ ${c.members.map(id => {
       const recentChatText = recentRecs.map(r => r.content).join('\n');
 
       selectedEntries.forEach(entry => {
-        if (entry.category === '记忆总结') {
-          // 记忆总结默认作为LTM处理
-          ltmContent += `[${entry.name}]\n${entry.content}\n\n`;
-        } else {
-          // 其他世界书根据触发类型处理
-          if (entry.triggerType === 'keyword' && entry.keywords) {
-            // 关键词触发逻辑
-            const keywords = entry.keywords.split(/[,，]/).map(k => k.trim()).filter(k => k);
-            const isTriggered = keywords.some(kw => recentChatText.includes(kw));
-            if (isTriggered) {
-              activeWorldBooks.push(`### 世界书设定开始 ###\n[${entry.name} - 设定]\n${sanitizeInput(entry.content)}\n### 世界书设定结束 ###`);
-              console.log(`[世界书触发] 关键词命中: ${entry.name}`);
-            }
-          } else {
-            // 常驻触发
+        // 其他世界书根据触发类型处理
+        if (entry.triggerType === 'keyword' && entry.keywords) {
+          // 关键词触发逻辑
+          const keywords = entry.keywords.split(/[,，]/).map(k => k.trim()).filter(k => k);
+          const isTriggered = keywords.some(kw => recentChatText.includes(kw));
+          if (isTriggered) {
             activeWorldBooks.push(`### 世界书设定开始 ###\n[${entry.name} - 设定]\n${sanitizeInput(entry.content)}\n### 世界书设定结束 ###`);
+            console.log(`[世界书触发] 关键词命中: ${entry.name}`);
           }
+        } else {
+          // 常驻触发
+          activeWorldBooks.push(`### 世界书设定开始 ###\n[${entry.name} - 设定]\n${sanitizeInput(entry.content)}\n### 世界书设定结束 ###`);
         }
       });
     }
+  }
+
+  // 1.5 提取长期记忆 (LTM)
+  const contactLtmEntries = longTermMemories.filter(e => e.category === '长期记忆' && e.name.includes(currentSpeaker.name));
+  if (contactLtmEntries.length > 0) {
+    ltmContent = contactLtmEntries.map(e => `[${e.name}]\n${e.content}`).join('\n\n') + '\n\n';
   }
 
   // 2. 提取短期记忆 (STM)
@@ -2622,13 +2688,9 @@ ${c.members.map(id => {
       if (privateStmData && privateStmData.entries && privateStmData.entries.length > 0) {
         stmContent += (stmContent ? '\n\n' : '') + '【与你的私聊近期记忆】\n' + privateStmData.entries.map((e, i) => `${i+1}. ${e.content}`).join('\n');
       }
-      const privateSettingsStr = await getFromStorage(`CHAT_SETTINGS_${currentSpeaker.id}`);
-      const privateSettings = privateSettingsStr ? (typeof privateSettingsStr === 'string' ? JSON.parse(privateSettingsStr) : privateSettingsStr) : {};
-      if (privateSettings.selectedWorldBooks && privateSettings.selectedWorldBooks.length > 0) {
-        const privateEntries = worldBookEntries.filter(e => privateSettings.selectedWorldBooks.includes(e.id) && e.category === '记忆总结');
-        if (privateEntries.length > 0) {
-          ltmContent += `\n【与你的私聊长期记忆】\n` + privateEntries.map(e => `[${e.name}]\n${e.content}`).join('\n\n') + `\n\n`;
-        }
+      const privateLtmEntries = longTermMemories.filter(e => e.category === '长期记忆' && e.name.includes(currentSpeaker.name));
+      if (privateLtmEntries.length > 0) {
+        ltmContent += `\n【与你的私聊长期记忆】\n` + privateLtmEntries.map(e => `[${e.name}]\n${e.content}`).join('\n\n') + `\n\n`;
       }
     }
   } catch(e) { console.error('读取STM失败', e); }
@@ -2918,6 +2980,8 @@ ${statusRules}
         let data = {};
         try { data = JSON.parse(r.content); } catch(e) { data = {msg: r.content}; }
         parsedContent = contentPrefix + `[转账：金额 ${data.amount || '未知'}元，备注：${data.msg || '转账给你'}]`;
+      } else if (r.type === 'image_text') {
+        parsedContent = contentPrefix + `[图片内容：${r.content}]`;
       } else if (r.side === 'notif') {
         let plainText = r.content.replace(/<[^>]*>?/gm, '').trim();
         parsedContent = `[系统提示：${plainText}]`;
@@ -3249,35 +3313,34 @@ ${statusRules}
         // 强制限制最多 5 条，防止 AI 话痨
         const limitedLines = lines.slice(0, 5);
 
-        // 先将所有消息存入记录
         if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
-        limitedLines.forEach(line => {
-          chatRecords[requestContactId].push({ side: 'left', content: line, time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData });
-        });
-
-        // 逐条延迟添加到 UI，每条间隔 600ms，模拟真实聊天节奏
-        if (isCurrentContact) {
-          for (let i = 0; i < limitedLines.length; i++) {
-            if (i > 0) {
-              await new Promise(resolve => setTimeout(resolve, 600));
-            }
+        
+        for (let i = 0; i < limitedLines.length; i++) {
+          if (i > 0) {
+            await new Promise(resolve => setTimeout(resolve, 600));
+          }
+          // 逐条存入记录
+          chatRecords[requestContactId].push({ side: 'left', content: limitedLines[i], time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData });
+          await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+          
+          // 如果当前还在这个聊天界面，才添加到UI
+          if (requestContactId === currentContactId) {
             addMsgToUI(limitedLines[i], 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData, false);
           }
         }
       } else {
         // 线下模式：保持原样，整段发送
-        if (isCurrentContact) {
+        if (requestContactId === currentContactId) {
           addMsgToUI(displayText, 'left', currentSpeaker.avatar, null, undefined, undefined, false, c.isGroup ? currentSpeaker.name : null, parsedStatusData, true);
         }
         if (!chatRecords[requestContactId]) chatRecords[requestContactId] = [];
         chatRecords[requestContactId].push({ side: 'left', content: displayText, time: Date.now(), senderId: currentSpeaker.id, statusData: parsedStatusData, isOfflineMsg: true });
+        await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
       }
-
-      await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
     }
     
   // 恢复群聊有序发言功能
-  if (c.isGroup && isCurrentContact) {
+  if (c.isGroup && requestContactId === currentContactId) {
     const validMembers = c.members.map(id => contacts.find(x => x.id === id)).filter(Boolean);
     if (validMembers.length > 0) {
       if (typeof window.groupSpeakerIndices === 'undefined') window.groupSpeakerIndices = {};
@@ -3292,11 +3355,6 @@ ${statusRules}
           }, 1000);
       }
     }
-  }
-
-  // 如果当前在别的聊天窗口，重新渲染聊天记录（因为可能刚好切到了别的窗口，这时候不应该显示刚才那个人的消息）
-  if (!isCurrentContact && document.getElementById('chat-win').classList.contains('show')) {
-      renderChat();
   }
   
   renderContactList();
@@ -3484,6 +3542,9 @@ function toggleAttachPanel() {
 function selectFile(t) {
     if (t === 'image') {
         document.getElementById('chat-img-input').click();
+    } else if (t === 'image_text') {
+        const modal = document.getElementById('imageTextModal');
+        if (modal) modal.style.display = 'flex';
     } else if (t === 'red_packet') {
         if (isOfflineMode) {
             showToast('线下模式不支持发送红包');
@@ -3501,6 +3562,34 @@ function selectFile(t) {
         alert('已选择:' + t);
     }
     hideAllPanels();
+}
+
+async function sendImageText() {
+    const text = document.getElementById('imageTextInput').value.trim();
+    if (!text) {
+        if (typeof showToast === 'function') showToast('请输入图片内容描述');
+        return;
+    }
+    
+    if (typeof lockLastAiAlternatives === 'function') lockLastAiAlternatives();
+
+    const content = text;
+    addMsgToUI(content, 'right', chatSettings.chatUserAvatar || userAvatar, null, undefined, 'image_text');
+    
+    if (!chatRecords[currentContactId]) chatRecords[currentContactId] = [];
+    chatRecords[currentContactId].push({ 
+      side: 'right', 
+      content: content, 
+      type: 'image_text',
+      quote: null, 
+      time: Date.now() 
+    });
+    await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+    
+    document.getElementById('imageTextInput').value = '';
+    document.getElementById('imageTextModal').style.display = 'none';
+    
+    // 不自动触发AI回复，需要用户手动点击小熊按钮
 }
 
 // ----------------------------------------------------------------------
@@ -3742,15 +3831,11 @@ async function generateDiary() {
     stmText = '';
   }
 
-  // 获取长期记忆 (世界书)
+  // 获取长期记忆 (LTM)
   let ltmText = '';
-  if (chatSettings.useWorldBook && chatSettings.selectedWorldBooks && chatSettings.selectedWorldBooks.length > 0) {
-    const selectedEntries = worldBookEntries.filter(e => chatSettings.selectedWorldBooks.includes(e.id));
-    selectedEntries.forEach(entry => {
-      if (entry.category === '记忆总结') {
-        ltmText += `[${entry.name}]\n${entry.content}\n\n`;
-      }
-    });
+  const contactLtmEntries = longTermMemories.filter(e => e.category === '长期记忆' && e.name.includes(c.name));
+  if (contactLtmEntries.length > 0) {
+    ltmText = contactLtmEntries.map(e => `[${e.name}]\n${e.content}`).join('\n\n') + '\n\n';
   }
 
   const systemPrompt = `你现在扮演 ${c.name}。请根据以下规则和上下文，写一篇今天的日记。
@@ -4063,9 +4148,274 @@ function switchChatSettingsTab(tabName) {
   } else if (tabName === 'role') {
     document.getElementById('chat-settings-tab-role').classList.add('active');
     document.querySelector('.settings-tab-btn[onclick="switchChatSettingsTab(\'role\')"]').classList.add('active');
-  } else if (tabName === 'memory') {
-    document.getElementById('chat-settings-tab-memory').classList.add('active');
-    document.querySelector('.settings-tab-btn[onclick="switchChatSettingsTab(\'memory\')"]').classList.add('active');
+    } else if (tabName === 'memory') {
+      document.getElementById('chat-settings-tab-memory').classList.add('active');
+      document.querySelector('.settings-tab-btn[onclick="switchChatSettingsTab(\'memory\')"]').classList.add('active');
+      renderFavorites(); // 切换到记忆标签时渲染收藏列表
+      if (typeof initFavoriteDatePicker === 'function') {
+        initFavoriteDatePicker();
+      }
+    }
+  }
+
+  async function initFavoriteDatePicker() {
+    const dateInput = document.getElementById('favorite-date-input');
+    if (!dateInput) return;
+
+    try {
+      let favorites = await getFromStorage('FAVORITED_MESSAGES');
+      favorites = favorites ? (typeof favorites === 'string' ? JSON.parse(favorites) : favorites) : [];
+      
+      const currentContact = contacts.find(c => c.id === currentContactId);
+      if (currentContact && currentContact.name) {
+        favorites = favorites.filter(fav => fav.contactName === currentContact.name);
+      }
+
+      // 收集有收藏的日期
+      const favoriteDates = new Set();
+      favorites.forEach(fav => {
+        let favDate;
+        if (typeof fav.time === 'string') {
+          favDate = new Date(fav.time.replace(/-/g, '/'));
+        } else {
+          favDate = new Date(fav.time);
+        }
+        if (!isNaN(favDate.getTime())) {
+          const dateStr = `${favDate.getFullYear()}-${String(favDate.getMonth() + 1).padStart(2, '0')}-${String(favDate.getDate()).padStart(2, '0')}`;
+          favoriteDates.add(dateStr);
+        }
+      });
+
+      // 销毁旧的实例
+      if (dateInput._flatpickr) {
+        dateInput._flatpickr.destroy();
+      }
+
+        flatpickr(dateInput, {
+          locale: "zh",
+          dateFormat: "m/d",
+          onChange: function(selectedDates, dateStr, instance) {
+            renderFavorites();
+          },
+        onDayCreate: function(dObj, dStr, fp, dayElem) {
+          // 检查该日期是否有收藏
+          const dateStr = `${dayElem.dateObj.getFullYear()}-${String(dayElem.dateObj.getMonth() + 1).padStart(2, '0')}-${String(dayElem.dateObj.getDate()).padStart(2, '0')}`;
+          if (favoriteDates.has(dateStr)) {
+            dayElem.innerHTML += '<span class="favorite-dot" style="position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:4px; height:4px; background-color:#ff4d4f; border-radius:50%;"></span>';
+          }
+        }
+      });
+    } catch (e) {
+      console.error('初始化日历失败:', e);
+    }
+  }
+
+async function renderFavorites() {
+  const listEl = document.getElementById('favorite-messages-list');
+  if (!listEl) return;
+  
+  const searchInput = document.getElementById('favorite-search-input');
+  const searchQuery = searchInput ? searchInput.value.toLowerCase() : '';
+  
+  const dateInput = document.getElementById('favorite-date-input');
+  const searchDate = dateInput ? dateInput.value : '';
+  
+  try {
+    let favorites = await getFromStorage('FAVORITED_MESSAGES');
+    favorites = favorites ? (typeof favorites === 'string' ? JSON.parse(favorites) : favorites) : [];
+    
+    // 过滤当前联系人的收藏
+    const currentContact = contacts.find(c => c.id === currentContactId);
+    if (currentContact && currentContact.name) {
+      favorites = favorites.filter(fav => fav.contactName === currentContact.name);
+    }
+    
+    if (favorites.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center; color:var(--text-light); font-size:13px; padding:20px;">暂无收藏的消息</div>';
+      return;
+    }
+    
+    // 按时间倒序排列
+    favorites.sort((a, b) => b.time - a.time);
+    
+    // 过滤
+    if (searchQuery || searchDate) {
+      favorites = favorites.filter(fav => {
+        let matchQuery = true;
+        let matchDate = true;
+
+        if (searchQuery) {
+          const content = (fav.content || '').toLowerCase();
+          const name = (fav.contactName || '').toLowerCase();
+          matchQuery = content.includes(searchQuery) || name.includes(searchQuery);
+        }
+
+          if (searchDate) {
+            let favDate;
+            if (typeof fav.time === 'string') {
+              favDate = new Date(fav.time.replace(/-/g, '/'));
+            } else {
+              favDate = new Date(fav.time);
+            }
+  
+            if (!isNaN(favDate.getTime())) {
+              // 解析搜索日期
+              const searchDateObj = new Date(searchDate.replace(/-/g, '/'));
+              if (!isNaN(searchDateObj.getTime())) {
+                const startOfDay = new Date(searchDateObj.getFullYear(), searchDateObj.getMonth(), searchDateObj.getDate(), 0, 0, 0).getTime();
+                const endOfDay = new Date(searchDateObj.getFullYear(), searchDateObj.getMonth(), searchDateObj.getDate(), 23, 59, 59, 999).getTime();
+                const favTime = favDate.getTime();
+                matchDate = favTime >= startOfDay && favTime <= endOfDay;
+              } else {
+                matchDate = false;
+              }
+            } else {
+              matchDate = false;
+            }
+          }
+
+        return matchQuery && matchDate;
+      });
+    }
+    
+    if (favorites.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center; color:var(--text-light); font-size:13px; padding:20px;">没有找到匹配的收藏</div>';
+      return;
+    }
+    
+      listEl.innerHTML = '';
+      favorites.forEach(fav => {
+        let favDate;
+        if (typeof fav.time === 'string') {
+          favDate = new Date(fav.time.replace(/-/g, '/'));
+        } else {
+          favDate = new Date(fav.time);
+        }
+        const timeStr = !isNaN(favDate.getTime()) ? favDate.toLocaleString('zh-CN', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '未知时间';
+        const div = document.createElement('div');
+      div.style.cssText = 'background:rgba(255,255,255,0.8); border-radius:12px; padding:12px; margin-bottom:10px; border:1px solid rgba(0,0,0,0.05); position:relative; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: all 0.2s ease;';
+      
+      // 移除可能存在的 HTML 标签，只显示纯文本预览
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = fav.content;
+      const plainText = tempDiv.textContent || tempDiv.innerText || "[图片/其他信息]";
+      
+        div.innerHTML = `
+          <div onclick="window.showFavoriteDetail('${fav.id}')" style="cursor:pointer;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:14px; font-weight:600; color:var(--text-dark);">${fav.contactName}</span>
+              </div>
+              <span style="font-size:11px; color:var(--text-light);">${timeStr}</span>
+            </div>
+            <div style="font-size:13px; color:var(--text-dark); line-height:1.5; word-break:break-all; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-bottom:4px; opacity:0.85;">
+              ${plainText}
+            </div>
+          </div>
+          <div onclick="event.stopPropagation(); deleteFavorite('${fav.id}')" style="position:absolute; bottom:10px; right:10px; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s ease; z-index:2;" onmouseover="this.style.background='rgba(255,77,79,0.1)'; this.querySelector('svg').style.fill='#ff4d4f'" onmouseout="this.style.background='transparent'; this.querySelector('svg').style.fill='var(--text-light)'" title="删除">
+            <svg viewBox="0 0 24 24" width="14" height="14" style="fill:var(--text-light); transition:fill 0.2s ease;">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+          </div>
+        `;
+      listEl.appendChild(div);
+    });
+  } catch (e) {
+    console.error('渲染收藏列表失败:', e);
+    listEl.innerHTML = '<div style="text-align:center; color:#ff4d4f; font-size:13px; padding:20px;">加载失败</div>';
+  }
+}
+
+    window.showFavoriteDetail = async function(id) {
+      try {
+        let favorites = await getFromStorage('FAVORITED_MESSAGES');
+        favorites = favorites ? (typeof favorites === 'string' ? JSON.parse(favorites) : favorites) : [];
+        const fav = favorites.find(f => f.id === id);
+        if (!fav) return;
+  
+        let favDate;
+        if (typeof fav.time === 'string') {
+          favDate = new Date(fav.time.replace(/-/g, '/'));
+        } else {
+          favDate = new Date(fav.time);
+        }
+        const timeStr = !isNaN(favDate.getTime()) ? favDate.toLocaleString('zh-CN', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '未知时间';
+        
+          const modal = document.createElement('div');
+          modal.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:999999; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s ease;';
+  
+          const content = document.createElement('div');
+          content.style.cssText = 'background:#ffffff; width:85%; max-width:360px; max-height:75vh; border-radius:20px; display:flex; flex-direction:column; box-shadow:0 12px 40px rgba(0,0,0,0.2); transform:translateY(30px) scale(0.95); transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow:hidden; position:relative; z-index:1000000;';
+  
+          // 提取纯文本和图片
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = fav.content;
+          
+          // 提取图片
+          const images = Array.from(tempDiv.querySelectorAll('img')).map(img => `<img src="${img.src}" style="max-width:100%; border-radius:8px; margin-top:8px; display:block;">`).join('');
+          
+          // 提取纯文本
+          // 移除所有图片标签，避免重复显示
+          tempDiv.querySelectorAll('img').forEach(img => img.remove());
+          const plainText = tempDiv.innerHTML.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
+          
+          const displayContent = `
+            <div style="white-space: pre-wrap; word-break: break-word;">${plainText}</div>
+            ${images}
+          `;
+
+          content.innerHTML = `
+            <div style="padding:20px 24px 16px; border-bottom:1px solid rgba(0,0,0,0.06); display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.9); backdrop-filter:blur(10px);">
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <span style="font-size:17px; font-weight:600; color:#1a1a1a; letter-spacing:0.5px;">${fav.contactName}</span>
+                <span style="font-size:13px; color:#8c8c8c;">${timeStr}</span>
+              </div>
+              <div onclick="this.closest('.fav-modal').remove()" style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#f5f5f5; transition:all 0.2s ease;" onmouseover="this.style.background='#e8e8e8'; this.style.transform='rotate(90deg)'" onmouseout="this.style.background='#f5f5f5'; this.style.transform='rotate(0deg)'">
+                <svg viewBox="0 0 24 24" width="18" height="18" style="fill:#595959;">
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+              </div>
+            </div>
+            <div style="padding:24px; overflow-y:auto; font-size:15px; color:#333; line-height:1.7; background:#ffffff; max-height: 60vh; overscroll-behavior: contain;">
+              ${displayContent}
+            </div>
+          `;
+        
+        modal.className = 'fav-modal';
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+        
+        // Trigger animation
+        requestAnimationFrame(() => {
+          modal.style.opacity = '1';
+          content.style.transform = 'translateY(0) scale(1)';
+        });
+        
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.style.opacity = '0';
+            content.style.transform = 'translateY(30px) scale(0.95)';
+            setTimeout(() => modal.remove(), 400);
+          }
+        });
+      } catch (e) {
+        console.error('显示收藏详情失败:', e);
+      }
+    };
+
+  async function deleteFavorite(id) {
+  if (!confirm('确定要删除这条收藏吗？')) return;
+  try {
+    let favorites = await getFromStorage('FAVORITED_MESSAGES');
+    favorites = favorites ? (typeof favorites === 'string' ? JSON.parse(favorites) : favorites) : [];
+    favorites = favorites.filter(f => f.id !== id);
+    await saveToStorage('FAVORITED_MESSAGES', JSON.stringify(favorites));
+    renderFavorites();
+    showToast('🗑️ 已删除收藏');
+  } catch (e) {
+    console.error('删除收藏失败:', e);
+    showToast('❌ 删除失败');
   }
 }
 
@@ -8315,130 +8665,231 @@ window.onload = async () => {
   // 修复方案：统一用 click 事件检测双击（click 在 iOS/Android/桌面端都可靠触发），
   //          touchend 仅作为辅助加速检测，不再做去重过滤
   (function() {
-    let lastTapTime = 0;
-    let lastTapBubble = null;
-    let tapTimeout = null;
-    let doubleTapFired = false; // 防止 touchend 和 click 同时触发双击
     const chatContent = document.getElementById('chatContent');
     
-    // 记录 touchstart 的目标和位置
-    let touchStartTarget = null;
-    let touchStartX = 0;
-    let touchStartY = 0;
-    
-    // 统一的双击检测函数
-    function handleTap(bubble, source) {
-      if (!bubble || !bubble.dataset || bubble.dataset.msgIdx === undefined) {
-        lastTapTime = 0;
-        lastTapBubble = null;
-        return false;
-      }
-      
-      const now = Date.now();
-      
-      if (lastTapBubble === bubble && (now - lastTapTime) > 80 && (now - lastTapTime) < 600) {
-        // 检测到双击（间隔80-600ms，iOS需要更宽的窗口）
-        if (doubleTapFired) return false; // 防止重复触发
-        doubleTapFired = true;
-        setTimeout(function() { doubleTapFired = false; }, 300);
-        if (tapTimeout) { clearTimeout(tapTimeout); tapTimeout = null; }
-        const msgIdx = parseInt(bubble.dataset.msgIdx);
-        lastTapTime = 0;
-        lastTapBubble = null;
-        // 延迟执行，避免 iOS 事件冲突
-        setTimeout(function() { openEditMsg(msgIdx); }, 10);
-        return true; // 表示检测到双击
-      } else {
-        lastTapTime = now;
-        lastTapBubble = bubble;
-        if (tapTimeout) clearTimeout(tapTimeout);
-        tapTimeout = setTimeout(function() {
-          lastTapTime = 0;
-          lastTapBubble = null;
-        }, 650);
-        return false;
-      }
-    }
-    
-    // 从事件目标中查找气泡元素
-    function findBubble(target) {
-      if (!target) return null;
-      if (target.nodeType === 3) target = target.parentNode; // 文本节点
-      return target && target.closest ? target.closest('.msg-bubble, .msg-blue-card') : null;
-    }
-    
-    chatContent.addEventListener('touchstart', function(e) {
-      if (isBatchDeleteMode) return;
-      const touch = e.touches[0];
-      touchStartX = touch ? touch.clientX : 0;
-      touchStartY = touch ? touch.clientY : 0;
-      touchStartTarget = findBubble(e.target);
-    }, { passive: true });
-    
-    chatContent.addEventListener('touchend', function(e) {
-      if (isBatchDeleteMode) return;
-      
-      // 检查是否有明显的滑动（超过15px则不算点击）
-      const touch = e.changedTouches[0];
-      if (touch) {
-        const dx = Math.abs(touch.clientX - touchStartX);
-        const dy = Math.abs(touch.clientY - touchStartY);
-        if (dx > 15 || dy > 15) {
-          touchStartTarget = null;
-          return;
-        }
-      }
-      
-      const bubble = touchStartTarget;
-      touchStartTarget = null;
-      
-      if (handleTap(bubble, 'touchend')) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }, { passive: false });
-    
-    // 核心修复：click 事件是 iOS Safari 上最可靠的 tap 检测方??
-    // iOS Safari 即使在 touch-action: manipulation 下，click 事件也始终会触发
     let clickTimeout = null;
     chatContent.addEventListener('click', function(e) {
       if (isBatchDeleteMode) return;
       
-      const bubble = findBubble(e.target);
-      const isDoubleTap = handleTap(bubble, 'click');
-      
-      if (isDoubleTap) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (clickTimeout) {
-          clearTimeout(clickTimeout);
-          clickTimeout = null;
-        }
-      } else {
-        if (e.target.tagName === 'IMG' && (e.target.classList.contains('zoomable-image') || e.target.classList.contains('ai-emoji') || e.target.style.cursor === 'zoom-in')) {
-          const src = e.target.dataset.src || e.target.src;
-          if (clickTimeout) clearTimeout(clickTimeout);
-          clickTimeout = setTimeout(() => {
-            viewFullImage(src);
-          }, 350);
-        }
+      // This is a single click. If it's on an image, we might want to view it.
+      if (e.target.tagName === 'IMG' && (e.target.classList.contains('zoomable-image') || e.target.classList.contains('ai-emoji') || e.target.style.cursor === 'zoom-in')) {
+        const src = e.target.dataset.src || e.target.src;
+        if (clickTimeout) clearTimeout(clickTimeout);
+        clickTimeout = setTimeout(() => {
+          viewFullImage(src);
+        }, 350);
       }
-    });
+    }, { capture: true });
     
-    // 桌面端后备：使用原生 dblclick 事件
+    // ˺󱸣ʹԭ dblclick ¼
     chatContent.addEventListener('dblclick', function(e) {
       if (isBatchDeleteMode) return;
-      // 如果是触摸设备，跳过（已由 touch/click 处理）
-      if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
       
-      const bubble = findBubble(e.target);
+      let target = e.target;
+      if (target.nodeType === 3) target = target.parentNode;
+      const bubble = target && target.closest ? target.closest('[data-msg-idx]') : null;
+      
       if (bubble && bubble.dataset.msgIdx !== undefined) {
         e.preventDefault();
         e.stopPropagation();
         openEditMsg(parseInt(bubble.dataset.msgIdx));
       }
     });
+
   })();
+
+  // 显示悬浮菜单
+  function showHoverMenu(bubble, btn) {
+    const msgIdx = parseInt(bubble.dataset.msgIdx);
+    if (isNaN(msgIdx)) return;
+
+    // 移除已有的菜单
+    const existingMenu = document.getElementById('longPressMenu');
+    if (existingMenu) existingMenu.remove();
+
+    const menu = document.createElement('div');
+    menu.id = 'longPressMenu';
+    menu.className = 'long-press-menu';
+    
+    menu.innerHTML = `
+        <div class="long-press-menu-item" onclick="handleLongPressAction('quote', ${msgIdx})">
+          <span>引用</span>
+        </div>
+        <div class="long-press-menu-item" onclick="handleLongPressAction('copy', ${msgIdx})">
+          <span>复制</span>
+        </div>
+        <div class="long-press-menu-item" onclick="handleLongPressAction('favorite', ${msgIdx})">
+          <span>收藏</span>
+        </div>
+        <div class="long-press-menu-item" onclick="handleLongPressAction('retract', ${msgIdx})">
+          <span>撤回</span>
+        </div>
+      `;
+
+    // 将菜单添加到气泡内部，并设置气泡为相对定位
+    bubble.style.position = 'relative';
+    menu.style.top = '-28px'; // 距离气泡顶部更近
+    menu.style.left = '50%';
+    
+    bubble.appendChild(menu);
+
+    // 智能边界检测 (防出框)
+    requestAnimationFrame(() => {
+      const menuRect = menu.getBoundingClientRect();
+      const screenRect = document.querySelector('.screen').getBoundingClientRect();
+      
+      // 默认居中
+      let transformX = -50;
+      let arrowLeft = 50;
+
+      // 检测左侧是否出框 (相对于屏幕容器)
+      if (menuRect.left < screenRect.left + 10) {
+        const moveRight = (screenRect.left + 10) - menuRect.left;
+        transformX = -50 + (moveRight / menuRect.width * 100);
+        arrowLeft = 50 - (moveRight / menuRect.width * 100);
+      } 
+      // 检测右侧是否出框
+      else if (menuRect.right > screenRect.right - 10) {
+        const moveLeft = menuRect.right - (screenRect.right - 10);
+        transformX = -50 - (moveLeft / menuRect.width * 100);
+        arrowLeft = 50 + (moveLeft / menuRect.width * 100);
+      }
+
+      // 限制小三角的范围，防止超出菜单
+      arrowLeft = Math.max(15, Math.min(85, arrowLeft));
+
+      menu.style.transform = `translateX(${transformX}%)`;
+      menu.style.setProperty('--arrow-left', `${arrowLeft}%`);
+    });
+
+    // 延迟添加点击外部关闭事件
+    setTimeout(() => {
+      document.addEventListener('click', closeLongPressMenu, { once: true });
+      document.addEventListener('touchstart', closeLongPressMenu, { once: true });
+    }, 0);
+  }
+
+  function closeLongPressMenu(e) {
+    const menu = document.getElementById('longPressMenu');
+    if (menu && (!e || !menu.contains(e.target))) {
+      menu.remove();
+    }
+  }
+
+  window.handleLongPressAction = async function(action, msgIdx) {
+    closeLongPressMenu();
+    const rec = chatRecords[currentContactId] || [];
+    const msg = rec[msgIdx];
+    if (!msg) return;
+
+    switch (action) {
+      case 'quote':
+        replyToMsg(msg.content, document.createElement('div')); // 模拟一个按钮元素传入
+        break;
+      case 'copy':
+        copyMessage(msg.content);
+        break;
+      case 'favorite':
+        favoriteMessage(msg);
+        break;
+      case 'retract':
+        retractMessage(msgIdx);
+        break;
+    }
+  };
+
+  function copyMessage(content) {
+    // 移除可能存在的 HTML 标签
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    const plainText = tempDiv.textContent || tempDiv.innerText || "";
+    
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(plainText).then(() => {
+        showToast('✅ 已复制到剪贴板');
+      }).catch(err => {
+        console.error('复制失败:', err);
+        fallbackCopyTextToClipboard(plainText);
+      });
+    } else {
+      fallbackCopyTextToClipboard(plainText);
+    }
+  }
+
+  function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    // 避免滚动到页面底部
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        showToast('✅ 已复制到剪贴板');
+      } else {
+        showToast('❌ 复制失败，请手动复制');
+      }
+    } catch (err) {
+      console.error('Fallback: 复制失败', err);
+      showToast('❌ 复制失败，请手动复制');
+    }
+    document.body.removeChild(textArea);
+  }
+
+  async function favoriteMessage(msg) {
+    try {
+      let favorites = await getFromStorage('FAVORITED_MESSAGES');
+      favorites = favorites ? (typeof favorites === 'string' ? JSON.parse(favorites) : favorites) : [];
+      
+      const contact = contacts.find(c => c.id === currentContactId);
+      const contactName = contact ? contact.name : '未知联系人';
+      
+      favorites.push({
+        id: Date.now().toString(),
+        contactId: currentContactId,
+        contactName: contactName,
+        content: msg.content,
+        time: msg.time || Date.now(),
+        side: msg.side
+      });
+      
+      await saveToStorage('FAVORITED_MESSAGES', JSON.stringify(favorites));
+      showToast('⭐ 已收藏');
+    } catch (e) {
+      console.error('收藏失败:', e);
+      showToast('❌ 收藏失败');
+    }
+  }
+
+  async function retractMessage(msgIdx) {
+    if (!confirm('确定要撤回这条消息吗？')) return;
+    
+    const rec = chatRecords[currentContactId] || [];
+    if (msgIdx < 0 || msgIdx >= rec.length) return;
+    
+    // 将消息标记为已撤回
+    rec[msgIdx].isHidden = true;
+    rec[msgIdx].isRetracted = true; // 添加一个标记，虽然目前 isHidden 已经足够隐藏它
+    
+    // 可以在这里添加一条系统提示消息 "你撤回了一条消息"
+    const isLeft = rec[msgIdx].side === 'left';
+    const retractMsg = isLeft ? '对方撤回了一条消息' : '你撤回了一条消息';
+    
+    rec.splice(msgIdx + 1, 0, {
+      side: 'notif',
+      type: 'rp_notif',
+      content: `<div style="text-align:center;font-size:12px;color:#999;margin:10px 0;">${retractMsg}</div>`,
+      time: Date.now()
+    });
+
+    await saveToStorage('CHAT_RECORDS', JSON.stringify(chatRecords));
+    renderChat();
+    showToast('↩️ 消息已撤回');
+  }
   
   // 监听签名输入框的变化，实时保存
   const sigEl = document.getElementById('userSignature');
@@ -10418,9 +10869,7 @@ async function refreshMoments() {
         if (contactSettings.selectedWorldBooks && contactSettings.selectedWorldBooks.length > 0) {
           const selectedEntries = worldBookEntries.filter(e => contactSettings.selectedWorldBooks.includes(e.id));
           selectedEntries.forEach(entry => {
-            if (entry.category === '记忆总结') {
-              activeWorldBooks.push(`[${entry.name}]\n${entry.content}`);
-            } else if (entry.triggerType !== 'keyword') {
+            if (entry.triggerType !== 'keyword') {
               activeWorldBooks.push(`### 世界书设定开始 ###\n[${entry.name} - 设定]\n${sanitizeInput(entry.content)}\n### 世界书设定结束 ###`);
             }
           });
@@ -11116,27 +11565,35 @@ const DEFAULT_LTM_PROMPT = `【长期记忆总结 - 生成与归档规则】
 请基于以下10条短期记忆，生成一份长期记忆总结：
 
 **时间跨度：** 覆盖这10条短期记忆所对应的全部对话时间段
-**核心提炼：** 基于10条短期记忆，客观提炼该阶段内发生的主要事件脉络、核心讨论议题、关键进展或结论
+**核心提炼：** 
+1. 合并同类事件：将多条短期记忆中相同主题或连续因果链的事件合并为一条记录，不逐条罗列
+2. 保留关键细节：每个合并后的事件必须保留直接原因与结果，格式为“因……，导致……”
+3. 筛选原则：只记录以下内容——
+   - 关系发生质变的时刻（如首次表白、首次肢体接触）
+   - 角色状态的重大转折（如从抗拒到接受、从稳定到崩溃）
+   - 反复出现的行为模式的首次或最剧烈的一次
+   - 明确的外部事件及其直接后果（如来电、离开、自残）
+
 **要素记录：** 如短期记忆中有多次提及的稳定地点或明确时间节点，可择要记录。人物固定为 {userName} 与 {charName}
 
 生成要求：
 1. 风格：绝对客观、精简，仅陈述事实
-2. 重点：抓准核心重点，忽略次要细节
-3. 字数：严格控制在 300字以内
-4. 禁止进行任何延展性猜测或补充细节`;
+2. 字数：严格控制在300字以内
+3. 禁止延展猜测，禁止补充短期记忆中未提及的细节
+4. 禁止按短期记忆的序号逐条复述，必须合并主题`;
 
 const DEFAULT_STM_PROMPT = `【短期记忆总结 - 生成规则】
-请根据以下10轮对话，生成一条短期记忆总结，严格按照以下格式：
+请根据每10轮对话，生成一条短期记忆总结，严格按照以下格式：
 
-**时间：** [优先记录对话中明确提及的具体时间（如"晚上八点"）。若未提及，则记录当前系统时间]
+**时间：** [优先记录对话中明确提及的具体时间，若无则记录当前系统时间]
 **地点：** [仅在对话内容明确提及具体地点时记录，否则省略此项]
 **人物：** {userName} 与 {charName}
-**事件：** [以客观、概要的叙述，总结这10轮对话的核心内容与关键信息，字数严格100字以内]
+**事件：** [客观、概要叙述核心内容，**必须包含因果链条**。格式要求：使用“因……，导致……”或“……，起因是……，随后……”等结构，明确写出触发原因与结果。字数严格控制在100字以内，因果关键词不可省略。]
 
 要求：
-1. 时间信息优先从对话内容中提取，若无则使用系统时间
+1. 时间信息优先从对话中提取，若无则使用系统时间
 2. 地点仅在明确提及时记录
-3. 事件描述客观、简洁，不添加未提及的内容
+3. 事件描述必须保留“原因 → 行为/结果”的逻辑链条，不添加未提及内容
 4. 总字数控制在100字以内`;
 
 function toggleLtmAuto() {
@@ -11327,8 +11784,9 @@ async function memorySummary() {
 
 // ========== 消息编辑功能 ==========
 let editingMsgIdx = -1;
+let editingLtmId = null;
 
-function openEditMsg(idx) {
+  function openEditMsg(idx) {
   if (isBatchDeleteMode) return;
   const rec = chatRecords[currentContactId] || [];
   if (idx < 0 || idx >= rec.length) return;
@@ -11340,20 +11798,50 @@ function openEditMsg(idx) {
   setTimeout(() => textarea.focus(), 100);
 }
 
-function cancelEditMsg() {
-  editingMsgIdx = -1;
-  if (typeof editingStmIdx !== 'undefined') editingStmIdx = -1;
-  document.getElementById('msgEditModal').style.display = 'none';
+function editLtmEntry(id) {
+  const entry = longTermMemories.find(m => m.id === id);
+  if (!entry) return;
+  
+  editingLtmId = id;
+  const modal = document.getElementById('msgEditModal');
+  const textarea = document.getElementById('msgEditTextarea');
+  
+  textarea.value = entry.content;
+  modal.style.display = 'flex';
+  setTimeout(() => textarea.focus(), 100);
 }
 
-async function confirmEditMsg() {
-  // 判断是编辑消息还是编辑STM
-  if (editingStmIdx >= 0) {
-    await confirmEditStm();
-    return;
+  function cancelEditMsg() {
+    editingMsgIdx = -1;
+    editingLtmId = null;
+    if (typeof editingStmIdx !== 'undefined') editingStmIdx = -1;
+    document.getElementById('msgEditModal').style.display = 'none';
   }
-  
-  if (editingMsgIdx < 0) return;
+
+  async function confirmEditMsg() {
+    // 判断是编辑LTM
+    if (editingLtmId !== null) {
+      const textarea = document.getElementById('msgEditTextarea');
+      const newContent = textarea.value.trim();
+      if (!newContent) { alert('内容不能为空'); return; }
+      
+      const entryIndex = longTermMemories.findIndex(e => e.id === editingLtmId);
+      if (entryIndex !== -1) {
+        longTermMemories[entryIndex].content = newContent;
+        await saveToStorage('LONG_TERM_MEMORIES', JSON.stringify(longTermMemories));
+        renderLtmList();
+      }
+      cancelEditMsg();
+      return;
+    }
+
+    // 判断是编辑消息还是编辑STM
+    if (editingStmIdx >= 0) {
+      await confirmEditStm();
+      return;
+    }
+
+    if (editingMsgIdx < 0) return;
   const rec = chatRecords[currentContactId] || [];
   const textarea = document.getElementById('msgEditTextarea');
   const newContent = textarea.value.trim();
@@ -11380,13 +11868,136 @@ async function saveStmData(contactId, data) {
   await window.storage.setItem(`STM_${contactId}`, JSON.stringify(data));
 }
 
-// 打开短期记忆页面
-async function openStmPage() {
-  toggleChatMenu();
-  if (!currentContactId) { alert('请先选择联系人'); return; }
-  await renderStmList();
-  openSub('stm-page');
-}
+  // 打开短期记忆页面
+  async function openStmPage() {
+    toggleChatMenu();
+    if (!currentContactId) { alert('请先选择联系人'); return; }
+    switchMemoryTab('stm'); // 默认打开短期记忆标签
+    openSub('stm-page');
+  }
+
+  // 切换记忆标签
+  function switchMemoryTab(tab) {
+    const tabStm = document.getElementById('tab-stm');
+    const tabLtm = document.getElementById('tab-ltm');
+    const stmList = document.getElementById('stmList');
+    const ltmList = document.getElementById('ltmList');
+    const stmCount = document.getElementById('stm-count');
+    const stmDeleteBtn = document.getElementById('stm-delete-btn');
+    const stmManualSummaryBtn = document.getElementById('stm-manual-summary-btn');
+
+    if (tab === 'stm') {
+      if (tabStm) {
+        tabStm.style.fontWeight = '600';
+        tabStm.style.color = 'var(--main-pink)';
+        tabStm.style.borderBottom = '2px solid var(--main-pink)';
+      }
+      if (tabLtm) {
+        tabLtm.style.fontWeight = 'normal';
+        tabLtm.style.color = 'var(--text-light)';
+        tabLtm.style.borderBottom = 'none';
+      }
+      if (stmList) stmList.style.display = 'block';
+      if (ltmList) ltmList.style.display = 'none';
+      if (stmCount) stmCount.style.display = 'inline';
+      if (stmDeleteBtn) stmDeleteBtn.style.display = 'block';
+      if (stmManualSummaryBtn) stmManualSummaryBtn.style.display = 'block';
+      renderStmList();
+    } else {
+      if (tabLtm) {
+        tabLtm.style.fontWeight = '600';
+        tabLtm.style.color = 'var(--main-pink)';
+        tabLtm.style.borderBottom = '2px solid var(--main-pink)';
+      }
+      if (tabStm) {
+        tabStm.style.fontWeight = 'normal';
+        tabStm.style.color = 'var(--text-light)';
+        tabStm.style.borderBottom = 'none';
+      }
+      if (ltmList) ltmList.style.display = 'block';
+      if (stmList) stmList.style.display = 'none';
+      if (stmCount) stmCount.style.display = 'none';
+      if (stmDeleteBtn) stmDeleteBtn.style.display = 'none';
+      if (stmManualSummaryBtn) stmManualSummaryBtn.style.display = 'none';
+      renderLtmList();
+    }
+  }
+
+  // 渲染长期记忆列表
+  async function renderLtmList() {
+    const el = document.getElementById('ltmList');
+    if (!el) return;
+    if (!currentContactId) { el.innerHTML = '<div class="empty-tip">暂无长期记忆</div>'; return; }
+
+    const contact = contacts.find(c => c.id === currentContactId);
+    if (!contact) return;
+
+    // 过滤当前角色的长期记忆
+    const ltmEntries = longTermMemories.filter(e => (e.category === '长期记忆' || e.category === '长期总结' || e.category === '记忆总结') && e.name.includes(contact.name));
+
+    if (ltmEntries.length === 0) {
+      el.innerHTML = '<div class="empty-tip">暂无长期记忆</div>';
+      return;
+    }
+
+      el.innerHTML = '';
+      ltmEntries.forEach((entry, index) => {
+        const div = document.createElement('div');
+        div.className = 'stm-item'; // 复用stm-item的样式
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'stm-content';
+        contentDiv.innerHTML = `<span style="color:var(--main-pink); font-weight:bold; margin-right:5px;">${index + 1}.</span><span class="ltm-text-content">${entry.content}</span>`;
+        
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'stm-time';
+        timeDiv.innerText = new Date(entry.timestamp || Date.now()).toLocaleString();
+        
+        const actionsDiv = document.createElement('div');
+        actionsDiv.style.display = 'flex';
+        actionsDiv.style.gap = '10px';
+        actionsDiv.style.position = 'absolute';
+        actionsDiv.style.right = '15px';
+        actionsDiv.style.top = '15px';
+
+        const editBtn = document.createElement('div');
+        editBtn.innerHTML = '✏️';
+        editBtn.style.cursor = 'pointer';
+        editBtn.style.fontSize = '16px';
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          editLtmEntry(entry.id);
+        };
+
+        const delBtn = document.createElement('div');
+        delBtn.innerHTML = '🗑️';
+        delBtn.style.cursor = 'pointer';
+        delBtn.style.fontSize = '16px';
+        delBtn.onclick = async (e) => {
+          e.stopPropagation();
+          if (confirm('确定删除这条长期记忆吗？')) {
+            const idx = longTermMemories.findIndex(x => x.id === entry.id);
+            if (idx !== -1) {
+              longTermMemories.splice(idx, 1);
+              await saveToStorage('LONG_TERM_MEMORIES', JSON.stringify(longTermMemories));
+              renderLtmList();
+            }
+          }
+        };
+        
+        actionsDiv.appendChild(editBtn);
+        actionsDiv.appendChild(delBtn);
+
+        div.ondblclick = () => {
+          editLtmEntry(entry.id);
+        };
+        
+        div.appendChild(contentDiv);
+        div.appendChild(timeDiv);
+        div.appendChild(actionsDiv);
+        el.appendChild(div);
+      });
+  }
 
 // 渲染短期记忆列表
 async function renderStmList() {
@@ -11492,13 +12103,13 @@ async function generateStmEntry(contactId, stm) {
   stm.lastSummarizedIndex = rec.length;
 }
 
-// STM批量删除相关变量
-let isStmBatchDeleteMode = false;
-let selectedStmIndices = [];
-let editingStmIdx = -1;
+  // STM批量删除相关变量
+  let isStmBatchDeleteMode = false;
+  let selectedStmIndices = [];
+  let editingStmIdx = -1;
 
-// 切换STM批量删除模式
-function toggleStmBatchDelete() {
+  // 切换STM批量删除模式
+  function toggleStmBatchDelete() {
   isStmBatchDeleteMode = !isStmBatchDeleteMode;
   selectedStmIndices = [];
   if (isStmBatchDeleteMode) {
@@ -11561,6 +12172,144 @@ async function confirmEditStm() {
   renderStmList();
 }
 
+// 手动归档STM到世界书
+async function manualArchiveStmToWorldBook(contactId, stm) {
+  const c = contacts.find(x => x.id === contactId);
+  if (!c) return;
+
+  const cfgStr = await getFromStorage('AI_CHAT_CONFIG');
+  const cfg = cfgStr ? (typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr) : {};
+  if (!cfg.key || !cfg.url || !cfg.model) {
+    alert('请先配置API');
+    return;
+  }
+
+  // 获取当前聊天设置中的昵称，如果没有则使用全局昵称
+  let chatSettingsForContact = {};
+  const savedSettings = await getFromStorage(`CHAT_SETTINGS_${contactId}`);
+  if (savedSettings) {
+    chatSettingsForContact = typeof savedSettings === 'string' ? JSON.parse(savedSettings) : savedSettings;
+  }
+  const userName = chatSettingsForContact.chatNickname || await getFromStorage('USER_NICKNAME') || '用户';
+
+  // 合并所有短期记忆内容
+  let mergedText = stm.entries.map((e, i) => `${i+1}. ${e.content}`).join('\n');
+
+  const memSettingsStr = await getFromStorage('MEMORY_SETTINGS');
+  const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
+  let ltmPrompt = memSettings.ltmPrompt || DEFAULT_LTM_PROMPT;
+
+  // 替换提示词中的变量
+  ltmPrompt = ltmPrompt
+    .replace(/\{charName\}/g, c.name)
+    .replace(/\{userName\}/g, userName);
+
+  const prompt = ltmPrompt + `\n\n请根据要求归档这 ${stm.entries.length} 条短期记忆：\n` + mergedText;
+
+  try {
+    const res = await fetch(`${cfg.url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
+      body: JSON.stringify({ model: cfg.model, temperature: 0.3, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const archiveText = data.choices?.[0]?.message?.content || mergedText;
+
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+    const entryName = `记忆总结：${c.name} (${timeStr})`;
+
+    // 新建条目，不再追加
+    longTermMemories.push({
+      id: Date.now().toString(),
+      name: entryName,
+      category: '长期记忆',
+      content: archiveText.trim(),
+      timestamp: Date.now()
+    });
+
+    try {
+      await saveToStorage('LONG_TERM_MEMORIES', JSON.stringify(longTermMemories));
+    } catch(e) {
+      console.error('保存长期记忆失败:', e);
+    }
+
+    // 检查是否超过上限，如果超过则删除最老的长期记忆
+    const memorySummaries = longTermMemories.filter(e => (e.category === '长期记忆' || e.category === '长期总结' || e.category === '记忆总结') && e.name.includes(c.name));
+    const ltmMaxEntries = memSettings.ltmMaxEntries || 20;
+    if (memorySummaries.length > ltmMaxEntries) {
+        const oldest = memorySummaries[0];
+        const oldIdx = longTermMemories.findIndex(e => e.id === oldest.id);
+        if (oldIdx > -1) {
+            longTermMemories.splice(oldIdx, 1);
+            try {
+                await saveToStorage('LONG_TERM_MEMORIES', JSON.stringify(longTermMemories));
+            } catch(e) {
+                console.error('保存长期记忆失败:', e);
+            }
+        }
+    }
+
+    // 清空短期记忆
+    stm.entries = [];
+    try {
+      await saveToStorage(`STM_${contactId}`, JSON.stringify(stm));
+    } catch(e) {
+      console.error('清空短期记忆失败:', e);
+    }
+
+    if (document.getElementById('ltmList') && document.getElementById('ltmList').style.display !== 'none') {
+        renderLtmList();
+    }
+    if (document.getElementById('stmList') && document.getElementById('stmList').style.display !== 'none') {
+        renderStmList();
+    }
+    
+    // 更新数量显示
+    const stmCount = document.getElementById('stm-count');
+    if (stmCount) {
+      const memSettingsStr = await getFromStorage('MEMORY_SETTINGS');
+      const memSettings = memSettingsStr ? (typeof memSettingsStr === 'string' ? JSON.parse(memSettingsStr) : memSettingsStr) : {};
+      const windowSize = memSettings.stmWindowSize || 10;
+      stmCount.textContent = `0/${windowSize}`;
+    }
+
+    alert('手动总结成功！');
+  } catch (e) { 
+    console.error('总结失败:', e); 
+    alert('手动总结失败，请检查网络或API配置。');
+  }
+}
+
+// 处理手动总结按钮点击
+async function handleManualSummary() {
+  if (!currentContactId) return;
+  
+  const stmStr = await getFromStorage(`STM_${currentContactId}`);
+  let stm = stmStr ? (typeof stmStr === 'string' ? JSON.parse(stmStr) : stmStr) : { entries: [] };
+  
+  if (!stm.entries || stm.entries.length === 0) {
+    alert('当前没有短期记忆可以总结');
+    return;
+  }
+  
+  if (confirm(`确定要手动总结当前的 ${stm.entries.length} 条短期记忆吗？\n总结成功后，这 ${stm.entries.length} 条短期记忆将被清空并归档到长期记忆中。`)) {
+    // 显示加载状态
+    const btn = document.getElementById('stm-manual-summary-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '总结中...';
+    btn.style.pointerEvents = 'none';
+    btn.style.opacity = '0.7';
+    
+    await manualArchiveStmToWorldBook(currentContactId, stm);
+    
+    // 恢复按钮状态
+    btn.textContent = originalText;
+    btn.style.pointerEvents = 'auto';
+    btn.style.opacity = '1';
+  }
+}
+
 // 归档10条STM到世界书
 async function archiveStmToWorldBook(contactId, stm) {
   const c = contacts.find(x => x.id === contactId);
@@ -11605,34 +12354,46 @@ async function archiveStmToWorldBook(contactId, stm) {
     const now = new Date().toLocaleString('zh-CN');
     const separator = `\n\n--- 归档于 ${now} ---\n`;
     
-    // 查找是否已有同名世界书条目
-    const existing = worldBookEntries.find(e => e.name === entryName);
+    // 查找是否已有同名长期记忆条目
+    const existing = longTermMemories.find(e => e.name === entryName);
     if (existing) {
       // 追加内容
       existing.content += separator + archiveText.trim();
     } else {
       // 新建条目
-      worldBookEntries.push({
+      longTermMemories.push({
         id: Date.now().toString(),
         name: entryName,
-        category: '聊天总结',
-        content: archiveText.trim()
+        category: '长期记忆',
+        content: archiveText.trim(),
+        timestamp: Date.now()
       });
     }
     
     try {
-      await saveToStorage('WORLDBOOK_ENTRIES', JSON.stringify(worldBookEntries));
+      await saveToStorage('LONG_TERM_MEMORIES', JSON.stringify(longTermMemories));
     } catch(e) {
-      console.error('寮哄埗鍥哄寲涓栫晫涔﹀け璐?', e);
+      console.error('保存长期记忆失败:', e);
     }
-    renderWorldBookList();
     
-    // 自动关联到聊天
-    if (!chatSettings.selectedWorldBooks) chatSettings.selectedWorldBooks = [];
-    const entry = worldBookEntries.find(e => e.name === entryName);
-    if (entry && !chatSettings.selectedWorldBooks.includes(entry.id)) {
-      chatSettings.selectedWorldBooks.push(entry.id);
-      await saveToStorage(`CHAT_SETTINGS_${contactId}`, JSON.stringify(chatSettings));
+    // 检查是否超过上限，如果超过则删除最旧的长期记忆
+    const memorySummaries = longTermMemories.filter(e => (e.category === '长期记忆' || e.category === '长期总结' || e.category === '记忆总结') && e.name.includes(c.name));
+    const ltmMaxEntries = memSettings.ltmMaxEntries || 20;
+    if (memorySummaries.length > ltmMaxEntries) {
+        const oldest = memorySummaries[0];
+        const oldIdx = longTermMemories.findIndex(e => e.id === oldest.id);
+        if (oldIdx > -1) {
+            longTermMemories.splice(oldIdx, 1);
+            try {
+                await saveToStorage('LONG_TERM_MEMORIES', JSON.stringify(longTermMemories));
+            } catch(e) {
+                console.error('保存长期记忆失败:', e);
+            }
+        }
+    }
+    
+    if (document.getElementById('ltmList') && document.getElementById('ltmList').style.display !== 'none') {
+        renderLtmList();
     }
   } catch (e) { console.error('归档失败:', e); }
 }
@@ -12192,4 +12953,5 @@ function bpSaveAll() {
     document.querySelectorAll('.bp-range').forEach(bpUpdateSliderTrack);
   }, 500);
 })();
+
 

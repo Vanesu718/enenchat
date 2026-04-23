@@ -57,3 +57,9 @@ git_diff*.txt
 # ŔŹťřÎÄźţťă×ÜźĐ  
 temp_trash/
 Temp_Files/
+
+# 其他测试和备份文件
+*.tar
+extract_*.js
+extract_*.py
+js/*_backup_*.js

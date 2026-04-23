@@ -52,6 +52,7 @@
   position: relative; 
 }
 
+
 .msg-item.left { 
   align-self: flex-start; 
 }
@@ -450,3 +451,4 @@
 }
 
 .hide-avatars-global .msg-avatar { display: none !important; }
+

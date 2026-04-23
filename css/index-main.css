@@ -444,6 +444,40 @@ body {
 .chat-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .chat-content { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 .msg-item { display: flex; max-width: 85%; position: relative; }
+
+.msg-more-btn {
+  display: none;
+  align-self: center;
+  margin: 0 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.msg-more-btn img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.msg-item:hover .msg-more-btn {
+  display: flex;
+}
+
+.msg-more-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.msg-more-btn:hover img {
+  opacity: 0.9;
+}
+
 .msg-item.left { align-self: flex-start; }
 .msg-item.right { align-self: flex-end; flex-direction: row-reverse; }
 .msg-avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid #e0e0e0; margin: 0 8px; }
@@ -1026,12 +1060,51 @@ body {
   left: -20%; /* 【修改位置】向左偏移，通常是 (height - 100) / 2 的负数 */
   width: 140%; /* 【修改大小】头像框的宽度，100% 是和头像一样大，140% 是大一圈 */
   height: 140%; /* 【修改大小】头像框的高度，和 width 保持一致 */
-  background-image: url('ring_frame.png');
+  background-image: url('../ring_frame.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   z-index: 10;
   pointer-events: none;
+}
+
+/* 专门针对联系人列表的钻戒头像框大小和图片 */
+.contact-avatar.ring-avatar-frame::after {
+  width: 140% !important;
+  height: 140% !important;
+  top: -20% !important;
+  left: -20% !important;
+  background-image: url('../ring_frame.png') !important;
+}
+
+/* 简约模式下的钻戒头像框 */
+body.theme-blue .blue-card-avatar.ring-avatar-frame {
+  border: none !important;
+}
+body.theme-blue .blue-card-avatar.ring-avatar-frame img {
+  border-radius: 10px !important;
+}
+body.theme-blue .blue-card-avatar.ring-avatar-frame::after {
+  background-image: url('../ICON/简约婚戒测试1.png');
+  mix-blend-mode: screen;
+  width: 122%;
+  height: 115%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0;
+}
+
+/* 钻戒图标 */
+.diamond-ring-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+  vertical-align: middle;
+  display: inline-block;
 }
 
 /* 状态卡片半透明磨砂质感 */
@@ -1108,7 +1181,7 @@ body {
     flex-shrink: 0;
     border: 2px solid var(--main-pink);
     display: flex;
-    margin-left: -3px;
+    margin-left: -4px;
   }
   .blue-card-avatar img {
     width: 100%;
@@ -1121,6 +1194,7 @@ body {
     grid-template-columns: 7fr 4fr;
     gap: 6px;
     padding-right: 4px;
+    margin-left: 6px;
   }
   .bc-status-item {
     background: rgba(255,255,255,0.5);
@@ -1699,3 +1773,41 @@ body.bg-light .blue-card-status { color: #374151; }
 
 /* HIDE AVATARS GLOBAL */
 .hide-avatars-global .msg-avatar { display: none !important; }
+
+/* 长按菜单样式 */
+.long-press-menu {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 20px;
+    padding: 4px 12px;
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+.long-press-menu::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: var(--arrow-left, 50%);
+    transform: translateX(-50%);
+    border-width: 4px 4px 0;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+}
+
+.long-press-menu-item {
+    cursor: pointer;
+    padding: 2px 4px;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.long-press-menu-item:hover {
+    color: #4ade80;
+}

@@ -22,6 +22,8 @@
   <link rel="stylesheet" href="css/emoji.css">
   <link rel="stylesheet" href="css/secret-thought.css">
   <link rel="stylesheet" href="css/diary.css">
+  <!-- 引入 Flatpickr 样式 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
 .icon {
   width: 1em;
@@ -340,10 +342,6 @@
         </div>
         <div style="margin-top:10px;">
           <div class="form-label" style="margin-bottom:4px;">自定义颜色</div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <input type="color" id="customThemeColor" value="#f0b8c8" onchange="document.getElementById('customThemeColorHex').value=this.value; applyCustomColor(this.value)" style="width:50px;height:36px;border:none;cursor:pointer;border-radius:8px;padding:0;">
-            <input type="text" id="customThemeColorHex" value="#f0b8c8" onchange="document.getElementById('customThemeColor').value=this.value; applyCustomColor(this.value)" style="width:80px;height:36px;border:1px solid var(--light-pink);border-radius:8px;padding:0 10px;font-size:14px;outline:none;" placeholder="#HEX">
-          </div>
         </div>
       </div>
     </div>
@@ -887,7 +885,7 @@
             <div class="switch-label">开启自动总结</div>
             <div class="switch-toggle" id="ltm-auto-toggle" onclick="toggleLtmAuto()"></div>
           </div>
-          <div class="setting-desc">🔄 容错说明：如果某次总结失败，系统不会清空历史对话，而是保留下来，并在下一轮对话时自动重试，直到成功为止。</div>
+          <div class="setting-desc"> 容错说明：如果某次总结失败，系统不会清空历史对话，而是保留下来，并在下一轮对话时自动重试，直到成功为止。</div>
           
           <div style="margin-top:15px;">
             <div class="switch-label" style="margin-bottom:8px;">自动总结触发间隔</div>
@@ -905,22 +903,24 @@
 -每条总结约100字，描述一个事件或关键信息，包括背景、经过和影响。 
 -语言客观中立，避免添加未提及内容，保持叙事一致性。 
 -若事件较多，可分组(如按日期或主题)，并在分组前加小标题。</textarea>
-            <div class="setting-desc" style="margin-top:10px; padding:12px; background:rgba(240,184,200,0.1); border-radius:8px; border-left:3px solid var(--main-pink);">
-              <strong style="color:var(--main-pink);">📌 变量替换说明</strong><br><br>
-              本系统在生成记忆总结时，会自动识别并替换以下预设变量，请在编写自定义提示词时直接使用这些变量名。<br><br>
-              <strong>🔹 可用变量：</strong><br><br>
-              <code style="background:#f5f5f5; padding:2px 6px; border-radius:4px; color:#e67e22;">{charName}</code><br>
-              → 自动替换为当前AI扮演的角色名称。<br><br>
-              <code style="background:#f5f5f5; padding:2px 6px; border-radius:4px; color:#e67e22;">{userName}</code><br>
-              → 自动替换为当前用户的昵称/用户名。<br><br>
-              <code style="background:#f5f5f5; padding:2px 6px; border-radius:4px; color:#e67e22;">{timeHeader}</code><br>
-              → 自动替换为系统生成的标准化时间段标记。<br>
-              格式示例：<code style="background:#f5f5f5; padding:2px 6px; border-radius:4px;">【25/01/01 07:00 - 11:00】</code><br><br>
-              <strong style="color:#e67e22;">⚠️ 重要提示：</strong><br>
-              • <strong>变量格式：</strong>请严格使用英文大括号 <code>{}</code> 包裹变量名，例如 <code>{timeHeader}</code>，请勿更改其拼写或格式。<br>
-              • <strong>位置要求：</strong><code>{timeHeader}</code> 必须置于自定义提示词的开头，以确保时间信息能被系统正确识别与记录。<br>
-              • <strong>自动替换：</strong>您只需在提示词中写入变量名，系统会在执行时自动完成内容替换，无需手动填写。
-            </div>
+              <details class="setting-desc" style="margin-top:10px; padding:12px; background:rgba(240,184,200,0.1); border-radius:8px; border-left:3px solid var(--main-pink);">
+                <summary style="color:var(--main-pink); font-weight:bold; cursor:pointer; outline:none;">变量替换说明</summary>
+                <div style="margin-top:10px;">
+                  本系统在生成记忆总结时，会自动识别并替换以下预设变量，请在编写自定义提示词时直接使用这些变量名。<br><br>
+                  <strong>📌 可用变量：</strong><br><br>
+                  <code style="background:#f5f5f5; padding:2px 6px; border-radius:4px; color:#e67e22;">{charName}</code><br>
+                  👉 自动替换为当前AI扮演的角色名称。<br><br>
+                  <code style="background:#f5f5f5; padding:2px 6px; border-radius:4px; color:#e67e22;">{userName}</code><br>
+                  👉 自动替换为当前用户的昵称/用户名称。<br><br>
+                  <code style="background:#f5f5f5; padding:2px 6px; border-radius:4px; color:#e67e22;">{timeHeader}</code><br>
+                  👉 自动替换为系统生成的标准时间头标签。<br>
+                  格式示例：<code style="background:#f5f5f5; padding:2px 6px; border-radius:4px;">【25/01/01 07:00 - 11:00】</code><br><br>
+                  <strong style="color:#e67e22;">⚠️ 重要提示：</strong><br>
+                  • <strong>括号格式：</strong>请严格使用英文大括号 <code>{}</code> 包裹变量名（如 <code>{timeHeader}</code>），否则无法正确解析。<br>
+                  • <strong>位置要求：</strong><code>{timeHeader}</code> 必须放在自定义提示词的开头，以确保时间信息能被系统准确识别和记录。<br>
+                  • <strong>自动替换：</strong>您只需在提示词中写上变量名，系统在执行时会自动将它们替换为真实数据，无需手动填写。
+                </div>
+              </details>
           </div>
         </div>
 
@@ -1110,8 +1110,9 @@
       <div class="chat-header">
         <div class="page-back" onclick="closeSub('chat-win')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
         <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;" onclick="toggleStatusCard()">
-          <div class="page-title" id="chatHeaderTitle" style="margin-left:0; font-size:17px; color: #333333;">聊天</div>
-          <span id="typingStatus" style="display:none; font-size:12px; color: #777777; font-weight:400; white-space:nowrap;">（输入中…）</span>
+          <img src="ICON/钻戒.png" class="diamond-ring-icon" id="chatHeaderRing" style="display:none;" alt="钻戒">
+          <div class="page-title" id="chatHeaderTitle" style="margin-left:0; font-size:17px; color: #333333;">角色</div>
+          <span id="typingStatus" style="display:none; font-size:12px; color: #777777; font-weight:400; white-space:nowrap;">对方正在输入...</span>
         </div>
         <div style="display:flex; align-items:center; margin-left:auto; gap:4px;">
           <div style="cursor:pointer; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size: 18px;" onclick="toggleChatSearch(event)">
@@ -1193,7 +1194,7 @@
         <div onclick="openCoupleSpace()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">情侣空间</div>
         <div onclick="quickReRoll()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">快速重roll</div>
         <div onclick="batchDeleteMsg()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">批量删除</div>
-        <div onclick="openStmPage()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">短期记忆</div>
+        <div onclick="openStmPage()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">查看记忆</div>
         <div onclick="clearChatRecord()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark);">清空记录</div>
         <div onclick="deleteCurrentContact()" style="padding:10px 16px; min-width:140px; cursor:pointer; color:var(--text-dark); border-top:1px solid #f0e8df;">删除联系人</div>
       </div>
@@ -1399,16 +1400,33 @@
 
         <!-- Tab Content: 记忆与高阶 -->
         <div class="settings-tab-content" id="chat-settings-tab-memory">
-        <!-- 关联世界书设置 -->
-        <div class="setting-section">
-          <div class="setting-section-title">关联世界书（用于聊天）</div>
-          <div class="setting-desc">勾选你想在此聊天中使用的世界书条目。可以多选。</div>
-          <div id="worldbook-checkbox-list" style="max-height:200px; overflow-y:auto;">
-            <!-- 动态生成的世界书多选框 -->
+          <!-- 关联世界书条目 -->
+          <div class="setting-section">
+            <div class="setting-section-title">关联世界书（长期记忆）</div>
+            <div class="setting-desc">勾选后，在此聊天中使用的世界书条目，可多选。</div>
+            <div id="worldbook-checkbox-list" style="max-height:200px; overflow-y:auto;">
+              <!-- 动态生成的多选框列表 -->
+            </div>
           </div>
-        </div>
 
-        </div>
+<!-- 收藏的消息 -->
+          <div class="setting-section">
+              <div class="setting-section-title">收藏的消息</div>
+                <div style="display: flex; gap: 10px; margin-top: 10px; margin-bottom: 10px;">
+                <div style="position: relative; width: 80px; flex-shrink: 0;">
+                  <input type="text" id="favorite-date-input" placeholder="选择日期" style="width: 100%; padding: 8px 28px 8px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-size: 13px; background: rgba(255,255,255,0.8); outline: none; box-sizing: border-box; transition: all 0.3s ease; cursor: pointer;" onfocus="this.style.borderColor='var(--main-pink)'; this.style.boxShadow='0 0 0 2px rgba(255,182,193,0.2)'" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='none'">
+                  <svg viewBox="0 0 24 24" width="14" height="14" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); fill: #8c8c8c; pointer-events: none;">
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z"/>
+                  </svg>
+                </div>
+                <input type="text" id="favorite-search-input" placeholder="搜索联系人或消息内容..." style="flex: 1; padding: 8px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-size: 13px; background: rgba(255,255,255,0.8); outline: none; box-sizing: border-box; transition: all 0.3s ease;" onfocus="this.style.borderColor='var(--main-pink)'; this.style.boxShadow='0 0 0 2px rgba(255,182,193,0.2)'" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='none'" oninput="renderFavorites()">
+                </div>
+            <div id="favorite-messages-list" style="max-height:400px; overflow-y:auto; margin-top:10px; padding-right: 5px;">
+              <!-- 动态生成的收藏列表 -->
+            </div>
+          </div>
+
+          </div>
 
         <!-- 保存按钮 -->
         <button class="save-btn" onclick="saveAllChatSettings()">保存所有设置</button>
@@ -2031,23 +2049,36 @@
 
     <input type="file" id="moments-cover-file" accept="image/*" onchange="uploadMomentsCover(this)" style="display:none;">
 
-    <!-- 短期记忆查看页面 -->
+    <!-- 记忆管理页面 -->
     <div class="sub-page" id="stm-page">
       <div class="page-header">
         <div class="page-back" onclick="closeSub('stm-page')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="page-title">📋 短期记忆</div>
+        <div class="page-title">📋 记忆管理</div>
         <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
           <span style="font-size:13px; color:var(--text-light);" id="stm-count">0/10</span>
+          <div style="font-size:14px; color:var(--main-pink); cursor:pointer; padding: 4px 8px; border: 1px solid var(--main-pink); border-radius: 4px;" onclick="handleManualSummary()" id="stm-manual-summary-btn">手动总结</div>
           <div style="font-size:18px; color:var(--main-pink); cursor:pointer;" onclick="toggleStmBatchDelete()" id="stm-delete-btn">🗑️</div>
         </div>
       </div>
-      <div class="page-body" id="stmList">
+      
+      <!-- 记忆类型切换标签 -->
+      <div style="display:flex; border-bottom:1px solid #eee; background:white;">
+        <div id="tab-stm" onclick="switchMemoryTab('stm')" style="flex:1; text-align:center; padding:12px 0; font-size:14px; font-weight:600; color:var(--main-pink); border-bottom:2px solid var(--main-pink); cursor:pointer;">短期记忆</div>
+        <div id="tab-ltm" onclick="switchMemoryTab('ltm')" style="flex:1; text-align:center; padding:12px 0; font-size:14px; color:var(--text-light); cursor:pointer;">长期记忆</div>
+      </div>
+
+      <div class="page-body" id="stmList" style="height:calc(100% - 100px);">
         <div class="empty-tip">暂无短期记忆</div>
       </div>
+      
+      <div class="page-body" id="ltmList" style="display:none; height:calc(100% - 100px);">
+        <div class="empty-tip">暂无长期记忆</div>
+      </div>
+
       <!-- 批量删除底部栏 -->
       <div class="batch-delete-bar" id="stmBatchDeleteBar">
         <div class="cancel" onclick="exitStmBatchDelete()">取消</div>
-        <div class="count" id="stmSelectedCount">已选 0 条</div>
+        <div class="count" id="stmSelectedCount">已选 0 项</div>
         <div class="delete" onclick="confirmDeleteSelectedStm()">删除</div>
       </div>
     </div>
@@ -2114,6 +2145,9 @@
   <script src="js/main.js"></script>
   <script src="js/chat-features.js"></script>
   <script src="js/secret-thought.js"></script>
+  <!-- 引入 Flatpickr 脚本 -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
 <!-- Red Packet Send Modal -->
     <div id="redPacketSendModal" class="rp-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
       <div class="rp-send-card">
@@ -2142,6 +2176,24 @@
         </div>
       </div>
     </div>
+
+    <!-- Image Text Modal -->
+    <div id="imageTextModal" class="rp-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+      <div class="rp-send-card" style="height: auto; min-height: 200px;">
+        <div class="rp-card-top" style="height: 60px; padding-bottom: 0;">
+          <button class="rp-card-close" onclick="document.getElementById('imageTextModal').style.display='none'">&#x2715;</button>
+          <div class="rp-card-title">图片(文字)</div>
+        </div>
+        <div class="rp-card-bottom" style="padding-top: 20px;">
+          <div class="rp-field">
+            <label class="rp-label">图片内容描述</label>
+            <textarea id="imageTextInput" class="rp-textarea" placeholder="请输入图片内容，例如：一只猫头上站着一只耗子的图片" style="height: 80px;"></textarea>
+          </div>
+          <button class="rp-send-btn" onclick="sendImageText()">发送</button>
+        </div>
+      </div>
+    </div>
+
     <div class="secret-trigger-icon" id="triggerIcon" onclick="openPuzzle()"></div>
 
     <div class="puzzle-modal" id="puzzleModal">
