@@ -1744,20 +1744,10 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
       }
     }
 
-    const moreBtn = document.createElement('div');
-    moreBtn.className = 'msg-more-btn';
-    moreBtn.innerHTML = '<img src="ICON/更多.png" alt="更多">';
-    moreBtn.onclick = (e) => {
-      if (window.isBatchDeleteMode) return;
-      e.stopPropagation();
-      showHoverMenu(bubble, moreBtn);
-    };
-
     div.innerHTML = `
-      <div class="check-icon">✓</div>
+      <div class="check-icon"></div>
     `;
     div.appendChild(bubbleWrapper);
-    div.appendChild(moreBtn);
     
   } else {
       bubble.className = 'msg-bubble';
@@ -1900,21 +1890,11 @@ function createMsgElement(content, side, avatar, quote, idx, type, senderName, s
 
     let avatarHtml = `<div class="msg-avatar${ringClass}"><img src="${avatar}"></div>`;
 
-    const moreBtn = document.createElement('div');
-    moreBtn.className = 'msg-more-btn';
-    moreBtn.innerHTML = '<img src="ICON/更多.png" alt="更多">';
-    moreBtn.onclick = (e) => {
-      if (window.isBatchDeleteMode) return;
-      e.stopPropagation();
-      showHoverMenu(bubble, moreBtn);
-    };
-
     div.innerHTML = `
-      <div class="check-icon">✓</div>
+      <div class="check-icon"></div>
       ${avatarHtml}
     `;
     div.appendChild(bubbleWrapper);
-    div.appendChild(moreBtn);
   }
 
   div.onclick = () => {
@@ -2013,12 +1993,8 @@ function replyToMsg(content, btn) {
   short = short.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/\n/g, ' ');
   replyMsg = { content, shortContent: short };
   document.getElementById('replyTip').style.display = 'flex';
-  document.getElementById('replyContent').innerHTML = short;
-  if (btn) {
-    const menu = btn.closest('.msg-menu');
-    if (menu) menu.style.display = 'none';
+    document.getElementById('replyContent').innerHTML = short;
   }
-}
 function cancelReply() {
   replyMsg = null;
   document.getElementById('replyTip').style.display = 'none';
@@ -8668,18 +8644,49 @@ window.onload = async () => {
     const chatContent = document.getElementById('chatContent');
     
     let clickTimeout = null;
-    chatContent.addEventListener('click', function(e) {
-      if (isBatchDeleteMode) return;
+    let longPressTimer = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isLongPressTriggered = false;
+
+    // 拦截原生右键/长按菜单
+    chatContent.addEventListener('contextmenu', function(e) {
+      let target = e.target;
+      if (target.nodeType === 3) target = target.parentNode;
+      const bubble = target && target.closest ? target.closest('[data-msg-idx]') : null;
       
-      // This is a single click. If it's on an image, we might want to view it.
-      if (e.target.tagName === 'IMG' && (e.target.classList.contains('zoomable-image') || e.target.classList.contains('ai-emoji') || e.target.style.cursor === 'zoom-in')) {
-        const src = e.target.dataset.src || e.target.src;
-        if (clickTimeout) clearTimeout(clickTimeout);
-        clickTimeout = setTimeout(() => {
-          viewFullImage(src);
-        }, 350);
+      if (bubble && bubble.dataset.msgIdx !== undefined) {
+        e.preventDefault(); // 阻止系统默认菜单
+        if (isBatchDeleteMode) return;
+        
+        // PC端右键直接显示菜单
+        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          showHoverMenu(bubble, e);
+        }
       }
-    }, { capture: true });
+    });
+
+      chatContent.addEventListener('click', function(e) {
+        if (isBatchDeleteMode) return;
+
+        if (isLongPressTriggered) {
+          e.preventDefault();
+          e.stopPropagation();
+          isLongPressTriggered = false;
+          return;
+        }
+
+        // This is a single click. If it's on an image, we might want to view it.
+        if (e.target.tagName === 'IMG' && (e.target.classList.contains('zoomable-image') || e.target.classList.contains('ai-emoji') || e.target.style.cursor === 'zoom-in')) {
+          const src = e.target.dataset.src || e.target.src;
+          if (clickTimeout) clearTimeout(clickTimeout);
+          clickTimeout = setTimeout(() => {
+            viewFullImage(src);
+          }, 350);
+          return;
+        }
+
+      }, { capture: true });
     
     // ˺󱸣ʹԭ dblclick ¼
     chatContent.addEventListener('dblclick', function(e) {
@@ -8693,6 +8700,62 @@ window.onload = async () => {
         e.preventDefault();
         e.stopPropagation();
         openEditMsg(parseInt(bubble.dataset.msgIdx));
+      }
+    });
+
+    // 手机端长按气泡弹出菜单
+    chatContent.addEventListener('touchstart', function(e) {
+      if (isBatchDeleteMode) return;
+      if (e.touches.length > 1) return;
+
+      let target = e.target;
+      if (target.nodeType === 3) target = target.parentNode;
+      const bubble = target && target.closest ? target.closest('[data-msg-idx]') : null;
+
+      if (bubble && bubble.dataset.msgIdx !== undefined) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isLongPressTriggered = false;
+
+        if (longPressTimer) clearTimeout(longPressTimer);
+        longPressTimer = setTimeout(() => {
+          isLongPressTriggered = true;
+          // 震动反馈 (如果设备支持)
+          if (navigator.vibrate) {
+            navigator.vibrate(50);
+          }
+          showHoverMenu(bubble, e);
+        }, 500); // 500ms 触发长按
+      }
+    }, { passive: true });
+
+    chatContent.addEventListener('touchmove', function(e) {
+      if (longPressTimer) {
+        const moveX = e.touches[0].clientX;
+        const moveY = e.touches[0].clientY;
+        // 如果滑动距离超过 10px，取消长按
+        if (Math.abs(moveX - touchStartX) > 10 || Math.abs(moveY - touchStartY) > 10) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+      }
+    }, { passive: true });
+
+    chatContent.addEventListener('touchend', function(e) {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+      // 如果已经触发了长按，阻止后续的点击事件（可选，视具体需求而定）
+      if (isLongPressTriggered) {
+          // e.preventDefault(); // 注意：touchend 中 preventDefault 可能会影响其他逻辑，这里先不加，因为我们主要靠 isLongPressTriggered 标志位
+      }
+    });
+
+    chatContent.addEventListener('touchcancel', function(e) {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
       }
     });
 

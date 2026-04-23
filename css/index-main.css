@@ -445,38 +445,6 @@ body {
 .chat-content { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 .msg-item { display: flex; max-width: 85%; position: relative; }
 
-.msg-more-btn {
-  display: none;
-  align-self: center;
-  margin: 0 8px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.2s ease;
-}
-
-.msg-more-btn img {
-  width: 16px;
-  height: 16px;
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
-}
-
-.msg-item:hover .msg-more-btn {
-  display: flex;
-}
-
-.msg-more-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.msg-more-btn:hover img {
-  opacity: 0.9;
-}
 
 .msg-item.left { align-self: flex-start; }
 .msg-item.right { align-self: flex-end; flex-direction: row-reverse; }
@@ -489,10 +457,6 @@ body {
 .msg-item.left .msg-bubble::after { content: ''; position: absolute; top: var(--left-dec-top, auto); bottom: var(--left-dec-bottom, auto); left: var(--left-dec-left, auto); right: var(--left-dec-right, auto); width: var(--left-dec-size, 30px); height: var(--left-dec-size, 30px); background-image: var(--left-dec-img, none); background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 10; transform: translate(var(--left-dec-tx, 0), var(--left-dec-ty, 0)); }
 .msg-item.right .msg-bubble::after { content: ''; position: absolute; top: var(--right-dec-top, auto); bottom: var(--right-dec-bottom, auto); left: var(--right-dec-left, auto); right: var(--right-dec-right, auto); width: var(--right-dec-size, 30px); height: var(--right-dec-size, 30px); background-image: var(--right-dec-img, none); background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 10; transform: translate(var(--right-dec-tx, 0), var(--right-dec-ty, 0)); }
 .msg-quote { padding: 6px 10px; border-radius: 8px; font-size: 12px; margin-bottom: 6px; line-height: 1.2; background: #f8f5f0; color: #777777; }
-.msg-menu { position: absolute; top: -5px; right: 10px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 99; display: none; pointer-events: none; }
-.msg-item:active .msg-menu { display: block; pointer-events: auto; }
-.msg-menu-item { padding: 6px 12px; font-size: 12px; color: var(--text-dark); cursor: pointer; }
-.msg-menu-item:hover { background: var(--light-pink); }
 .msg-item.selected .msg-bubble { opacity: 0.7; border: 2px solid #ff6b81; }
 .msg-item .check-icon { position: absolute; top: 0; left: 0; width: 20px; height: 20px; background: #ff6b81; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; display: none; }
 .msg-item.selected .check-icon { display: flex; }

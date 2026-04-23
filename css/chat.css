@@ -113,33 +113,6 @@
   color: var(--text-light); 
 }
 
-.msg-menu { 
-  position: absolute; 
-  top: -5px; 
-  right: 10px; 
-  background: #fff; 
-  border-radius: 8px; 
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
-  z-index: 99; 
-  display: none; 
-  pointer-events: none; 
-}
-
-.msg-item:active .msg-menu { 
-  display: block; 
-  pointer-events: auto; 
-}
-
-.msg-menu-item { 
-  padding: 6px 12px; 
-  font-size: 12px; 
-  color: var(--text-dark); 
-  cursor: pointer; 
-}
-
-.msg-menu-item:hover { 
-  background: var(--light-pink); 
-}
 
 .msg-item.selected .msg-bubble { 
   opacity: 0.7; 
@@ -429,9 +402,6 @@
 
 /* 绉诲姩绔槻璇Е */
 @media (hover: none) and (pointer: coarse) {
-  .msg-menu {
-    display: none !important;
-  }
   .msg-row {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
