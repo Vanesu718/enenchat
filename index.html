@@ -1413,13 +1413,13 @@
           <div class="setting-section">
               <div class="setting-section-title">收藏的消息</div>
                 <div style="display: flex; gap: 10px; margin-top: 10px; margin-bottom: 10px;">
-                <div style="position: relative; width: 80px; flex-shrink: 0;">
+                <div style="position: relative; width: 130px; flex-shrink: 0;">
                   <input type="text" id="favorite-date-input" placeholder="选择日期" style="width: 100%; padding: 8px 28px 8px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-size: 13px; background: rgba(255,255,255,0.8); outline: none; box-sizing: border-box; transition: all 0.3s ease; cursor: pointer;" onfocus="this.style.borderColor='var(--main-pink)'; this.style.boxShadow='0 0 0 2px rgba(255,182,193,0.2)'" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='none'">
                   <svg viewBox="0 0 24 24" width="14" height="14" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); fill: #8c8c8c; pointer-events: none;">
                     <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z"/>
                   </svg>
                 </div>
-                <input type="text" id="favorite-search-input" placeholder="搜索联系人或消息内容..." style="flex: 1; padding: 8px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-size: 13px; background: rgba(255,255,255,0.8); outline: none; box-sizing: border-box; transition: all 0.3s ease;" onfocus="this.style.borderColor='var(--main-pink)'; this.style.boxShadow='0 0 0 2px rgba(255,182,193,0.2)'" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='none'" oninput="renderFavorites()">
+                <input type="text" id="favorite-search-input" placeholder="搜索联系人或消息内容..." style="flex: 1; min-width: 0; padding: 8px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-size: 13px; background: rgba(255,255,255,0.8); outline: none; box-sizing: border-box; transition: all 0.3s ease;" onfocus="this.style.borderColor='var(--main-pink)'; this.style.boxShadow='0 0 0 2px rgba(255,182,193,0.2)'" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='none'" oninput="renderFavorites()">
                 </div>
             <div id="favorite-messages-list" style="max-height:400px; overflow-y:auto; margin-top:10px; padding-right: 5px;">
               <!-- 动态生成的收藏列表 -->
