@@ -28,9 +28,23 @@ document.addEventListener('touchstart', function(event) {
 // 统一处理所有输入框的键盘遮挡问题 (iOS/Android/鸿蒙)
 document.addEventListener('focusin', function(e) {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-    setTimeout(() => {
-      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 150); // 短暂延迟等待软键盘动画展开
+    // 排除聊天输入框，避免输入框跳到屏幕中间
+    if (e.target.id === 'chatInput') {
+      setTimeout(() => {
+        const chatContent = document.getElementById('chatContent');
+        if (chatContent) {
+          chatContent.scrollTop = chatContent.scrollHeight;
+        }
+      }, 150);
+      return;
+    }
+    
+    // 避免其他输入框（如搜索框）获取焦点时页面跳动
+    if (e.target.id !== 'searchInput' && !e.target.closest('.search-container') && e.target.id !== 'chatInput') {
+      setTimeout(() => {
+        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150); // 稍微延迟等待软键盘展开
+    }
   }
 });
 
@@ -1970,6 +1984,12 @@ function addMsgToUI(content, side, avatar, quote, idx, type, skipScroll = false,
   }
 
   // 头像显示/隐藏统一由 CSS class hide-avatars-global 控制，无需 inline style
+  
+  // 检查天气关键词
+  if (type !== 'image' && type !== 'red_packet' && type !== 'transfer' && typeof checkChatForWeatherKeywords === 'function') {
+    console.log('[天气] 传入的内容是：', content);
+    checkChatForWeatherKeywords(content);
+  }
 }
 
 // 全屏查看图片
@@ -5245,6 +5265,27 @@ function initChatSettingsPage() {
           <div class="switch-toggle" id="chat-time-awareness-toggle" onclick="toggleTimeAwareness()"></div>
         </div>
         <div class="setting-desc">开启后AI可感知当前时间和对话间隔</div>
+      `;
+      hideAvatarSection.parentNode.insertBefore(weatherSection, hideAvatarSection.nextElementSibling);
+    }
+  }
+  
+  // 天气特效开关（私聊 - 动态插入）
+  if (!document.getElementById('chat-weather-effect-item')) {
+    const hideAvatarToggle = document.getElementById('hide-avatar-toggle');
+    const hideAvatarRow = hideAvatarToggle ? hideAvatarToggle.closest('.switch-row') : null;
+    const hideAvatarSection = hideAvatarRow ? hideAvatarRow.closest('.setting-section') : null;
+    if (hideAvatarSection && hideAvatarSection.parentNode) {
+      const weatherSection = document.createElement('div');
+      weatherSection.className = 'setting-section';
+      weatherSection.id = 'chat-weather-effect-item';
+      weatherSection.innerHTML = `
+        <div class="setting-section-title">天气特效</div>
+        <div class="switch-row">
+          <div class="switch-label">开启天气特效</div>
+          <div class="switch-toggle" id="weather-effect-toggle" onclick="toggleWeatherEffect()"></div>
+        </div>
+        <div class="setting-desc">开启后将根据定位或聊天关键词显示天气特效（晴天/下雨/下雪）</div>
       `;
       hideAvatarSection.parentNode.insertBefore(taSection, hideAvatarSection.nextElementSibling);
     }
@@ -8648,6 +8689,8 @@ window.onload = async () => {
     let touchStartX = 0;
     let touchStartY = 0;
     let isLongPressTriggered = false;
+    let lastTapTime = 0;
+    let lastTapBubbleIdx = null;
 
     // 拦截原生右键/长按菜单
     chatContent.addEventListener('contextmenu', function(e) {
@@ -8746,9 +8789,31 @@ window.onload = async () => {
         clearTimeout(longPressTimer);
         longPressTimer = null;
       }
-      // 如果已经触发了长按，阻止后续的点击事件（可选，视具体需求而定）
+      // 触发已经长按退出，不阻止默认的点击事件，以便选中内容或者其他点击
       if (isLongPressTriggered) {
-          // e.preventDefault(); // 注意：touchend 中 preventDefault 可能会影响其他逻辑，这里先不加，因为我们主要靠 isLongPressTriggered 标志位
+          // e.preventDefault(); // 注意：touchend 的 preventDefault 可能不影响后续逻辑，这里暂不加，因为后面需要由 isLongPressTriggered 标志位
+          return;
+      }
+      
+      if (isBatchDeleteMode) return;
+      
+      let target = e.target;
+      if (target.nodeType === 3) target = target.parentNode;
+      const bubble = target && target.closest ? target.closest('[data-msg-idx]') : null;
+      
+      if (bubble && bubble.dataset.msgIdx !== undefined) {
+        const currentIdx = parseInt(bubble.dataset.msgIdx);
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTapTime;
+        
+        if (tapLength < 300 && tapLength > 0 && lastTapBubbleIdx === currentIdx) {
+          e.preventDefault();
+          openEditMsg(currentIdx);
+          lastTapTime = 0;
+        } else {
+          lastTapTime = currentTime;
+          lastTapBubbleIdx = currentIdx;
+        }
       }
     });
 
@@ -11669,6 +11734,36 @@ function toggleStmAuto() {
   toggle.classList.toggle('active');
 }
 
+  function startRain() {
+    if (typeof applyWeatherEffect === 'function') {
+      applyWeatherEffect('rain');
+    }
+  }
+
+  function toggleWeatherEffect() {
+    const toggle = document.getElementById('weather-effect-toggle');
+    if (toggle) {
+      toggle.classList.toggle('active');
+      const isEnabled = toggle.classList.contains('active');
+      localStorage.setItem('weatherEffectEnabled', isEnabled);
+      
+      if (isEnabled) {
+        if (typeof startRain === 'function') {
+          startRain();
+        }
+        // 开启时自动获取天气并显示特效
+        if (typeof checkWeatherAndApplyEffect === 'function') {
+          checkWeatherAndApplyEffect();
+        }
+      } else {
+        // 关闭时清除已有特效
+        if (typeof clearWeatherEffects === 'function') {
+          clearWeatherEffects();
+        }
+      }
+    }
+  }
+
 function resetLtmPrompt() {
   document.getElementById('ltm-prompt').value = DEFAULT_LTM_PROMPT;
 }
@@ -13016,5 +13111,200 @@ function bpSaveAll() {
     document.querySelectorAll('.bp-range').forEach(bpUpdateSliderTrack);
   }, 500);
 })();
+
+// ========== 天气特效系统 ==========
+let weatherEffectTimer = null;
+
+function checkWeatherAndApplyEffect() {
+  const isEnabled = localStorage.getItem('weatherEffectEnabled') === 'true';
+  if (!isEnabled) {
+    clearWeatherEffects();
+    return;
+  }
+
+  // 尝试获取地理位置和天气
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        fetchWeather(lat, lon);
+      },
+      (error) => {
+        console.warn('获取地理位置失败，无法自动显示天气特效', error);
+      }
+    );
+  }
+}
+
+async function fetchWeather(lat, lon) {
+  try {
+    // 使用 Open-Meteo 免费 API
+    const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+    const data = await response.json();
+    if (data && data.current_weather) {
+      const code = data.current_weather.weathercode;
+      // WMO Weather interpretation codes (WW)
+      // 0: Clear sky
+      // 1, 2, 3: Mainly clear, partly cloudy, and overcast
+      // 51, 53, 55: Drizzle
+      // 61, 63, 65: Rain
+      // 71, 73, 75: Snow fall
+      // 80, 81, 82: Rain showers
+      // 85, 86: Snow showers
+      
+      let weatherType = '';
+      if (code === 0 || code === 1 || code === 2) {
+        weatherType = 'sun';
+      } else if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) {
+        weatherType = 'rain';
+      } else if ([71, 73, 75, 85, 86].includes(code)) {
+        weatherType = 'snow';
+      }
+      
+      if (weatherType) {
+        if (window._isManualWeatherActive) {
+            console.log('[天气] 手动特效展示中，已阻止自动天气更新覆盖');
+            return;
+        }
+        applyWeatherEffect(weatherType);
+      }
+    }
+  } catch (e) {
+    console.error('获取天气失败', e);
+  }
+}
+
+
+function applyWeatherEffect(type) {
+  // Remove existing weather effect container if any
+  const existingEffect = document.getElementById('weather-effect-container');
+  if (existingEffect) {
+    existingEffect.remove();
+  }
+
+  const effectContainer = document.createElement('div');
+  effectContainer.id = 'weather-effect-container';
+  effectContainer.className = `weather-effect ${type}`;
+
+  if (type === 'sun') {
+    effectContainer.innerHTML = '<div class="sun-ray"></div><div class="sun-ray"></div><div class="sun-ray"></div>';
+    for (let i = 0; i < 20; i++) {
+      const mote = document.createElement('div');
+      mote.className = 'sun-mote';
+      mote.style.left = `${Math.random() * 100}%`;
+      mote.style.top = `${Math.random() * 100}%`;
+      mote.style.animationDuration = `${Math.random() * 5 + 3}s`;
+      mote.style.animationDelay = `${Math.random() * 2}s`;
+      effectContainer.appendChild(mote);
+    }
+  } else if (type === 'rain') {
+      for (let i = 0; i < 50; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'rain-drop';
+        drop.style.left = `${Math.random() * 100}%`;
+        drop.style.animationDuration = `${Math.random() * 1.0 + 1.5}s`;
+        drop.style.animationDelay = `${Math.random() * 2}s`;
+        effectContainer.appendChild(drop);
+      }
+  } else if (type === 'snow') {
+    for (let i = 0; i < 30; i++) {
+      const flake = document.createElement('div');
+      flake.className = 'snow-flake';
+      flake.style.left = `${Math.random() * 100}%`;
+      flake.style.animationDuration = `${Math.random() * 3 + 2}s`;
+      flake.style.animationDelay = `${Math.random() * 5}s`;
+      flake.style.opacity = Math.random() * 0.8 + 0.2;
+      flake.style.width = `${Math.random() * 6 + 4}px`;
+      flake.style.height = flake.style.width;
+      effectContainer.appendChild(flake);
+    }
+  } else if (type === 'spring') {
+    for (let i = 0; i < 30; i++) {
+      const petal = document.createElement('div');
+      petal.className = 'spring-petal';
+      petal.style.left = `${Math.random() * 100}%`;
+      petal.style.animationDuration = `${Math.random() * 4 + 3}s`;
+      petal.style.animationDelay = `${Math.random() * 5}s`;
+      petal.style.opacity = Math.random() * 0.6 + 0.4;
+      const size = Math.random() * 6 + 8;
+      petal.style.width = `${size}px`;
+      petal.style.height = `${size}px`;
+      effectContainer.appendChild(petal);
+    }
+  }
+
+  document.body.appendChild(effectContainer);
+  console.log('[天气] 特效已挂载，父节点是：', effectContainer.parentNode);
+  
+  // 10秒后自动清除特效
+  if (window.weatherEffectTimeout) {
+    clearTimeout(window.weatherEffectTimeout);
+  }
+  window.weatherEffectTimeout = setTimeout(() => {
+    clearWeatherEffects();
+  }, 10000);
+}
+
+  window.applyWeatherEffect = applyWeatherEffect;
+
+  function clearWeatherEffects() {
+    const existing = document.getElementById('weather-effect-container');
+  if (existing) {
+    existing.remove();
+  }
+}
+
+// 监听聊天内容，触发天气特效
+  function checkChatForWeatherKeywords(text) {
+    // 移除对天气系统开关的依赖，只要输入关键词就触发
+    // const isEnabled = localStorage.getItem('weatherEffectEnabled') === 'true';
+    // console.log('[天气] 特效开关状态：', isEnabled);
+    // if (!isEnabled) return;
+
+    if (text.includes('下雨') || text.includes('落雨')) {
+      window._isManualWeatherActive = true;
+      applyWeatherEffect('rain');
+      resetWeatherEffectTimer();
+    } else if (text.includes('下雪') || text.includes('雪花') || text.includes('飘雪')) {
+      console.log('[天气] 检测到关键词，准备触发下雪特效');
+      window._isManualWeatherActive = true;
+      applyWeatherEffect('snow');
+      resetWeatherEffectTimer();
+    } else if (text.includes('天晴') || text.includes('出太阳') || text.includes('大太阳') || text.includes('好太阳') || text.includes('阳光') || text.includes('晴天')) {
+      window._isManualWeatherActive = true;
+      applyWeatherEffect('sun');
+      resetWeatherEffectTimer();
+    } else if (text.includes('春天') || text.includes('花瓣')) {
+      console.log('[天气] 检测到关键词，准备触发春天特效');
+      window._isManualWeatherActive = true;
+      applyWeatherEffect('spring');
+      resetWeatherEffectTimer();
+    }
+  }
+
+function resetWeatherEffectTimer() {
+  if (weatherEffectTimer) clearTimeout(weatherEffectTimer);
+  // 10秒后恢复真实天气或清除
+  weatherEffectTimer = setTimeout(() => {
+    window._isManualWeatherActive = false;
+    clearWeatherEffects();
+    checkWeatherAndApplyEffect();
+  }, 10000);
+}
+
+// 在页面加载时初始化天气
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const isEnabled = localStorage.getItem('weatherEffectEnabled') === 'true';
+    const toggle = document.getElementById('weather-effect-toggle');
+    if (toggle && isEnabled) {
+      toggle.classList.add('active');
+    }
+    if (isEnabled) {
+      checkWeatherAndApplyEffect();
+    }
+  }, 2000);
+});
 
 

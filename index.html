@@ -961,6 +961,17 @@
       </div>
       <div class="page-body">
         <div class="form-section">
+          <div class="form-label">天气特效</div>
+          <div class="switch-row">
+            <div class="switch-label">开启天气特效与定位</div>
+            <div class="switch-toggle" id="weather-effect-toggle" onclick="toggleWeatherEffect()"></div>
+          </div>
+          <div class="setting-desc">开启后，聊天界面将自动感知天气变化，并随机触发沉浸式天气特效。</div>
+        </div>
+        
+        <div style="margin:20px 0; border-top:1px solid #f0e8df;"></div>
+
+        <div class="form-section">
           <div class="form-label">数据备份与恢复</div>
           <div class="setting-desc">导出数据为JSON文件，或从备份文件中恢复数据。</div>
           <div style="margin-top:12px; background:#fff8fa; border:1px solid var(--light-pink); border-radius:12px; padding:12px;">
@@ -2212,6 +2223,7 @@
         </div>
     </div>
 
+    <div class="weather-effect"></div>
     </body>
 </html>
 

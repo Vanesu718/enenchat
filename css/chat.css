@@ -1,5 +1,5 @@
 ﻿/* 聊天页面样式 */
-.chat-page { background: var(--bg-cream); }
+.chat-page { background: var(--bg-cream); position: relative; }
 
 .chat-header { 
   height: 50px; 
@@ -422,3 +422,147 @@
 
 .hide-avatars-global .msg-avatar { display: none !important; }
 
+/* 天气特效样式 */
+#weather-effect-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2147483647;
+  overflow: visible !important;
+}
+
+.weather-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* 阳光特效 */
+.weather-effect.sun {
+  z-index: 9998;
+  background: transparent;
+}
+.weather-effect.sun::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at 10% 10%, rgba(255, 245, 200, 0.4) 0%, rgba(255, 230, 150, 0.1) 40%, transparent 70%);
+  pointer-events: none;
+  animation: sun-glow 8s infinite alternate ease-in-out;
+}
+
+.sun-ray {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 100px;
+  background: linear-gradient(to bottom, rgba(255, 255, 200, 0.6) 0%, transparent 100%);
+  transform-origin: top left;
+  filter: blur(15px);
+  animation: sun-rays 6s infinite alternate ease-in-out;
+  pointer-events: none;
+}
+
+.sun-ray:nth-child(1) { top: -10%; left: -10%; --rot: -15deg; }
+.sun-ray:nth-child(2) { top: -5%; left: 20%; --rot: -30deg; animation-delay: 2s; }
+.sun-ray:nth-child(3) { top: 0; left: 50%; --rot: -45deg; animation-delay: 4s; }
+
+.sun-mote {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 200, 0.9);
+  border-radius: 50%;
+  filter: blur(2px);
+  box-shadow: 0 0 10px rgba(255, 255, 200, 0.8);
+  animation: float-mote linear infinite alternate;
+  will-change: transform, opacity;
+}
+
+@keyframes float-mote {
+  0% { transform: translateY(0) scale(0.8); opacity: 0.2; }
+  100% { transform: translateY(-60px) scale(1.5); opacity: 1; }
+}
+
+@keyframes sun-glow {
+  0% { opacity: 0.5; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes sun-rays {
+  0% { opacity: 0.3; transform: scaleY(0.8) translateY(0) rotate(var(--rot)); }
+  100% { opacity: 0.8; transform: scaleY(1.5) translateY(20px) rotate(calc(var(--rot) + 5deg)); }
+}
+
+/* 雨丝特效 */
+.weather-effect.rain {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, transparent 100%);
+}
+  .rain-drop {
+    position: absolute;
+    top: -20px;
+    width: 1px;
+    height: 30px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%);
+    animation: rain-fall linear infinite;
+    will-change: transform;
+  }
+@keyframes rain-fall {
+  0% { transform: translateY(-20px) rotate(15deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh) rotate(15deg); opacity: 0; }
+}
+
+/* 雪花特效 */
+.weather-effect.snow {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+}
+.snow-flake {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  filter: blur(1px);
+  box-shadow: 0 0 5px white;
+  animation: snow-fall linear infinite;
+  will-change: transform;
+}
+@keyframes snow-fall {
+  0% { transform: translateY(-20px) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh) translateX(20px); opacity: 0; }
+}
+
+.weather-effect.spring {
+  background: linear-gradient(to bottom, rgba(255, 182, 193, 0.05) 0%, transparent 100%);
+}
+.spring-petal {
+  position: absolute;
+  top: -20px;
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle at 30% 30%, #ffb6c1, #ff69b4);
+  border-radius: 50% 0 50% 50%;
+  filter: drop-shadow(0 0 4px rgba(255,105,180,0.8));
+  animation: petal-fall linear infinite;
+  will-change: transform;
+}
+@keyframes petal-fall {
+  0% { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh) translateX(50px) rotate(360deg); opacity: 0; }
+}
